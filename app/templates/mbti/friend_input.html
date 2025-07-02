@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}친구 MBTI 평가 - 친구 정보 입력{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">친구 MBTI 평가</h1>
+            <p class="text-gray-600">평가할 친구의 정보를 입력해주세요</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label for="friend_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        친구 이름 *
+                    </label>
+                    <input type="text" 
+                           id="friend_name" 
+                           name="friend_name" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="친구의 이름을 입력하세요">
+                </div>
+
+                <div>
+                    <label for="friend_email" class="block text-sm font-medium text-gray-700 mb-2">
+                        친구 이메일 *
+                    </label>
+                    <input type="email" 
+                           id="friend_email" 
+                           name="friend_email" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="friend@example.com">
+                    <p class="mt-1 text-sm text-gray-500">
+                        이 이메일로 친구의 평가 결과를 확인할 수 있습니다
+                    </p>
+                </div>
+
+                <div>
+                    <label for="friend_description" class="block text-sm font-medium text-gray-700 mb-2">
+                        친구에 대한 간단한 설명 (선택사항)
+                    </label>
+                    <textarea id="friend_description" 
+                              name="friend_description" 
+                              rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="친구에 대한 간단한 설명을 입력하세요"></textarea>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <h3 class="text-sm font-medium text-blue-800 mb-2">💡 어떻게 작동하나요?</h3>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• 친구의 정보를 입력하면 MBTI 테스트 페이지로 이동합니다</li>
+                        <li>• 여러 사람이 같은 이메일로 친구를 평가할 수 있습니다</li>
+                        <li>• 평가 결과는 통계와 함께 친구 이메일로 확인 가능합니다</li>
+                        <li>• 친구 이름이 질문에 자동으로 반영됩니다</li>
+                    </ul>
+                </div>
+
+                <div class="bg-purple-50 border border-purple-200 rounded-md p-4">
+                    <h3 class="text-sm font-medium text-purple-800 mb-2">🔗 URL 공유 기능</h3>
+                    <ul class="text-sm text-purple-700 space-y-1">
+                        <li>• 친구 정보 입력 후 평가 요청 링크를 생성할 수 있습니다</li>
+                        <li>• 링크를 공유하면 친구들이 쉽게 평가할 수 있습니다</li>
+                        <li>• 친구 이름이 질문에 자동으로 표시됩니다</li>
+                    </ul>
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                    MBTI 테스트 시작하기
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <a href="/mbti/" class="text-blue-600 hover:text-blue-800 text-sm">
+                    ← MBTI 홈으로 돌아가기
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

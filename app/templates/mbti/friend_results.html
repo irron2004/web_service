@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}{{ friend_info.name }}님의 MBTI 평가 결과{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- 친구 정보 헤더 -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ friend_info.name }}님의 MBTI 평가 결과</h1>
+            <p class="text-gray-600">{{ friend_info.email }}</p>
+            {% if friend_info.description %}
+            <p class="text-gray-500 mt-2">{{ friend_info.description }}</p>
+            {% endif %}
+        </div>
+
+        {% if statistics.total_evaluations == 0 %}
+        <!-- 평가가 없는 경우 -->
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div class="text-gray-400 mb-4">
+                <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">아직 평가가 없습니다</h3>
+            <p class="text-gray-600 mb-6">친구들이 {{ friend_info.name }}님을 평가하면 결과가 여기에 표시됩니다.</p>
+            <a href="/mbti/friend" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                새로운 평가 시작하기
+            </a>
+        </div>
+        {% else %}
+        <!-- 평가 통계 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- 전체 통계 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 전체 통계</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">총 평가 수</span>
+                        <span class="font-semibold text-blue-600">{{ statistics.total_evaluations }}명</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">가장 많은 MBTI</span>
+                        <span class="font-semibold text-green-600">
+                            {% set max_mbti = statistics.mbti_distribution.items() | max(attribute=1) %}
+                            {{ max_mbti[0] }} ({{ max_mbti[1] }}명)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 평균 점수 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">📈 평균 점수</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">E/I</div>
+                        <div class="font-semibold text-blue-600">{{ statistics.average_scores.E }}/{{ statistics.average_scores.I }}</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">S/N</div>
+                        <div class="font-semibold text-green-600">{{ statistics.average_scores.S }}/{{ statistics.average_scores.N }}</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">T/F</div>
+                        <div class="font-semibold text-purple-600">{{ statistics.average_scores.T }}/{{ statistics.average_scores.F }}</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">J/P</div>
+                        <div class="font-semibold text-orange-600">{{ statistics.average_scores.J }}/{{ statistics.average_scores.P }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MBTI 분포 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">🎯 MBTI 유형 분포</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                {% for mbti_type, count in statistics.mbti_distribution.items() %}
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <div class="text-lg font-bold text-blue-600">{{ mbti_type }}</div>
+                    <div class="text-sm text-gray-600">{{ count }}명</div>
+                    <div class="text-xs text-gray-500">
+                        {{ "%.1f"|format(count / statistics.total_evaluations * 100) }}%
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 최근 평가 -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">🕒 최근 평가 (최대 5개)</h3>
+            <div class="space-y-4">
+                {% for evaluation in statistics.recent_evaluations %}
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-semibold text-gray-900">
+                                {{ evaluation.mbti_type }}
+                                {% if evaluation.evaluator_name %}
+                                <span class="text-sm text-gray-500">({{ evaluation.evaluator_name }}님)</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">
+                                {{ evaluation.created_at.split('T')[0] if evaluation.created_at else '날짜 없음' }}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-600">
+                                E{{ evaluation.scores.E }}/I{{ evaluation.scores.I }}
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                S{{ evaluation.scores.S }}/N{{ evaluation.scores.N }}
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                T{{ evaluation.scores.T }}/F{{ evaluation.scores.F }}
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                J{{ evaluation.scores.J }}/P{{ evaluation.scores.P }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- URL 공유 섹션 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 친구들과 공유하기</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        평가 요청 링크
+                    </label>
+                    <div class="flex">
+                        <input type="text" 
+                               id="share-url" 
+                               value="{{ request.base_url }}mbti/test?friend_email={{ friend_info.email }}" 
+                               readonly
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-600">
+                        <button onclick="copyShareUrl()" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
+                            복사
+                        </button>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">
+                        이 링크를 친구들에게 공유하면 {{ friend_info.name }}님을 평가할 수 있습니다.
+                    </p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        결과 확인 링크
+                    </label>
+                    <div class="flex">
+                        <input type="text" 
+                               id="result-url" 
+                               value="{{ request.base_url }}mbti/friend/{{ friend_info.email }}" 
+                               readonly
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-600">
+                        <button onclick="copyResultUrl()" 
+                                class="bg-green-600 text-white px-4 py-2 rounded-r-md hover:bg-green-700 transition-colors">
+                            복사
+                        </button>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">
+                        이 링크로 {{ friend_info.name }}님의 평가 결과를 확인할 수 있습니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="mt-8 text-center space-x-4">
+            <a href="/mbti/friend" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                새로운 평가 시작하기
+            </a>
+            <a href="/mbti/" class="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-colors">
+                MBTI 홈으로
+            </a>
+        </div>
+
+        <script>
+        function copyShareUrl() {
+            const urlInput = document.getElementById('share-url');
+            urlInput.select();
+            document.execCommand('copy');
+            
+            // 복사 완료 알림
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '복사됨!';
+            button.classList.add('bg-green-600');
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('bg-green-600');
+            }, 2000);
+        }
+        
+        function copyResultUrl() {
+            const urlInput = document.getElementById('result-url');
+            urlInput.select();
+            document.execCommand('copy');
+            
+            // 복사 완료 알림
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '복사됨!';
+            button.classList.add('bg-green-600');
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('bg-green-600');
+            }, 2000);
+        }
+        </script>
+    </div>
+</div>
+{% endblock %} 
