@@ -187,4 +187,110 @@ MIT License
 
 ---
 
-**즐거운 MBTI 테스트와 게임 되세요! 🎮✨** 
+**즐거운 MBTI 테스트와 게임 되세요! 🎮✨**
+
+# Web Service Collection
+
+여러 웹페이지를 한 곳에서 관리하는 저장소입니다.
+
+## 📁 프로젝트 구조
+
+```
+web_service/
+├── mbti-arcade/          # MBTI 테스트 + 아케이드 게임
+│   ├── app/              # FastAPI 애플리케이션
+│   ├── requirements.txt  # Python 의존성
+│   ├── Dockerfile        # Docker 설정
+│   └── test_mbti.py      # MBTI 테스트 스크립트
+├── README.md             # 이 파일
+└── .gitignore           # Git 무시 파일
+```
+
+## 🎯 현재 프로젝트
+
+### MBTI Arcade (`mbti-arcade/`)
+- **기술 스택**: FastAPI, Python, HTML, Tailwind CSS, HTMX, Alpine.js
+- **기능**: 
+  - MBTI 성격 유형 테스트 (24문항, 5점 척도)
+  - 친구 평가 기능 (이름/이메일 입력)
+  - 아케이드 게임 (Snake, Tetris, Puzzle)
+  - 결과 통계 및 차트
+- **배포**: Railway, Render, Vercel 등
+
+## 🚀 새로운 프로젝트 추가하기
+
+새로운 웹페이지를 추가하려면:
+
+1. 루트에 새 폴더 생성 (예: `portfolio/`, `blog/`, `dashboard/`)
+2. 각 폴더에 독립적인 웹 애플리케이션 구성
+3. 각각 별도로 배포 가능
+
+## 📋 배포 가이드
+
+각 프로젝트는 독립적으로 배포할 수 있습니다:
+
+### Railway 배포
+```bash
+cd mbti-arcade
+railway login
+railway init
+railway up
+```
+
+### Render 배포
+- Render 대시보드에서 새 Web Service 생성
+- GitHub 저장소 연결
+- Root Directory를 `mbti-arcade`로 설정
+
+### Vercel 배포
+```bash
+cd mbti-arcade
+vercel
+```
+
+## 🔧 개발 환경
+
+각 프로젝트는 독립적인 개발 환경을 가집니다:
+
+```bash
+# MBTI Arcade 개발
+cd mbti-arcade
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+## 📝 프로젝트 추가 예시
+
+### 포트폴리오 웹사이트
+```
+portfolio/
+├── index.html
+├── styles.css
+└── script.js
+```
+
+### 블로그
+```
+blog/
+├── app/
+├── requirements.txt
+└── Dockerfile
+```
+
+### API 서버
+```
+api/
+├── app/
+├── requirements.txt
+└── Dockerfile
+```
+
+## 🤝 기여하기
+
+각 프로젝트는 독립적으로 관리되며, 필요에 따라 공통 라이브러리를 `shared/` 폴더에 추가할 수 있습니다.
+
+## 📄 라이선스
+
+MIT License 
