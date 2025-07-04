@@ -135,6 +135,7 @@ async def mbti_result(request: Request):
     # 친구 정보 추출
     friend_email = form_data.get("friend_email", "")
     evaluator_name = form_data.get("evaluator_name", "")
+    my_perspective = form_data.get("my_perspective", "")
     
     # Likert 5점 척도 점수 계산
     scores = {"E": 0, "I": 0, "S": 0, "N": 0, "T": 0, "F": 0, "J": 0, "P": 0}

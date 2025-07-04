@@ -28,6 +28,9 @@
     <form method="POST" action="/mbti/result" class="bg-white rounded-lg shadow-lg p-8">
         <!-- 친구 평가 정보 (URL 파라미터에서 가져옴) -->
         <input type="hidden" name="friend_email" value="{{ request.query_params.get('friend_email', '') }}">
+        {% if friend_info and friend_info.my_perspective %}
+        <input type="hidden" name="my_perspective" value="{{ friend_info.my_perspective }}">
+        {% endif %}
         
         <!-- 평가자 정보 입력 -->
         {% if request.query_params.get('friend_email') %}
