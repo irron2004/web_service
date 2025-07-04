@@ -12,23 +12,23 @@ import './StudentDashboard.css';
 const StudentDashboard: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalGames: 15,
     averageScore: 85,
     totalTime: 120,
     streak: 5
   });
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  // const handleLogout = () => {
+  //   logout();
+  //   navigate('/');
+  // };
 
   const startGame = () => {
     navigate('/game');
   };
 
-  if (!user || (user.role !== 'student' && user.role !== 'guest')) {
+  if (!user || user.role !== 'student') {
     return <div>접근 권한이 없습니다.</div>;
   }
 

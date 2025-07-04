@@ -22,7 +22,7 @@ const MathGame: React.FC = () => {
   const [gameState, setGameState] = useState<'loading' | 'playing' | 'finished' | 'submitted'>('loading');
   const [streak, setStreak] = useState(0);
   const [problems, setProblems] = useState<APIProblem[]>([]);
-  const [sessionId, setSessionId] = useState<number | null>(null);
+  const [sessionId] = useState<number | null>(null);
   const [attemptCount, setAttemptCount] = useState<number>(1);
   const [correctCount, setCorrectCount] = useState(0);
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: number }>({});
