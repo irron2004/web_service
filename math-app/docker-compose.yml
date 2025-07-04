@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./math_app.db
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    networks:
+      - math-app-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - math-app-network
+
+networks:
+  math-app-network:
+    driver: bridge 

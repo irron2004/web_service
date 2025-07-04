@@ -1,9 +1,9 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { User } from '../types';
+import type { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (nickname: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
 }
@@ -35,23 +35,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (nickname: string, password: string): Promise<boolean> => {
     try {
-      // 실제로는 API 호출을 해야 하지만, 데모용으로 하드코딩
-      const mockUsers: User[] = [
-        { id: '1', username: 'student1', role: 'student', name: '김철수', grade: 1 },
-        { id: '2', username: 'parent1', role: 'parent', name: '김부모', children: ['1'] },
-        { id: '3', username: 'teacher1', role: 'teacher', name: '이선생님' }
-      ];
+      const response = await fetch('http://localhost:8000/api/v1/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nickname: nickname,
+          password: password
+        }),
+      });
 
-      const foundUser = mockUsers.find(u => u.username === username);
-      
-      if (foundUser) {
-        setUser(foundUser);
-        localStorage.setItem('user', JSON.stringify(foundUser));
+      if (response.ok) {
+        const data = await response.json();
+        const userData: User = {
+          id: data.user_id.toString(),
+          username: data.nickname,
+          role: data.role,
+          name: data.nickname
+        };
+        
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
         return true;
+      } else {
+        const errorData = await response.json();
+        console.error('Login failed:', errorData);
+        return false;
       }
-      return false;
     } catch (error) {
       console.error('Login error:', error);
       return false;

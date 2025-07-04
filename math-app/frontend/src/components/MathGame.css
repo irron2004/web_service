@@ -49,6 +49,38 @@
   padding: 20px;
 }
 
+.loading-container {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.loading-container h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 20px 0;
+  font-weight: bold;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .problem-container {
   background: white;
   border-radius: 20px;
@@ -69,6 +101,51 @@
   margin: 0;
   font-weight: bold;
   font-family: 'Arial', sans-serif;
+}
+
+.attempt-indicator {
+  background: #fff3cd;
+  color: #856404;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.options-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.option-button {
+  background: #f8f9fa;
+  border: 3px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.option-button:hover {
+  background: #e9ecef;
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.option-button.selected {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 .answer-form {
@@ -108,26 +185,125 @@
   transition: all 0.3s ease;
 }
 
-.submit-button:hover {
+.submit-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
 }
 
+.submit-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .streak-indicator {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
   color: white;
   padding: 10px 20px;
-  border-radius: 20px;
+  border-radius: 25px;
   font-weight: bold;
-  font-size: 1.1rem;
   margin-top: 20px;
-  animation: pulse 1s infinite;
+  display: inline-block;
+  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
+  0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+}
+
+.submit-results {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.submit-results h2 {
+  font-size: 2rem;
+  color: #333;
+  margin: 0 0 20px 0;
+  font-weight: bold;
+}
+
+.submit-results p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0 0 30px 0;
+}
+
+.submit-results-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 40px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-results-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+}
+
+.problem-results {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.problem-results h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.results-grid {
+  display: grid;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: white;
+  border-left: 4px solid;
+  font-size: 0.9rem;
+}
+
+.result-item.correct {
+  border-left-color: #28a745;
+  background: #d4edda;
+}
+
+.result-item.incorrect {
+  border-left-color: #dc3545;
+  background: #f8d7da;
+}
+
+.result-item span {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.result-item span:last-child {
+  flex: none;
+  font-size: 1.2rem;
 }
 
 .feedback {
@@ -212,7 +388,7 @@
 .restart-button, .back-to-dashboard {
   padding: 12px 24px;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
@@ -226,7 +402,7 @@
 
 .restart-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 .back-to-dashboard {
@@ -266,15 +442,19 @@
     font-size: 2.5rem;
   }
 
-  .answer-input {
-    width: 150px;
-    padding: 12px;
+  .options-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .option-button {
+    padding: 15px;
     font-size: 1.3rem;
   }
 
   .submit-button {
-    padding: 12px 25px;
-    font-size: 1.1rem;
+    padding: 12px 24px;
+    font-size: 1rem;
   }
 
   .feedback {
@@ -310,15 +490,19 @@
     font-size: 2rem;
   }
 
-  .answer-input {
-    width: 120px;
-    padding: 10px;
+  .options-container {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .option-button {
+    padding: 12px;
     font-size: 1.2rem;
   }
 
   .submit-button {
-    width: 100%;
-    padding: 15px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
 
   .streak-indicator {

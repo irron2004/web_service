@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Math App Backend
+  math-backend:
+    build: ./math-app/backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./math_app.db
+    volumes:
+      - ./math-app/backend:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: math-backend
+
+  # Math App Frontend
+  math-frontend:
+    build: ./math-app/frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - math-backend
+    networks:
+      - web-service-network
+    container_name: math-frontend
+
+  # MBTI Arcade Service
+  mbti-arcade:
+    build: ./mbti-arcade
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./mbti-arcade:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: mbti-arcade
+
+networks:
+  web-service-network:
+    driver: bridge 
