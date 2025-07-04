@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}홈 - Web Service Hub{% endblock %}
+{% block title %}Web Service Hub{% endblock %}
 
 {% block content %}
 <div class="text-center">
-    <!-- 헤더 섹션 -->
     <div class="gradient-bg text-white py-16 rounded-2xl mb-12">
         <h1 class="text-5xl font-bold mb-6">
             🚀 Web Service Hub
@@ -12,155 +11,40 @@
         <p class="text-xl mb-8 max-w-3xl mx-auto">
             다양한 웹 서비스를 한 곳에서 관리하고 접근할 수 있는 중앙 허브입니다.
         </p>
-        <div class="flex justify-center space-x-4">
-            <div class="bg-white bg-opacity-20 rounded-lg px-6 py-3">
-                <div class="text-2xl font-bold">3</div>
-                <div class="text-sm">활성 서비스</div>
-            </div>
-            <div class="bg-white bg-opacity-20 rounded-lg px-6 py-3">
-                <div class="text-2xl font-bold">24/7</div>
-                <div class="text-sm">가동 시간</div>
-            </div>
-        </div>
     </div>
 
-    <!-- 서비스 섹션 -->
+    <!-- 사용 가능한 서비스 -->
     <div class="mb-16">
         <h2 class="text-3xl font-bold text-gray-800 mb-8">🎯 사용 가능한 서비스</h2>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            
-            <!-- MBTI & Arcade Service -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
+        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <!-- 심리검사 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
                 <div class="text-6xl mb-4">🧠</div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-4">심리검사</h3>
-                <p class="text-gray-600 mb-6">
-                    MBTI 성격 유형 테스트와 재미있는 아케이드 게임을 제공합니다.
-                    개인 테스트, 친구 평가, 스네이크, 테트리스, 퍼즐 게임 등이 포함되어 있습니다.
-                </p>
-                <div class="space-y-3">
-                    <a href="http://localhost:8001" 
-                       class="block w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
-                        🧠 MBTI 테스트
-                    </a>
-                    <a href="http://localhost:8001/arcade" 
-                       class="block w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                        🎮 아케이드 게임
-                    </a>
-                </div>
-            </div>
-
-            <!-- Calculate Service -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
-                <div class="text-6xl mb-4">🧮</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">초등수학문제</h3>
-                <p class="text-gray-600 mb-6">
-                    초등학생을 위한 다양한 수학 문제를 제공합니다.
-                    덧셈, 뺄셈, 곱셈, 나눗셈 문제로 기본 연산 능력을 향상시킬 수 있습니다.
-                </p>
-                <div class="space-y-3">
-                    <a href="http://localhost:8002" 
-                       class="block w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                        🧮 수학 문제 풀기
-                    </a>
-                    <a href="http://localhost:8002/problems" 
-                       class="block w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
-                        📚 문제 유형 선택
-                    </a>
-                </div>
-            </div>
-
-            <!-- Math App Service -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
-                <div class="text-6xl mb-4">📊</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Math App</h3>
-                <p class="text-gray-600 mb-6">
-                    수학 학습을 위한 교육용 애플리케이션입니다.
-                    학생, 교사, 부모를 위한 대시보드와 수학 게임을 제공합니다.
-                </p>
-                <div class="space-y-3">
-                    <a href="http://localhost:3000" 
-                       class="block w-full bg-teal-600 text-white px-4 py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium">
-                        📊 Math App 접속
-                    </a>
-                    <a href="http://localhost:8000/api" 
-                       class="block w-full bg-gray-600 text-white px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium">
-                        🔧 API 문서
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 빠른 액세스 섹션 -->
-    <div class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8">⚡ 빠른 액세스</h2>
-        <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            
-            <!-- MBTI 개인 테스트 -->
-            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl p-6 card-hover">
-                <div class="text-4xl mb-3">🧠</div>
-                <h3 class="text-xl font-bold mb-2">MBTI 개인 테스트</h3>
-                <p class="text-purple-100 mb-4">당신의 성격 유형을 알아보세요!</p>
-                <a href="http://localhost:8001/mbti" 
-                   class="inline-block bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium">
-                    테스트 시작
+                <a href="http://localhost:8001/mbti" class="block w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium mb-2">
+                    MBTI
                 </a>
             </div>
 
             <!-- 초등수학문제 -->
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl p-6 card-hover">
-                <div class="text-4xl mb-3">🧮</div>
-                <h3 class="text-xl font-bold mb-2">초등수학문제</h3>
-                <p class="text-blue-100 mb-4">수학 문제를 풀어보세요!</p>
-                <a href="http://localhost:8002" 
-                   class="inline-block bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium">
-                    문제 풀기
+            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
+                <div class="text-6xl mb-4">🧮</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">초등수학 문제</h3>
+                <a href="http://localhost:8002/problems?category=덧셈" class="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium mb-2">
+                    덧셈
+                </a>
+                <a href="http://localhost:8002/problems?category=뺄셈" class="block w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                    뺄셈
                 </a>
             </div>
 
-            <!-- 아케이드 게임 -->
-            <div class="bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-xl p-6 card-hover">
-                <div class="text-4xl mb-3">🎮</div>
-                <h3 class="text-xl font-bold mb-2">아케이드 게임</h3>
-                <p class="text-green-100 mb-4">재미있는 게임을 즐겨보세요!</p>
-                <a href="http://localhost:8001/arcade" 
-                   class="inline-block bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium">
-                    게임 시작
+            <!-- Arcade -->
+            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
+                <div class="text-6xl mb-4">🎮</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Arcade</h3>
+                <a href="http://localhost:8001/arcade" class="block w-full bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium">
+                    게임
                 </a>
-            </div>
-
-            <!-- Math App -->
-            <div class="bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl p-6 card-hover">
-                <div class="text-4xl mb-3">📊</div>
-                <h3 class="text-xl font-bold mb-2">Math App</h3>
-                <p class="text-teal-100 mb-4">수학 학습을 시작해보세요!</p>
-                <a href="http://localhost:3000" 
-                   class="inline-block bg-white text-teal-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium">
-                    앱 접속
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- 통계 섹션 -->
-    <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 서비스 통계</h2>
-        <div class="grid md:grid-cols-4 gap-6">
-            <div class="text-center">
-                <div class="text-3xl font-bold text-purple-600 mb-2">3</div>
-                <div class="text-gray-600">활성 서비스</div>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-green-600 mb-2">100%</div>
-                <div class="text-gray-600">가동률</div>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-blue-600 mb-2">24/7</div>
-                <div class="text-gray-600">지원 시간</div>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-orange-600 mb-2">∞</div>
-                <div class="text-gray-600">확장 가능</div>
             </div>
         </div>
     </div>
