@@ -7,7 +7,7 @@
     <div class="max-w-md mx-auto">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">친구 MBTI 평가</h1>
-            <p class="text-gray-600">평가할 친구의 정보를 입력해주세요</p>
+            <p class="text-gray-600">상대방의 입장에서 MBTI를 평가해보세요</p>
         </div>
 
         <div class="bg-white rounded-lg shadow-lg p-6">
@@ -36,6 +36,21 @@
                            placeholder="friend@example.com">
                     <p class="mt-1 text-sm text-gray-500">
                         이 이메일로 친구의 평가 결과를 확인할 수 있습니다
+                    </p>
+                </div>
+
+                <div>
+                    <label for="my_perspective" id="perspective_label" class="block text-sm font-medium text-gray-700 mb-2">
+                        내가 <span id="friend_name_display">친구</span> 이라고 생각하고 MBTI를 작성해주세요 *
+                    </label>
+                    <input type="text" 
+                           id="my_perspective" 
+                           name="my_perspective" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="예: 내가 김철수라고 생각하고 MBTI를 작성해주세요">
+                    <p class="mt-1 text-sm text-gray-500">
+                        평가할 사람의 이름을 입력하세요. 질문에서 "그 사람은..." 대신 이 이름이 사용됩니다.
                     </p>
                 </div>
 
@@ -83,4 +98,26 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const friendNameInput = document.getElementById('friend_name');
+    const friendNameDisplay = document.getElementById('friend_name_display');
+    
+    // 친구 이름 입력 필드의 값이 변경될 때 라벨 업데이트
+    friendNameInput.addEventListener('input', function() {
+        const friendName = this.value.trim();
+        if (friendName) {
+            friendNameDisplay.textContent = friendName;
+        } else {
+            friendNameDisplay.textContent = '친구';
+        }
+    });
+    
+    // 페이지 로드 시 초기값 설정
+    if (friendNameInput.value.trim()) {
+        friendNameDisplay.textContent = friendNameInput.value.trim();
+    }
+});
+</script>
 {% endblock %} 

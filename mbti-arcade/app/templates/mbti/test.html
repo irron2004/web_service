@@ -54,6 +54,21 @@
                     </p>
                 </div>
             </div>
+            
+            <!-- 상대방 입장에서 MBTI 평가 안내 -->
+            <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p class="text-sm text-yellow-800">
+                    <strong>🎯 평가 방식:</strong> 
+                    {% if friend_info %}
+                        "내가 <strong>{{ friend_info.name }}</strong>이라고 생각하고 MBTI를 작성해주세요"
+                    {% else %}
+                        "내가 [친구 이름]이라고 생각하고 MBTI를 작성해주세요"
+                    {% endif %}
+                </p>
+                <p class="text-xs text-yellow-700 mt-1">
+                    상대방의 입장에서 생각하고 답변해주세요. 객관적인 관찰을 바탕으로 평가해주세요.
+                </p>
+            </div>
         </div>
         {% endif %}
         {% for question in questions %}

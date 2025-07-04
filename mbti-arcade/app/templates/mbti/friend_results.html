@@ -14,6 +14,82 @@
             {% endif %}
         </div>
 
+        <!-- 실제 MBTI 입력/표시 섹션 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">🎯 {{ friend_info.name }}의 실제 MBTI는 무엇인가요?</h3>
+            
+            {% if friend_info.actual_mbti %}
+            <!-- 실제 MBTI가 있는 경우 -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-green-800 mb-1">실제 MBTI:</p>
+                        <p class="text-2xl font-bold text-green-600">{{ friend_info.actual_mbti }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-green-600">업데이트: {{ friend_info.mbti_updated_at.split('T')[0] if friend_info.mbti_updated_at else '날짜 없음' }}</p>
+                        <button onclick="showMbtiForm()" class="text-sm text-green-700 underline hover:text-green-800">
+                            수정하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- 실제 MBTI가 없는 경우 -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p class="text-yellow-800 mb-3">아직 실제 MBTI가 입력되지 않았습니다.</p>
+                <button onclick="showMbtiForm()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                    실제 MBTI 입력하기
+                </button>
+            </div>
+            {% endif %}
+
+            <!-- 실제 MBTI 입력 폼 (숨겨진 상태) -->
+            <div id="mbti-form" class="mt-4 {% if not friend_info.actual_mbti %}hidden{% endif %}">
+                <form method="POST" action="/mbti/update_actual_mbti" class="space-y-4">
+                    <input type="hidden" name="friend_email" value="{{ friend_info.email }}">
+                    <div>
+                        <label for="actual_mbti" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ friend_info.name }}의 실제 MBTI
+                        </label>
+                        <select id="actual_mbti" 
+                                name="actual_mbti" 
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <option value="">MBTI를 선택하세요</option>
+                            <option value="ISTJ" {% if friend_info.actual_mbti == 'ISTJ' %}selected{% endif %}>ISTJ - 청렴결백한 논리주의자</option>
+                            <option value="ISFJ" {% if friend_info.actual_mbti == 'ISFJ' %}selected{% endif %}>ISFJ - 용감한 수호자</option>
+                            <option value="INFJ" {% if friend_info.actual_mbti == 'INFJ' %}selected{% endif %}>INFJ - 선의의 옹호자</option>
+                            <option value="INTJ" {% if friend_info.actual_mbti == 'INTJ' %}selected{% endif %}>INTJ - 용의주도한 전략가</option>
+                            <option value="ISTP" {% if friend_info.actual_mbti == 'ISTP' %}selected{% endif %}>ISTP - 만능 재주꾼</option>
+                            <option value="ISFP" {% if friend_info.actual_mbti == 'ISFP' %}selected{% endif %}>ISFP - 모험을 즐기는 사교형</option>
+                            <option value="INFP" {% if friend_info.actual_mbti == 'INFP' %}selected{% endif %}>INFP - 열정적인 중재자</option>
+                            <option value="INTP" {% if friend_info.actual_mbti == 'INTP' %}selected{% endif %}>INTP - 논리적인 사색가</option>
+                            <option value="ESTP" {% if friend_info.actual_mbti == 'ESTP' %}selected{% endif %}>ESTP - 모험을 즐기는 사업가</option>
+                            <option value="ESFP" {% if friend_info.actual_mbti == 'ESFP' %}selected{% endif %}>ESFP - 자유로운 영혼의 연예인</option>
+                            <option value="ENFP" {% if friend_info.actual_mbti == 'ENFP' %}selected{% endif %}>ENFP - 재기발랄한 활동가</option>
+                            <option value="ENTP" {% if friend_info.actual_mbti == 'ENTP' %}selected{% endif %}>ENTP - 뜨거운 논쟁을 즐기는 변론가</option>
+                            <option value="ESTJ" {% if friend_info.actual_mbti == 'ESTJ' %}selected{% endif %}>ESTJ - 엄격한 관리자</option>
+                            <option value="ESFJ" {% if friend_info.actual_mbti == 'ESFJ' %}selected{% endif %}>ESFJ - 사교적인 외교관</option>
+                            <option value="ENFJ" {% if friend_info.actual_mbti == 'ENFJ' %}selected{% endif %}>ENFJ - 정의로운 사회운동가</option>
+                            <option value="ENTJ" {% if friend_info.actual_mbti == 'ENTJ' %}selected{% endif %}>ENTJ - 대담한 통솔자</option>
+                        </select>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button type="submit" 
+                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                            저장하기
+                        </button>
+                        <button type="button" 
+                                onclick="hideMbtiForm()" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
+                            취소
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {% if statistics.total_evaluations == 0 %}
         <!-- 평가가 없는 경우 -->
         <div class="bg-white rounded-lg shadow-lg p-8 text-center">
@@ -46,6 +122,12 @@
                             {{ max_mbti[0] }} ({{ max_mbti[1] }}명)
                         </span>
                     </div>
+                    {% if friend_info.actual_mbti %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">실제 MBTI</span>
+                        <span class="font-semibold text-purple-600">{{ friend_info.actual_mbti }}</span>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -78,12 +160,15 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-4">🎯 MBTI 유형 분포</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
                 {% for mbti_type, count in statistics.mbti_distribution.items() %}
-                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                <div class="text-center p-3 bg-gray-50 rounded-lg {% if friend_info.actual_mbti and mbti_type == friend_info.actual_mbti %}ring-2 ring-green-500 bg-green-50{% endif %}">
                     <div class="text-lg font-bold text-blue-600">{{ mbti_type }}</div>
                     <div class="text-sm text-gray-600">{{ count }}명</div>
                     <div class="text-xs text-gray-500">
                         {{ "%.1f"|format(count / statistics.total_evaluations * 100) }}%
                     </div>
+                    {% if friend_info.actual_mbti and mbti_type == friend_info.actual_mbti %}
+                    <div class="text-xs text-green-600 font-semibold">실제 MBTI</div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -215,6 +300,14 @@
                 button.textContent = originalText;
                 button.classList.remove('bg-green-600');
             }, 2000);
+        }
+
+        function showMbtiForm() {
+            document.getElementById('mbti-form').classList.remove('hidden');
+        }
+
+        function hideMbtiForm() {
+            document.getElementById('mbti-form').classList.add('hidden');
         }
         </script>
     </div>

@@ -26,15 +26,25 @@ def get_friend_evaluations(friend_email: str) -> List[dict]:
     """친구의 모든 평가 결과 조회"""
     return friend_evaluations.get(friend_email, [])
 
-def save_friend_info(email: str, name: str, description: str = ""):
+def save_friend_info(email: str, name: str, description: str = "", my_perspective: str = ""):
     """친구 정보 저장"""
     friend_info[email] = {
         'name': name,
         'email': email,
         'description': description,
+        'my_perspective': my_perspective,
         'created_at': datetime.now().isoformat()
     }
     save_to_file()
+
+def update_actual_mbti(email: str, actual_mbti: str):
+    """실제 MBTI 업데이트"""
+    if email in friend_info:
+        friend_info[email]['actual_mbti'] = actual_mbti
+        friend_info[email]['mbti_updated_at'] = datetime.now().isoformat()
+        save_to_file()
+        return True
+    return False
 
 def get_friend_info(email: str) -> Optional[dict]:
     """친구 정보 조회"""

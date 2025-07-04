@@ -21,7 +21,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-white shadow-lg" x-data="{ mobileMenuOpen: false, dropdownOpen: false }">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -29,10 +29,128 @@
                         🎮 MBTI & Arcade
                     </a>
                 </div>
-                <div class="flex items-center space-x-4">
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-4">
                     <a href="/" class="text-gray-600 hover:text-blue-600 transition-colors">홈</a>
-                    <a href="/mbti" class="text-gray-600 hover:text-blue-600 transition-colors">MBTI 테스트</a>
-                    <a href="/arcade" class="text-gray-600 hover:text-blue-600 transition-colors">아케이드</a>
+                    
+                    <!-- 검사 서비스 드롭다운 -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                @click.away="open = false"
+                                class="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                            🔍 검사 서비스
+                            <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="/mbti" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                🧠 MBTI 성격 유형
+                            </a>
+                            <a href="/mbti/friend" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                👥 친구 MBTI 평가
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <div class="px-4 py-2 text-xs text-gray-500">
+                                곧 추가될 예정:
+                            </div>
+                            <div class="px-4 py-1 text-xs text-gray-400 cursor-not-allowed">
+                                🔮 에니어그램
+                            </div>
+                            <div class="px-4 py-1 text-xs text-gray-400 cursor-not-allowed">
+                                💝 사랑의 언어
+                            </div>
+                            <div class="px-4 py-1 text-xs text-gray-400 cursor-not-allowed">
+                                🎯 스트레스 지수
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 게임 서비스 드롭다운 -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                @click.away="open = false"
+                                class="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                            🎮 게임
+                            <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="/arcade" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                🎯 아케이드 게임
+                            </a>
+                            <a href="/arcade/stats" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                📊 게임 통계
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation -->
+            <div x-show="mobileMenuOpen" 
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="transform opacity-100 scale-100"
+                 x-transition:leave-end="transform opacity-0 scale-95"
+                 class="md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
+                    <a href="/" class="block px-3 py-2 text-gray-600 hover:text-blue-600 transition-colors">홈</a>
+                    
+                    <div class="px-3 py-2">
+                        <div class="text-sm font-medium text-gray-500 mb-2">🔍 검사 서비스</div>
+                        <div class="pl-4 space-y-1">
+                            <a href="/mbti" class="block py-1 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                                🧠 MBTI 성격 유형
+                            </a>
+                            <a href="/mbti/friend" class="block py-1 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                                👥 친구 MBTI 평가
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="px-3 py-2">
+                        <div class="text-sm font-medium text-gray-500 mb-2">🎮 게임</div>
+                        <div class="pl-4 space-y-1">
+                            <a href="/arcade" class="block py-1 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                                🎯 아케이드 게임
+                            </a>
+                            <a href="/arcade/stats" class="block py-1 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                                📊 게임 통계
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,7 +164,39 @@
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8 mt-16">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="col-span-2">
+                    <h3 class="text-lg font-semibold mb-4">🎮 MBTI & Arcade Web Service</h3>
+                    <p class="text-gray-400 mb-4">
+                        다양한 심리 검사와 재미있는 아케이드 게임을 제공하는 웹 서비스입니다.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="/" class="text-gray-400 hover:text-white transition-colors">홈</a>
+                        <a href="/mbti" class="text-gray-400 hover:text-white transition-colors">MBTI</a>
+                        <a href="/arcade" class="text-gray-400 hover:text-white transition-colors">게임</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-md font-semibold mb-3">🔍 검사 서비스</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="/mbti" class="hover:text-white transition-colors">MBTI 성격 유형</a></li>
+                        <li><a href="/mbti/friend" class="hover:text-white transition-colors">친구 MBTI 평가</a></li>
+                        <li class="text-gray-500">에니어그램 (준비 중)</li>
+                        <li class="text-gray-500">사랑의 언어 (준비 중)</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-md font-semibold mb-3">🎮 게임</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="/arcade" class="hover:text-white transition-colors">아케이드 게임</a></li>
+                        <li><a href="/arcade/stats" class="hover:text-white transition-colors">게임 통계</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
                 <p>&copy; 2024 MBTI & Arcade Web Service. All rights reserved.</p>
                 <p class="mt-2 text-gray-400">MBTI 테스트와 재미있는 아케이드 게임을 즐겨보세요!</p>
             </div>

@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 import random
-from app.database import save_evaluation, get_friend_info, get_evaluation_statistics, save_friend_info
+from app.database import save_evaluation, get_friend_info, get_evaluation_statistics, save_friend_info, update_actual_mbti
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -77,10 +77,22 @@ async def friend_input(request: Request):
 async def friend_input_post(request: Request, 
                           friend_name: str = Form(...),
                           friend_email: str = Form(...),
+                          my_perspective: str = Form(...),
                           friend_description: str = Form("")):
     """친구 정보 저장 및 테스트 페이지로 리다이렉트"""
-    save_friend_info(friend_email, friend_name, friend_description)
+    save_friend_info(friend_email, friend_name, friend_description, my_perspective)
     return RedirectResponse(url=f"/mbti/test?friend_email={friend_email}", status_code=303)
+
+@router.post("/update_actual_mbti", response_class=HTMLResponse)
+async def update_actual_mbti_post(request: Request,
+                                friend_email: str = Form(...),
+                                actual_mbti: str = Form(...)):
+    """실제 MBTI 업데이트"""
+    success = update_actual_mbti(friend_email, actual_mbti)
+    if success:
+        return RedirectResponse(url=f"/mbti/friend/{friend_email}", status_code=303)
+    else:
+        return RedirectResponse(url="/mbti/friend", status_code=303)
 
 @router.get("/friend/{friend_email}", response_class=HTMLResponse)
 async def friend_results(request: Request, friend_email: str):
