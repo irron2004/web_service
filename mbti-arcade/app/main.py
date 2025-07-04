@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 import os
 
 from app.routers import mbti, arcade
@@ -24,8 +24,7 @@ app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """MBTI 서비스 메인페이지 - Web Service Hub로 리다이렉트"""
-    return templates.TemplateResponse("redirect.html", {"request": request})
+    return RedirectResponse(url="http://localhost:8080")
 
 @app.get("/health")
 async def health_check():
