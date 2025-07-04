@@ -1,11 +1,7 @@
 import {
     BarChart3,
-    Clock,
-    LogOut,
     Play,
     Settings,
-    Star,
-    Target,
     Trophy
 } from 'lucide-react';
 import React, { useState } from 'react';
@@ -32,66 +28,54 @@ const StudentDashboard: React.FC = () => {
     navigate('/game');
   };
 
-  if (!user || user.role !== 'student') {
+  if (!user || (user.role !== 'student' && user.role !== 'guest')) {
     return <div>접근 권한이 없습니다.</div>;
   }
 
   return (
     <div className="student-dashboard">
       <header className="dashboard-header">
-        <div className="header-content">
-          <h1>안녕하세요, {user.name}님! 👋</h1>
-          <p>{user.grade}학년 수학 학습을 시작해보세요</p>
-        </div>
-        <button onClick={handleLogout} className="logout-button">
-          <LogOut size={20} />
-        </button>
+        <h1>안녕하세요, {user.name}님! <span role="img" aria-label="wave">👋</span></h1>
+        <p>학년 수학 학습을 시작해보세요</p>
       </header>
-
-      <div className="dashboard-content">
-        {/* 통계 카드 */}
+      {user.role === 'guest' ? (
+        <div className="stat-card guest-message">
+          게스트는 기록이 저장되지 않습니다
+        </div>
+      ) : (
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon">
-              <Trophy color="#FFD700" />
-            </div>
-            <div className="stat-info">
-              <h3>{stats.totalGames}</h3>
-              <p>총 게임 수</p>
+            <span className="stat-icon">🏆</span>
+            <div>
+              <div className="stat-value">{stats.totalGames}</div>
+              <div className="stat-label">총 게임 수</div>
             </div>
           </div>
-
           <div className="stat-card">
-            <div className="stat-icon">
-              <Star color="#FF6B6B" />
-            </div>
-            <div className="stat-info">
-              <h3>{stats.averageScore}%</h3>
-              <p>평균 점수</p>
+            <span className="stat-icon">⭐</span>
+            <div>
+              <div className="stat-value">{stats.averageScore}%</div>
+              <div className="stat-label">평균 점수</div>
             </div>
           </div>
-
           <div className="stat-card">
-            <div className="stat-icon">
-              <Clock color="#4ECDC4" />
-            </div>
-            <div className="stat-info">
-              <h3>{stats.totalTime}분</h3>
-              <p>총 학습 시간</p>
+            <span className="stat-icon">⏰</span>
+            <div>
+              <div className="stat-value">{stats.totalTime}분</div>
+              <div className="stat-label">총 학습 시간</div>
             </div>
           </div>
-
           <div className="stat-card">
-            <div className="stat-icon">
-              <Target color="#45B7D1" />
-            </div>
-            <div className="stat-info">
-              <h3>{stats.streak}일</h3>
-              <p>연속 학습</p>
+            <span className="stat-icon">🎯</span>
+            <div>
+              <div className="stat-value">{stats.streak}일</div>
+              <div className="stat-label">연속 학습</div>
             </div>
           </div>
         </div>
+      )}
 
+      <div className="dashboard-content">
         {/* 메인 액션 버튼 */}
         <div className="main-action">
           <button onClick={startGame} className="start-game-button">

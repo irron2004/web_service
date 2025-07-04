@@ -1,77 +1,81 @@
 import {
     ArrowLeft,
-    Check,
     Clock,
-    Star,
-    Target,
-    X
+    Target
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { MathProblem } from '../types';
+import type { APIProblem } from '../types';
+import { createSession } from '../utils/api';
 import './MathGame.css';
 
 const MathGame: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [currentProblem, setCurrentProblem] = useState<MathProblem | null>(null);
-  const [userAnswer, setUserAnswer] = useState<string>('');
+  const [currentProblem, setCurrentProblem] = useState<APIProblem | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [totalQuestions] = useState(10);
+  const [totalQuestions] = useState(20); // 기획서에 따라 20문제
   const [timeLeft, setTimeLeft] = useState(30);
-  const [gameState, setGameState] = useState<'playing' | 'correct' | 'incorrect' | 'finished'>('playing');
+  const [gameState, setGameState] = useState<'loading' | 'playing' | 'finished' | 'submitted'>('loading');
   const [streak, setStreak] = useState(0);
-  const [problems, setProblems] = useState<MathProblem[]>([]);
+  const [problems, setProblems] = useState<APIProblem[]>([]);
+  const [sessionId, setSessionId] = useState<number | null>(null);
+  const [attemptCount, setAttemptCount] = useState<number>(1);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [userAnswers, setUserAnswers] = useState<{ [key: number]: number }>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // 문제 생성 함수
-  const generateProblem = (): MathProblem => {
-    const grade = user?.grade || 1;
-    const operations = grade === 1 ? ['addition', 'subtraction'] : ['addition', 'subtraction', 'multiplication'];
-    const operation = operations[Math.floor(Math.random() * operations.length)];
-    
-    let num1, num2, answer;
-    
-    switch (operation) {
-      case 'addition':
-        num1 = Math.floor(Math.random() * 20) + 1;
-        num2 = Math.floor(Math.random() * 20) + 1;
-        answer = num1 + num2;
-        break;
-      case 'subtraction':
-        num1 = Math.floor(Math.random() * 20) + 10;
-        num2 = Math.floor(Math.random() * num1) + 1;
-        answer = num1 - num2;
-        break;
-      case 'multiplication':
-        num1 = Math.floor(Math.random() * 10) + 1;
-        num2 = Math.floor(Math.random() * 10) + 1;
-        answer = num1 * num2;
-        break;
-      default:
-        num1 = 5;
-        num2 = 3;
-        answer = 8;
+  // API에서 문제 세트 로드
+  const loadProblems = async () => {
+    try {
+      setGameState('loading');
+      const session = await createSession();
+      setProblems(session.problems);
+      setCurrentProblem(session.problems[0]);
+      setSessionId(session.session_id);
+      setGameState('playing');
+    } catch (error) {
+      console.error('문제 로드 실패:', error);
+      // 에러 시 기본 문제 생성 (fallback)
+      const fallbackProblems = generateFallbackProblems();
+      setProblems(fallbackProblems);
+      setCurrentProblem(fallbackProblems[0]);
+      setGameState('playing');
     }
+  };
 
-    const question = `${num1} ${operation === 'addition' ? '+' : operation === 'subtraction' ? '-' : '×'} ${num2} = ?`;
-
-    return {
-      id: Date.now().toString(),
-      question,
-      answer,
-      difficulty: 'easy',
-      type: operation as any,
-      grade
-    };
+  // API 실패 시 사용할 기본 문제 생성
+  const generateFallbackProblems = (): APIProblem[] => {
+    return Array.from({ length: 20 }, (_, index) => {
+      const left = Math.floor(Math.random() * 9) + 1;
+      const right = Math.floor(Math.random() * 9) + 1;
+      const answer = left + right;
+      
+      // 선택지 생성
+      const options = [answer];
+      while (options.length < 4) {
+        const wrongAnswer = answer + Math.floor(Math.random() * 10) - 5;
+        if (wrongAnswer > 0 && !options.includes(wrongAnswer)) {
+          options.push(wrongAnswer);
+        }
+      }
+      
+      return {
+        id: index + 1,
+        left,
+        right,
+        answer,
+        options: options.sort(() => Math.random() - 0.5) // 선택지 순서 섞기
+      };
+    });
   };
 
   // 게임 초기화
   useEffect(() => {
-    const newProblems = Array.from({ length: totalQuestions }, () => generateProblem());
-    setProblems(newProblems);
-    setCurrentProblem(newProblems[0]);
+    loadProblems();
   }, []);
 
   // 타이머
@@ -80,51 +84,62 @@ const MathGame: React.FC = () => {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0) {
-      handleAnswer('timeout');
+      handleNextQuestion();
     }
   }, [timeLeft, gameState]);
 
-  // 답변 처리
-  const handleAnswer = (answer: string | 'timeout') => {
-    if (!currentProblem) return;
+  // 답변 처리 - 정답 체크 없이 바로 다음 문제로
+  const handleAnswer = async (chosenAnswer: number | null) => {
+    if (!currentProblem || chosenAnswer === null) return;
 
-    const isCorrect = answer === 'timeout' ? false : parseInt(answer) === currentProblem.answer;
-    
+    // 사용자 답변 저장
+    setUserAnswers(prev => ({
+      ...prev,
+      [currentProblem.id]: chosenAnswer
+    }));
+
+    // 정답 여부 확인 (점수 계산용, 화면에는 표시하지 않음)
+    const isCorrect = chosenAnswer === currentProblem.answer;
     if (isCorrect) {
       setScore(score + 10 + Math.floor(timeLeft / 3));
       setStreak(streak + 1);
-      setGameState('correct');
+      setCorrectCount(correctCount + 1);
     } else {
       setStreak(0);
-      setGameState('incorrect');
     }
 
-    setTimeout(() => {
-      if (currentQuestion < totalQuestions) {
-        setCurrentQuestion(currentQuestion + 1);
-        setCurrentProblem(problems[currentQuestion]);
-        setUserAnswer('');
-        setTimeLeft(30);
-        setGameState('playing');
-      } else {
-        setGameState('finished');
-      }
-    }, 1500);
+    // 바로 다음 문제로 넘어가기
+    handleNextQuestion();
+  };
+
+  // 다음 문제로 넘어가는 함수
+  const handleNextQuestion = () => {
+    if (currentQuestion < totalQuestions) {
+      setCurrentQuestion(currentQuestion + 1);
+      setCurrentProblem(problems[currentQuestion]);
+      setSelectedAnswer(null);
+      setTimeLeft(30);
+      setGameState('playing');
+      setAttemptCount(1);
+    } else {
+      setGameState('finished');
+    }
+  };
+
+  // 제출 버튼 클릭 시 결과 확인
+  const handleSubmitResults = () => {
+    setIsSubmitted(true);
+    setGameState('submitted');
+  };
+
+  const handleOptionSelect = (option: number) => {
+    setSelectedAnswer(option);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (userAnswer.trim()) {
-      handleAnswer(userAnswer);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (userAnswer.trim()) {
-        handleAnswer(userAnswer);
-      }
+    if (selectedAnswer !== null) {
+      handleAnswer(selectedAnswer);
     }
   };
 
@@ -133,19 +148,31 @@ const MathGame: React.FC = () => {
   };
 
   const restartGame = () => {
-    const newProblems = Array.from({ length: totalQuestions }, () => generateProblem());
-    setProblems(newProblems);
-    setCurrentProblem(newProblems[0]);
+    loadProblems();
     setScore(0);
     setCurrentQuestion(1);
     setTimeLeft(30);
     setStreak(0);
-    setUserAnswer('');
-    setGameState('playing');
+    setSelectedAnswer(null);
+    setAttemptCount(1);
+    setCorrectCount(0);
+    setUserAnswers({});
+    setIsSubmitted(false);
   };
 
   if (!user) {
     return <div>로그인이 필요합니다.</div>;
+  }
+
+  if (gameState === 'loading') {
+    return (
+      <div className="math-game">
+        <div className="loading-container">
+          <h2>문제를 준비하고 있습니다...</h2>
+          <div className="loading-spinner"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -160,10 +187,6 @@ const MathGame: React.FC = () => {
             <span>문제 {currentQuestion}/{totalQuestions}</span>
           </div>
           <div className="info-item">
-            <Star size={20} />
-            <span>점수: {score}</span>
-          </div>
-          <div className="info-item">
             <Clock size={20} />
             <span>{timeLeft}초</span>
           </div>
@@ -174,55 +197,73 @@ const MathGame: React.FC = () => {
         {gameState === 'playing' && currentProblem && (
           <div className="problem-container">
             <div className="problem-display">
-              <h2>{currentProblem.question}</h2>
+              <h2>{currentProblem.left} + {currentProblem.right} = ?</h2>
+              {attemptCount > 1 && (
+                <div className="attempt-indicator">
+                  {attemptCount}번째 시도
+                </div>
+              )}
             </div>
             
-            <form onSubmit={handleSubmit} className="answer-form">
-              <input
-                type="number"
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="답을 입력하세요"
-                className="answer-input"
-                autoFocus
-              />
-              <button type="submit" className="submit-button">
-                확인
-              </button>
-            </form>
+            <div className="options-container">
+              {currentProblem.options.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleOptionSelect(option)}
+                  className={`option-button ${selectedAnswer === option ? 'selected' : ''}`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
 
-            {streak > 0 && (
-              <div className="streak-indicator">
-                🔥 {streak}연속 정답!
-              </div>
-            )}
+            <button 
+              onClick={handleSubmit}
+              disabled={selectedAnswer === null}
+              className="submit-button"
+            >
+              확인
+            </button>
           </div>
         )}
 
-        {gameState === 'correct' && (
-          <div className="feedback correct">
-            <Check size={60} />
-            <h2>정답입니다! 🎉</h2>
-            <p>+{10 + Math.floor(timeLeft / 3)}점 획득!</p>
+        {gameState === 'finished' && !isSubmitted && (
+          <div className="submit-results">
+            <h2>모든 문제를 풀었습니다! 🎉</h2>
+            <p>결과를 확인하려면 제출 버튼을 눌러주세요.</p>
+            <button onClick={handleSubmitResults} className="submit-results-button">
+              제출
+            </button>
           </div>
         )}
 
-        {gameState === 'incorrect' && currentProblem && (
-          <div className="feedback incorrect">
-            <X size={60} />
-            <h2>틀렸습니다 😢</h2>
-            <p>정답: {currentProblem.answer}</p>
-          </div>
-        )}
-
-        {gameState === 'finished' && (
+        {gameState === 'submitted' && (
           <div className="game-result">
             <h2>게임 완료! 🎊</h2>
             <div className="final-score">
               <h3>최종 점수: {score}점</h3>
-              <p>정답률: {Math.round((score / (totalQuestions * 10)) * 100)}%</p>
+              <p>정답률: {Math.round((correctCount / totalQuestions) * 100)}%</p>
+              <p>맞은 문제: {correctCount}개 / {totalQuestions}개</p>
             </div>
+            
+            {/* 문제별 결과 표시 */}
+            <div className="problem-results">
+              <h3>문제별 결과:</h3>
+              <div className="results-grid">
+                {problems.map((problem, index) => {
+                  const userAnswer = userAnswers[problem.id];
+                  const isCorrect = userAnswer === problem.answer;
+                  return (
+                    <div key={problem.id} className={`result-item ${isCorrect ? 'correct' : 'incorrect'}`}>
+                      <span>문제 {index + 1}: {problem.left} + {problem.right} = {problem.answer}</span>
+                      <span>내 답: {userAnswer}</span>
+                      <span>{isCorrect ? '✅' : '❌'}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="result-actions">
               <button onClick={restartGame} className="restart-button">
                 다시 하기
