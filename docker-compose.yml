@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Main Service Hub
   main-hub:
@@ -49,6 +47,18 @@ services:
     networks:
       - web-service-network
     container_name: mbti-arcade
+
+  # Calculate Service
+  calculate-service:
+    build: ./calculate-service
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./calculate-service:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: calculate-service
 
 networks:
   web-service-network:
