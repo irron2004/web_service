@@ -1,8 +1,12 @@
 # 통합 Web Service Docker 설정
 
-이 설정은 Math App과 MBTI Arcade 프로젝트를 하나의 Docker Compose로 실행합니다.
+이 설정은 Web Service Hub, Math App, MBTI Arcade 프로젝트를 하나의 Docker Compose로 실행합니다.
 
 ## 서비스 구성
+
+### Web Service Hub (메인)
+- **URL**: http://localhost:8080
+- **역할**: 모든 서비스를 관리하는 중앙 허브
 
 ### Math App
 - **Backend**: http://localhost:8000
@@ -23,6 +27,9 @@ docker-compose up --build
 ### 2. 특정 서비스만 실행
 
 ```bash
+# 메인 허브만 실행
+docker-compose up main-hub
+
 # Math App만 실행
 docker-compose up math-backend math-frontend
 
@@ -46,6 +53,7 @@ docker-compose up -d --build
 docker-compose logs
 
 # 특정 서비스 로그
+docker-compose logs main-hub
 docker-compose logs math-backend
 docker-compose logs math-frontend
 docker-compose logs mbti-arcade
@@ -58,6 +66,7 @@ docker-compose logs -f
 
 | 서비스 | 내부 포트 | 외부 포트 | URL |
 |--------|-----------|-----------|-----|
+| Main Hub | 8080 | 8080 | http://localhost:8080 |
 | Math Backend | 8000 | 8000 | http://localhost:8000 |
 | Math Frontend | 80 | 3000 | http://localhost:3000 |
 | MBTI Arcade | 8000 | 8001 | http://localhost:8001 |
@@ -77,6 +86,9 @@ docker-compose up --build
 
 ## 환경 변수
 
+### Main Hub
+- 기본 환경 변수 사용
+
 ### Math Backend
 - `DATABASE_URL`: 데이터베이스 연결 문자열
 
@@ -91,6 +103,7 @@ docker-compose up --build
 ```yaml
 # docker-compose.yml에서 포트 변경
 ports:
+  - "8081:8080"  # Main Hub
   - "8002:8000"  # Math Backend
   - "3001:80"    # Math Frontend  
   - "8003:8000"  # MBTI Arcade
@@ -102,7 +115,7 @@ ports:
 docker-compose build --no-cache
 
 # 특정 서비스만 다시 빌드
-docker-compose build --no-cache math-backend
+docker-compose build --no-cache main-hub
 ```
 
 ### 컨테이너 상태 확인
@@ -128,6 +141,10 @@ docker-compose down -v
 ```
 
 ## 개별 서비스 접근
+
+### Web Service Hub (메인)
+- 메인 페이지: http://localhost:8080
+- 모든 서비스의 중앙 관리 포인트
 
 ### Math App
 - Frontend: http://localhost:3000

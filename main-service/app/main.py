@@ -4,11 +4,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 import os
 
-from app.routers import mbti, arcade
-
 app = FastAPI(
-    title="MBTI & Arcade Service",
-    description="MBTI 테스트와 아케이드 게임을 제공하는 웹 서비스",
+    title="Web Service Hub",
+    description="다양한 웹 서비스를 관리하는 중앙 허브",
     version="1.0.0"
 )
 
@@ -18,21 +16,17 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # 템플릿 설정
 templates = Jinja2Templates(directory="app/templates")
 
-# 라우터 등록
-app.include_router(mbti.router, prefix="/mbti", tags=["MBTI"])
-app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
-
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """MBTI 서비스 메인페이지 - Web Service Hub로 리다이렉트"""
-    return templates.TemplateResponse("redirect.html", {"request": request})
+    """메인 홈페이지"""
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/health")
 async def health_check():
     """헬스 체크 엔드포인트"""
-    return {"status": "healthy", "message": "MBTI & Arcade Service is running!"}
+    return {"status": "healthy", "message": "Web Service Hub is running!"}
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8080))
     uvicorn.run(app, host="0.0.0.0", port=port) 

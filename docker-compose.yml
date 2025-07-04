@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  # Main Service Hub
+  main-hub:
+    build: ./main-service
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./main-service:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: main-hub
+
   # Math App Backend
   math-backend:
     build: ./math-app/backend
