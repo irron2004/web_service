@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import './StudentDashboard.css';
 
 const StudentDashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [stats] = useState({
     totalGames: 15,
@@ -38,7 +38,7 @@ const StudentDashboard: React.FC = () => {
         <h1>안녕하세요, {user.name}님! <span role="img" aria-label="wave">👋</span></h1>
         <p>학년 수학 학습을 시작해보세요</p>
       </header>
-      {user.role === 'guest' ? (
+      {user.role === 'student' ? (
         <div className="stat-card guest-message">
           게스트는 기록이 저장되지 않습니다
         </div>

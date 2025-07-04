@@ -4,11 +4,14 @@ FROM node:18-alpine as build
 # 작업 디렉토리 설정
 WORKDIR /app
 
+# npm cache 정리
+RUN npm cache clean --force
+
 # package.json과 package-lock.json 복사
 COPY package*.json ./
 
-# 의존성 설치
-RUN npm ci --only=production
+# 의존성 설치 (rollup 문제 해결)
+RUN npm install
 
 # 소스 코드 복사
 COPY . .

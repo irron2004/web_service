@@ -22,7 +22,6 @@ const MathGame: React.FC = () => {
   const [gameState, setGameState] = useState<'loading' | 'playing' | 'finished' | 'submitted'>('loading');
   const [streak, setStreak] = useState(0);
   const [problems, setProblems] = useState<APIProblem[]>([]);
-  const [sessionId] = useState<number | null>(null);
   const [attemptCount, setAttemptCount] = useState<number>(1);
   const [correctCount, setCorrectCount] = useState(0);
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: number }>({});
@@ -35,7 +34,7 @@ const MathGame: React.FC = () => {
       const session = await createSession();
       setProblems(session.problems);
       setCurrentProblem(session.problems[0]);
-      setSessionId(session.session_id);
+      // setSessionId(session.session_id);
       setGameState('playing');
     } catch (error) {
       console.error('문제 로드 실패:', error);
