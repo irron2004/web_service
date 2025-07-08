@@ -1,6 +1,6 @@
 import type { APIProblemResponse, APISession } from '../types';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = '/math-api/api';
 
 // API 호출 유틸리티 함수
 async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {

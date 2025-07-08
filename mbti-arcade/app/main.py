@@ -24,7 +24,7 @@ app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return RedirectResponse(url="http://localhost:8080")
+    return RedirectResponse(url="/")
 
 @app.get("/health")
 async def health_check():
