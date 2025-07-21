@@ -89,7 +89,17 @@ async def friend_system_info(request: Request):
 @router.get("/friend", response_class=HTMLResponse)
 async def friend_input(request: Request):
     """친구 정보 입력 페이지"""
-    return templates.TemplateResponse("mbti/friend_input.html", {"request": request})
+    # URL 파라미터에서 미리 입력할 정보 가져오기
+    prefill_name = request.query_params.get('prefill_name', '')
+    prefill_email = request.query_params.get('prefill_email', '')
+    prefill_mbti = request.query_params.get('prefill_mbti', '')
+    
+    return templates.TemplateResponse("mbti/friend_input.html", {
+        "request": request,
+        "prefill_name": prefill_name,
+        "prefill_email": prefill_email,
+        "prefill_mbti": prefill_mbti
+    })
 
 @router.post("/friend", response_class=HTMLResponse)
 async def friend_input_post(request: Request, 
@@ -354,13 +364,24 @@ async def mbti_types(request: Request):
 
 @router.get("/share", response_class=HTMLResponse)
 async def mbti_share_form(request: Request, name: str = Query(None), email: str = Query(None), mbti: str = Query(None)):
-    """MBTI 결과 공유 폼 (이름, 이메일, MBTI 입력, 검사 버튼)"""
-    return templates.TemplateResponse("mbti/share.html", {
-        "request": request,
-        "name": name or "",
-        "email": email or "",
-        "mbti": mbti or ""
-    })
+    """MBTI 결과 공유 - 친구 평가 화면으로 리다이렉트"""
+    if name and mbti:
+        # 친구 평가 화면으로 리다이렉트 (이름과 MBTI 정보 전달)
+        return templates.TemplateResponse("mbti/share_friend_evaluation.html", {
+            "request": request,
+            "friend_name": name,
+            "friend_email": email or "",
+            "friend_mbti": mbti,
+            "mbti_result": MBTI_RESULTS.get(mbti, {"title": "알 수 없음", "description": "결과를 분석할 수 없습니다."})
+        })
+    else:
+        # 기본 공유 페이지 (이름, 이메일, MBTI 입력 폼)
+        return templates.TemplateResponse("mbti/share.html", {
+            "request": request,
+            "name": name or "",
+            "email": email or "",
+            "mbti": mbti or ""
+        })
 
 @router.post("/share", response_class=HTMLResponse)
 async def mbti_share_post(request: Request):
