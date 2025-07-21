@@ -1,7 +1,7 @@
 export type User = {
   id: string;
   username: string;
-  role: 'student' | 'parent' | 'teacher';
+  role: 'student' | 'parent' | 'teacher' | 'guest';
   name: string;
   grade?: number;
   parentId?: string;

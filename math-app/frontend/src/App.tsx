@@ -10,7 +10,7 @@ import { AuthProvider } from './contexts/AuthContext'
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/math">
         <div className="App">
           <Routes>
             <Route path="/" element={<Login />} />

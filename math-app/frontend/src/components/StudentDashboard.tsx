@@ -28,7 +28,7 @@ const StudentDashboard: React.FC = () => {
     navigate('/game');
   };
 
-  if (!user || user.role !== 'student') {
+  if (!user || (user.role !== 'student' && user.role !== 'guest')) {
     return <div>접근 권한이 없습니다.</div>;
   }
 
