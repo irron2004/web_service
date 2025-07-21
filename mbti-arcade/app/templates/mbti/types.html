@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}MBTI 유형 - MBTI & Arcade Web Service{% endblock %}
+
+{% block content %}
+<div class="max-w-6 mx-auto p-6">
+    <div class="text-center mb-8">
+        <h1 class="text-4ont-bold text-gray-800 mb-4">
+            📚 16가지 MBTI 성격 유형
+        </h1>
+        <p class="text-xl text-gray-60">
+            각 MBTI 유형의 특징을 알아보세요!
+        </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for mbti_type, info in mbti_results.items() %}
+        <div class="bg-white rounded-lg shadow-lg p-6 shadow-xl transition-shadow">
+            <div class="text-center mb-4">
+                <div class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full mb-2">
+                    <h3 class="text-lg font-bold">{{ mbti_type }}</h3>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800">{{ info.title }}</h4>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed">
+                {{ info.description }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-8 pt-6 border-t border-gray-200">
+        <a href="/mbti" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
+            🧠 MBTI 테스트 시작하기
+        </a>
+    </div>
+</div>
+{% endblock %} 

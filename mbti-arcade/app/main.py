@@ -24,7 +24,16 @@ app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return RedirectResponse(url="/")
+    return RedirectResponse(url="/mbti")
+
+@app.get("/redirect", response_class=HTMLResponse)
+async def redirect_page(request: Request):
+    """리다이렉트 페이지 - 환경 변수에서 base URL 가져오기"""
+    base_url = os.environ.get("BASE_URL", "/")
+    return templates.TemplateResponse("redirect.html", {
+        "request": request,
+        "base_url": base_url
+    })
 
 @app.get("/health")
 async def health_check():
