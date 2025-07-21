@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}MBTI 결과 공유 - MBTI & Arcade Web Service{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">
+            📤 MBTI 결과 공유하기
+        </h1>
+        <p class="text-xl text-gray-600 mb-6">
+            친구들과 MBTI 결과를 공유해보세요!
+        </p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <!-- 공유할 결과 정보 -->
+        {% if name and mbti %}
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">📋 공유할 결과</h3>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <span class="font-medium text-gray-700">이름:</span>
+                    <span class="text-gray-900">{{ name }}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-700">MBTI:</span>
+                    <span class="text-gray-900 font-bold">{{ mbti }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 공유 방법 선택 -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">🎯 공유 방법 선택</h2>
+            
+            <div class="space-y-4">
+                <!-- 직접 링크 공유 -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">🔗 직접 링크 공유</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        아래 링크를 복사하여 친구에게 보내세요.
+                    </p>
+                    <div class="flex">
+                        <input type="text" 
+                               id="shareLink" 
+                               value="{{ request.url }}" 
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md text-sm"
+                               readonly>
+                        <button onclick="copyLink()" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
+                            복사
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 소셜 미디어 공유 -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">📱 소셜 미디어 공유</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        소셜 미디어에 결과를 공유하세요.
+                    </p>
+                    <div class="flex space-x-2">
+                        <button onclick="shareToTwitter()" 
+                                class="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 transition-colors">
+                            Twitter
+                        </button>
+                        <button onclick="shareToFacebook()" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                            Facebook
+                        </button>
+                        <button onclick="shareToKakao()" 
+                                class="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500 transition-colors">
+                            KakaoTalk
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 이메일 공유 -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">📧 이메일 공유</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        이메일로 결과를 공유하세요.
+                    </p>
+                    <button onclick="shareToEmail()" 
+                            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors">
+                        이메일로 공유
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR 코드 (선택사항) -->
+        <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">📱 QR 코드</h3>
+            <p class="text-sm text-gray-600 mb-3">
+                모바일에서 QR 코드를 스캔하여 바로 접속하세요.
+            </p>
+            <div class="text-center">
+                <div class="inline-block p-4 bg-white rounded-lg">
+                    <div class="w-32 h-32 bg-gray-200 rounded flex items-center justify-center">
+                        <span class="text-gray-500 text-xs">QR Code</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 추가 액션 -->
+        <div class="flex justify-center space-x-4">
+            <a href="/mbti" 
+               class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
+                🧠 다시 테스트하기
+            </a>
+            <a href="/mbti/types" 
+               class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition-colors">
+                📊 모든 유형 보기
+            </a>
+            <a href="/" 
+               class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors">
+                🏠 홈으로
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyLink() {
+    const linkInput = document.getElementById('shareLink');
+    linkInput.select();
+    document.execCommand('copy');
+    
+    // 복사 완료 알림
+    alert('링크가 클립보드에 복사되었습니다!');
+}
+
+function shareToTwitter() {
+    const text = "{% if name and mbti %}{{ name }}님의 MBTI 결과: {{ mbti }}{% else %}MBTI 테스트 결과{% endif %}";
+    const url = "{{ request.url }}";
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(twitterUrl, '_blank');
+}
+
+function shareToFacebook() {
+    const url = "{{ request.url }}";
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    window.open(facebookUrl, '_blank');
+}
+
+function shareToKakao() {
+    const text = "{% if name and mbti %}{{ name }}님의 MBTI 결과: {{ mbti }}{% else %}MBTI 테스트 결과{% endif %}";
+    const url = "{{ request.url }}";
+    const kakaoUrl = `https://story.kakao.com/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    window.open(kakaoUrl, '_blank');
+}
+
+function shareToEmail() {
+    const subject = "{% if name and mbti %}{{ name }}님의 MBTI 결과{% else %}MBTI 테스트 결과{% endif %}";
+    const body = `{% if name and mbti %}{{ name }}님의 MBTI 결과: {{ mbti }}{% else %}MBTI 테스트 결과{% endif %}
+
+결과 확인하기: {{ request.url }}
+
+MBTI & Arcade Web Service에서 제공`;
+    
+    const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = emailUrl;
+}
+</script>
+{% endblock %} 

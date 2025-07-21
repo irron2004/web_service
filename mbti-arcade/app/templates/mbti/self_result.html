@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}내 MBTI 결과 - MBTI & Arcade Web Service{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">
+            🎉 내 MBTI 성격 유형 결과
+        </h1>
+        <p class="text-xl text-gray-600">
+            당신의 성격 유형을 확인해보세요!
+        </p>
+    </div>
+
+    <!-- MBTI 결과 카드 -->
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-4">🎯</div>
+            <h2 class="text-4xl font-bold text-gray-800 mb-2">{{ mbti_type }}</h2>
+            <h3 class="text-2xl font-semibold text-blue-600 mb-2">{{ result.title }}</h3>
+            <p class="text-gray-600">{{ result.description }}</p>
+        </div>
+
+        <!-- 성향 분석 차트 -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <!-- E/I 차트 -->
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-3">외향성(E) vs 내향성(I)</h4>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-sm font-medium">E {{ scores.E }}%</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-3">
+                        <div class="bg-blue-500 h-3 rounded-full" style="width: {{ scores.E }}%"></div>
+                    </div>
+                    <span class="text-sm font-medium">{{ scores.I }}% I</span>
+                </div>
+                <p class="text-xs text-gray-600">
+                    {% if scores.E > scores.I %}
+                        외향적인 성향이 강합니다
+                    {% else %}
+                        내향적인 성향이 강합니다
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- S/N 차트 -->
+            <div class="bg-green-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-3">감각(S) vs 직관(N)</h4>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-sm font-medium">S {{ scores.S }}%</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-3">
+                        <div class="bg-green-500 h-3 rounded-full" style="width: {{ scores.S }}%"></div>
+                    </div>
+                    <span class="text-sm font-medium">{{ scores.N }}% N</span>
+                </div>
+                <p class="text-xs text-gray-600">
+                    {% if scores.S > scores.N %}
+                        감각적인 성향이 강합니다
+                    {% else %}
+                        직관적인 성향이 강합니다
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- T/F 차트 -->
+            <div class="bg-purple-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-3">사고(T) vs 감정(F)</h4>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-sm font-medium">T {{ scores.T }}%</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-3">
+                        <div class="bg-purple-500 h-3 rounded-full" style="width: {{ scores.T }}%"></div>
+                    </div>
+                    <span class="text-sm font-medium">{{ scores.F }}% F</span>
+                </div>
+                <p class="text-xs text-gray-600">
+                    {% if scores.T > scores.F %}
+                        사고적인 성향이 강합니다
+                    {% else %}
+                        감정적인 성향이 강합니다
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- J/P 차트 -->
+            <div class="bg-orange-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-3">판단(J) vs 인식(P)</h4>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-sm font-medium">J {{ scores.J }}%</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-3">
+                        <div class="bg-orange-500 h-3 rounded-full" style="width: {{ scores.J }}%"></div>
+                    </div>
+                    <span class="text-sm font-medium">{{ scores.P }}% P</span>
+                </div>
+                <p class="text-xs text-gray-600">
+                    {% if scores.J > scores.P %}
+                        판단적인 성향이 강합니다
+                    {% else %}
+                        인식적인 성향이 강합니다
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- MBTI 유형 설명 -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">MBTI 유형 설명</h3>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[0] }} - {{ "외향성" if mbti_type[0] == "E" else "내향성" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[0] == "E" %}
+                        활발하고 사교적이며, 다른 사람들과의 상호작용을 통해 에너지를 얻습니다.
+                        {% else %}
+                        조용하고 신중하며, 혼자만의 시간을 통해 에너지를 얻습니다.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[1] }} - {{ "감각" if mbti_type[1] == "S" else "직관" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[1] == "S" %}
+                        구체적이고 실용적인 정보를 선호하며, 현재의 사실에 집중합니다.
+                        {% else %}
+                        추상적이고 미래지향적이며, 가능성과 패턴을 찾습니다.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[2] }} - {{ "사고" if mbti_type[2] == "T" else "감정" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[2] == "T" %}
+                        논리적이고 객관적인 분석을 통해 결정을 내립니다.
+                        {% else %}
+                        감정과 가치를 고려하여 결정을 내립니다.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[3] }} - {{ "판단" if mbti_type[3] == "J" else "인식" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[3] == "J" %}
+                        계획을 세우고 그대로 따르는 것을 선호합니다.
+                        {% else %}
+                        상황에 따라 유연하게 대응하는 것을 선호합니다.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center space-x-4">
+        <a href="/mbti/share?name=사용자&mbti={{ mbti_type }}" 
+           class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+            📤 결과 공유하기
+        </a>
+        <a href="/mbti/self-test" 
+           class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            🔄 다시 테스트하기
+        </a>
+        <a href="/mbti/types" 
+           class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+            📋 모든 유형 보기
+        </a>
+        <a href="/mbti/friend" 
+           class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors">
+            👥 친구 평가하기
+        </a>
+        <a href="/" 
+           class="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+            🏠 홈으로 돌아가기
+        </a>
+    </div>
+    
+    <!-- Disclaimer -->
+    <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <p class="text-sm text-yellow-800 text-center">
+            <strong>⚠️ 주의사항:</strong> 이 테스트는 오락 및 자기이해 목적으로 제작되었습니다. 
+            결과를 과도하게 일반화하지 마시고, 전문적인 성격 진단이 필요한 경우 전문가와 상담하시기 바랍니다.
+        </p>
+    </div>
+</div>
+{% endblock %} 

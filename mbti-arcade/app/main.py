@@ -24,7 +24,8 @@ app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return RedirectResponse(url="/mbti")
+    """메인 페이지 - 서비스 선택"""
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/redirect", response_class=HTMLResponse)
 async def redirect_page(request: Request):
