@@ -4,13 +4,19 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 import os
 
-from app.routers import mbti, arcade
+from app.routers import mbti, arcade, report
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.middleware import SlowAPIMiddleware
 
+limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
 app = FastAPI(
     title="MBTI & Arcade Service",
     description="MBTI 테스트와 아케이드 게임을 제공하는 웹 서비스",
     version="1.0.0"
 )
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
 
 # 정적 파일 마운트
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -21,6 +27,7 @@ templates = Jinja2Templates(directory="app/templates")
 # 라우터 등록
 app.include_router(mbti.router, prefix="/mbti", tags=["MBTI"])
 app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
+app.include_router(report.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):

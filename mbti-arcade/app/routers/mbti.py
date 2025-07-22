@@ -493,3 +493,9 @@ async def self_mbti_result(request: Request):
         "scores": scores,
         "raw_scores": raw_scores
     }) 
+
+@router.get("/api/report/{pair_id}", response_class=JSONResponse)
+async def report_json(pair_id: str, session=Depends(get_session)):
+    svc = MBTIService(session)
+    resp = await svc.get_response(pair_id)
+    return {"labels": ["E","I","S","N","T","F","J","P"], "values": [resp.scores[k] for k in "EISNTFJP"]} 

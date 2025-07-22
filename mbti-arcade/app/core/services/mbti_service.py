@@ -51,3 +51,17 @@ class MBTIService:
         self.session.add(resp)
         await self.session.commit()
         return resp, mbti, scores, raw 
+
+    async def get_response(self, pair_id: str):
+        from sqlmodel import select
+        result = await self.session.execute(select(Response).where(Response.pair_id == pair_id))
+        return result.scalars().first() 
+
+    async def get_pair_scores(self, pair_id: str):
+        from sqlmodel import select
+        stmt = select(Response).where(Response.pair_id == pair_id)
+        res = (await self.session.execute(stmt)).scalars().all()
+        if not res:
+            return None
+        latest = sorted(res, key=lambda r: r.created_at)[-2:]
+        return [{"role": r.role, "mbti": r.mbti_type, "scores": r.scores} for r in latest] 
