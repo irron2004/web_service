@@ -13,15 +13,19 @@ class Friend(SQLModel, table=True):
 
 class Pair(SQLModel, table=True):
     id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True)
-    friend_email: Optional[str] = Field(foreign_key="friend.email")
-    mode: str
+    mode: str                      # self | friend
+    friend_email: str | None = Field(foreign_key="friend.email")
+    my_name: str | None = None
+    my_email: str | None = None
+    my_mbti: str | None = None
     completed: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Response(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     pair_id: str = Field(foreign_key="pair.id", index=True)
-    role: str
+    role: str            # "me" | "other"
+    relation: str | None = None   # friend | boyfriend | ...
     answers: Dict[int, int]
     mbti_type: str
     scores: Dict[str, int]

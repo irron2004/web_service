@@ -37,8 +37,10 @@ class MBTIService:
         )
         return mbti, scores, raw
 
-    async def create_pair(self, mode: str, friend_email: str | None = None) -> str:
-        pair = Pair(mode=mode, friend_email=friend_email)
+    async def create_pair(self, mode: str, email: str | None,
+                         my_name: str | None = None, my_email: str | None = None, my_mbti: str | None = None) -> str:
+        pair = Pair(mode=mode, friend_email=email,
+                    my_name=my_name, my_email=my_email, my_mbti=my_mbti)
         self.session.add(pair)
         await self.session.commit()
         return pair.id
