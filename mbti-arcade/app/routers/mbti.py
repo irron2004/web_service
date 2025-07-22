@@ -1,6 +1,10 @@
-from fastapi import APIRouter, Request, Form, Query
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, Request, Form, Depends, HTTPException
+from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from app.core.db import get_session
+from app.core.services.mbti_service import MBTIService
+from app.core.models_db import Friend
+from app.core.token import issue_token, verify_token
 from typing import Optional
 import random
 from app.database import save_evaluation, get_friend_info, get_evaluation_statistics, save_friend_info, update_actual_mbti
@@ -106,17 +110,27 @@ async def friend_input_post(request: Request,
                           friend_name: str = Form(...),
                           friend_email: str = Form(...),
                           my_perspective: str = Form(...),
-                          friend_description: str = Form("")):
+                          friend_description: str = Form(""),
+                          session=Depends(get_session)):
     """친구 정보 저장 및 테스트 페이지로 리다이렉트"""
-    save_friend_info(friend_email, friend_name, friend_description, my_perspective)
-    return RedirectResponse(url=f"/mbti/test?friend_email={friend_email}", status_code=303)
+    svc = MBTIService(session)
+    # Friend upsert
+    friend = await session.get(Friend, friend_email) or Friend(email=friend_email)
+    friend.name = friend_name; friend.description = friend_description
+    session.add(friend); await session.commit()
+
+    pair_id = await svc.create_pair("friend", friend_email)
+    token = issue_token(pair_id)
+    return RedirectResponse(f"/mbti/share/{token}", 303)
 
 @router.post("/update_actual_mbti", response_class=HTMLResponse)
 async def update_actual_mbti_post(request: Request,
                                 friend_email: str = Form(...),
-                                actual_mbti: str = Form(...)):
+                                actual_mbti: str = Form(...),
+                                session=Depends(get_session)):
     """실제 MBTI 업데이트"""
-    success = update_actual_mbti(friend_email, actual_mbti)
+    svc = MBTIService(session)
+    success = await svc.update_actual_mbti(friend_email, actual_mbti)
     if success:
         return RedirectResponse(url=f"/mbti/friend/{friend_email}", status_code=303)
     else:
@@ -362,39 +376,120 @@ async def mbti_types(request: Request):
         "mbti_results": MBTI_RESULTS
     }) 
 
-@router.get("/share", response_class=HTMLResponse)
-async def mbti_share_form(request: Request, name: str = Query(None), email: str = Query(None), mbti: str = Query(None)):
-    """MBTI 결과 공유 - 친구 평가 화면으로 리다이렉트"""
-    if name and mbti:
-        # 친구 평가 화면으로 리다이렉트 (이름과 MBTI 정보 전달)
-        return templates.TemplateResponse("mbti/share_friend_evaluation.html", {
-            "request": request,
-            "friend_name": name,
-            "friend_email": email or "",
-            "friend_mbti": mbti,
-            "mbti_result": MBTI_RESULTS.get(mbti, {"title": "알 수 없음", "description": "결과를 분석할 수 없습니다."})
-        })
-    else:
-        # 기본 공유 페이지 (이름, 이메일, MBTI 입력 폼)
-        return templates.TemplateResponse("mbti/share.html", {
-            "request": request,
-            "name": name or "",
-            "email": email or "",
-            "mbti": mbti or ""
-        })
+@router.get("/share/{token}", response_class=HTMLResponse)
+async def share_form(request: Request, token: str):
+    try:
+        pair_id = verify_token(token)
+    except ValueError:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse("mbti/share_friend_evaluation.html", {"request": request, "pair_token": token})
 
-@router.post("/share", response_class=HTMLResponse)
-async def mbti_share_post(request: Request):
+@router.post("/result/{token}", response_class=HTMLResponse)
+async def mbti_result(token: str, request: Request, session=Depends(get_session)):
+    try:
+        pair_id = verify_token(token)
+    except ValueError:
+        raise HTTPException(status_code=404)
     form = await request.form()
-    name = form.get("name", "")
-    email = form.get("email", "")
-    mbti = form.get("mbti", "")
-    # 공유 링크 생성 (쿼리 파라미터로 전달)
-    share_url = f"/mbti/share?name={name}&email={email}&mbti={mbti}"
-    return templates.TemplateResponse("mbti/share_success.html", {
+    answers = {int(k[1:]): int(v) for k, v in form.items() if k.startswith("q")}
+    svc = MBTIService(session)
+    resp, mbti_type, scores, raw = await svc.save_response(pair_id, role="other", answers=answers, questions=MBTI_QUESTIONS)
+    return templates.TemplateResponse("mbti/result.html", {
         "request": request,
-        "share_url": share_url,
-        "name": name,
-        "email": email,
-        "mbti": mbti
+        "mbti_type": mbti_type,
+        "result": MBTI_RESULTS.get(mbti_type, {"title": "알 수 없음", "description": "결과를 분석할 수 없습니다."}),
+        "scores": scores,
+        "raw_scores": raw,
+        "friend_email": resp.friend_email,
+        "evaluator_name": resp.evaluator_name
+    })
+
+@router.post("/self-result", response_class=HTMLResponse)
+async def self_mbti_result(request: Request):
+    """내 MBTI 테스트 결과 페이지"""
+    form_data = await request.form()
+    
+    # Likert 5점 척도 점수 계산
+    scores = {"E": 0, "I": 0, "S": 0, "N": 0, "T": 0, "F": 0, "J": 0, "P": 0}
+    raw_scores = {"E-I": 0, "S-N": 0, "T-F": 0, "J-P": 0}
+    responses = {}
+    
+    for key, value in form_data.items():
+        if key.startswith("q"):
+            question_id = int(key[1:])
+            responses[question_id] = int(value)
+            question = next((q for q in MBTI_QUESTIONS if q["id"] == question_id), None)
+            if question:
+                # 응답값을 1-5에서 -2~+2로 변환 (중앙값 3 기준 편차)
+                response_value = int(value)
+                deviation = response_value - 3
+                
+                # 가중치 부호 적용
+                weighted_score = question["sign"] * deviation
+                
+                # 지표별 누적 합산
+                if question["type"] == "E-I":
+                    raw_scores["E-I"] += weighted_score
+                elif question["type"] == "S-N":
+                    raw_scores["S-N"] += weighted_score
+                elif question["type"] == "T-F":
+                    raw_scores["T-F"] += weighted_score
+                elif question["type"] == "J-P":
+                    raw_scores["J-P"] += weighted_score
+    
+    # 각 지표별 최대 가능 점수 (6문항 × 2 = 12)
+    max_score = 12
+    
+    # 백분율 계산 및 개별 점수 설정
+    if raw_scores["E-I"] > 0:
+        e_percent = min(100, ((raw_scores["E-I"] + max_score) / (2 * max_score)) * 100)
+        scores["E"] = int(e_percent)
+        scores["I"] = 100 - scores["E"]
+    else:
+        i_percent = min(100, ((-raw_scores["E-I"] + max_score) / (2 * max_score)) * 100)
+        scores["I"] = int(i_percent)
+        scores["E"] = 100 - scores["I"]
+    
+    if raw_scores["S-N"] > 0:
+        s_percent = min(100, ((raw_scores["S-N"] + max_score) / (2 * max_score)) * 100)
+        scores["S"] = int(s_percent)
+        scores["N"] = 100 - scores["S"]
+    else:
+        n_percent = min(100, ((-raw_scores["S-N"] + max_score) / (2 * max_score)) * 100)
+        scores["N"] = int(n_percent)
+        scores["S"] = 100 - scores["N"]
+    
+    if raw_scores["T-F"] > 0:
+        t_percent = min(100, ((raw_scores["T-F"] + max_score) / (2 * max_score)) * 100)
+        scores["T"] = int(t_percent)
+        scores["F"] = 100 - scores["T"]
+    else:
+        f_percent = min(100, ((-raw_scores["T-F"] + max_score) / (2 * max_score)) * 100)
+        scores["F"] = int(f_percent)
+        scores["T"] = 100 - scores["F"]
+    
+    if raw_scores["J-P"] > 0:
+        j_percent = min(100, ((raw_scores["J-P"] + max_score) / (2 * max_score)) * 100)
+        scores["J"] = int(j_percent)
+        scores["P"] = 100 - scores["J"]
+    else:
+        p_percent = min(100, ((-raw_scores["J-P"] + max_score) / (2 * max_score)) * 100)
+        scores["P"] = int(p_percent)
+        scores["J"] = 100 - scores["P"]
+    
+    # MBTI 유형 결정
+    mbti_type = ""
+    mbti_type += "E" if raw_scores["E-I"] > 0 else "I"
+    mbti_type += "S" if raw_scores["S-N"] > 0 else "N"
+    mbti_type += "T" if raw_scores["T-F"] > 0 else "F"
+    mbti_type += "J" if raw_scores["J-P"] > 0 else "P"
+    
+    result = MBTI_RESULTS.get(mbti_type, {"title": "알 수 없음", "description": "결과를 분석할 수 없습니다."})
+    
+    return templates.TemplateResponse("mbti/self_result.html", {
+        "request": request,
+        "mbti_type": mbti_type,
+        "result": result,
+        "scores": scores,
+        "raw_scores": raw_scores
     }) 

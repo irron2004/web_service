@@ -61,7 +61,7 @@
                                value="{{ request.url }}" 
                                class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md text-sm"
                                readonly>
-                        <button onclick="copyLink()" 
+                        <button onclick="copyText('shareLink')" 
                                 class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
                             복사
                         </button>
@@ -138,13 +138,14 @@
 </div>
 
 <script>
-function copyLink() {
-    const linkInput = document.getElementById('shareLink');
-    linkInput.select();
-    document.execCommand('copy');
-    
-    // 복사 완료 알림
-    alert('링크가 클립보드에 복사되었습니다!');
+async function copyText(id){
+  const el = document.getElementById(id);
+  try {
+    await navigator.clipboard.writeText(el.value);
+    alert('복사되었습니다!');
+  }catch(_){
+    el.select(); document.execCommand('copy');
+  }
 }
 
 function shareToTwitter() {

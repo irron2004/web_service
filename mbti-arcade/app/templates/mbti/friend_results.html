@@ -227,7 +227,7 @@
                                value="{{ request.base_url }}mbti/test?friend_email={{ friend_info.email }}" 
                                readonly
                                class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-600">
-                        <button onclick="copyShareUrl()" 
+                        <button onclick="copyText('share-url')" 
                                 class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
                             복사
                         </button>
@@ -247,7 +247,7 @@
                                value="{{ request.base_url }}mbti/friend/{{ friend_info.email }}" 
                                readonly
                                class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-600">
-                        <button onclick="copyResultUrl()" 
+                        <button onclick="copyText('result-url')" 
                                 class="bg-green-600 text-white px-4 py-2 rounded-r-md hover:bg-green-700 transition-colors">
                             복사
                         </button>
@@ -270,37 +270,15 @@
         </div>
 
         <script>
-        function copyShareUrl() {
-            const urlInput = document.getElementById('share-url');
-            urlInput.select();
-            document.execCommand('copy');
-            
-            // 복사 완료 알림
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = '복사됨!';
-            button.classList.add('bg-green-600');
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.classList.remove('bg-green-600');
-            }, 2000);
-        }
-        
-        function copyResultUrl() {
-            const urlInput = document.getElementById('result-url');
-            urlInput.select();
-            document.execCommand('copy');
-            
-            // 복사 완료 알림
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = '복사됨!';
-            button.classList.add('bg-green-600');
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.classList.remove('bg-green-600');
-            }, 2000);
-        }
+async function copyText(id){
+  const el = document.getElementById(id);
+  try {
+    await navigator.clipboard.writeText(el.value);
+    alert('복사되었습니다!');
+  }catch(_){
+    el.select(); document.execCommand('copy');
+  }
+}
 
         function showMbtiForm() {
             document.getElementById('mbti-form').classList.remove('hidden');
