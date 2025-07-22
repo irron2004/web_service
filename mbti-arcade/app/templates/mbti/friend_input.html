@@ -190,5 +190,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// URL 파라미터로 input 자동 채우기
+(function() {
+    function getParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param) || '';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var prefillName = getParam('prefill_name');
+        var prefillEmail = getParam('prefill_email');
+        var prefillMbti = getParam('prefill_mbti');
+        if (prefillName) {
+            var nameInput = document.getElementById('friend_name');
+            if (nameInput) nameInput.value = prefillName;
+            var display1 = document.getElementById('friend_name_display');
+            var display2 = document.getElementById('friend_name_display2');
+            if (display1) display1.textContent = prefillName;
+            if (display2) display2.textContent = prefillName;
+        }
+        if (prefillEmail) {
+            var emailInput = document.getElementById('friend_email');
+            if (emailInput) emailInput.value = prefillEmail;
+        }
+        if (prefillMbti) {
+            var mbtiInput = document.getElementById('friend_mbti');
+            if (mbtiInput) mbtiInput.value = prefillMbti;
+        }
+    });
+})();
 </script>
 {% endblock %} 
