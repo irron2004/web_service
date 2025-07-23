@@ -2,6 +2,7 @@ from sqlmodel import Field, SQLModel
 from datetime import datetime
 from uuid import uuid4
 from typing import Dict, Optional
+from sqlalchemy import JSON
 
 class Friend(SQLModel, table=True):
     email: str = Field(primary_key=True, index=True)
@@ -26,8 +27,8 @@ class Response(SQLModel, table=True):
     pair_id: str = Field(foreign_key="pair.id", index=True)
     role: str            # "me" | "other"
     relation: str | None = None   # friend | boyfriend | ...
-    answers: Dict[int, int]
+    answers: str = Field(sa_column=JSON)  # JSON string으로 저장
     mbti_type: str
-    scores: Dict[str, int]
-    raw_scores: Dict[str, int]
+    scores: str = Field(sa_column=JSON)   # JSON string으로 저장
+    raw_scores: str = Field(sa_column=JSON)  # JSON string으로 저장
     created_at: datetime = Field(default_factory=datetime.utcnow) 
