@@ -19,6 +19,7 @@ class Pair(SQLModel, table=True):
     my_name: str | None = None
     my_email: str | None = None
     my_mbti: str | None = None
+    relation: str | None = None    # friend | boyfriend | girlfriend | family | colleague
     completed: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -27,6 +28,9 @@ class Response(SQLModel, table=True):
     pair_id: str = Field(foreign_key="pair.id", index=True)
     role: str            # "me" | "other"
     relation: str | None = None   # friend | boyfriend | ...
+    my_name: str | None = None    # 내 이름 (공유자 정보)
+    my_email: str | None = None   # 내 이메일 (공유자 정보)
+    my_mbti: str | None = None    # 내 MBTI (공유자 정보)
     answers: str = Field(sa_column=JSON)  # JSON string으로 저장
     mbti_type: str
     scores: str = Field(sa_column=JSON)   # JSON string으로 저장

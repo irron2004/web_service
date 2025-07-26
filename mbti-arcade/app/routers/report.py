@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from app.core.db import get_session
 from app.core.token import verify_token
 from app.core.services.mbti_service import MBTIService
-from app.core.advice import build_advice
+from app.core.advice import MBTIAdvice
 
 router = APIRouter(prefix="/api", tags=["Report"])
 
@@ -30,5 +30,5 @@ async def advice(token: str, session=Depends(get_session)):
     if not data or len(data) < 2:
         raise HTTPException(404)
     mine, yours = sorted(data, key=lambda x: x["role"] == "other")
-    advice = build_advice(mine["mbti"], yours["mbti"])
+    advice = MBTIAdvice.generate_advice(mine["mbti"], yours["mbti"], "friend", mine.get("scores", {}))
     return {"my_mbti": mine["mbti"], "your_mbti": yours["mbti"], "advice": advice} 

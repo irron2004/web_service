@@ -146,6 +146,20 @@
               class="w-full h-72"></canvas>
     </div>
 
+    <!-- 개인화된 조언 카드 -->
+    {% if pair_token %}
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">💡 개인화된 조언</h3>
+        <div id="advice" 
+             hx-get="/api/advice/{{ pair_token }}" 
+             hx-trigger="load" 
+             hx-swap="innerHTML"
+             class="min-h-[100px] flex items-center justify-center">
+            <div class="text-gray-500">조언을 불러오는 중...</div>
+        </div>
+    </div>
+    {% endif %}
+
     {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
@@ -165,6 +179,22 @@
           },
           options:{responsive:true, plugins:{legend:{position:'top'}}}
         });
+      });
+
+      // 조언 API 응답 처리
+      document.body.addEventListener('htmx:afterOnLoad', evt => {
+        if(evt.detail.requestConfig.path.startsWith('/api/advice/')) {
+          try {
+            const {advice} = JSON.parse(evt.detail.xhr.responseText);
+            evt.target.innerHTML = `<div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+              <p class="text-purple-800 leading-relaxed">${advice}</p>
+            </div>`;
+          } catch (e) {
+            evt.target.innerHTML = `<div class="p-4 bg-red-50 rounded-lg border border-red-200">
+              <p class="text-red-800">조언을 불러오는 중 오류가 발생했습니다.</p>
+            </div>`;
+          }
+        }
       });
     </script>
     {% endblock %}

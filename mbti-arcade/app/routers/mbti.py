@@ -8,6 +8,8 @@ from app.core.token import issue_token, verify_token
 from typing import Optional
 import random
 from app.database import save_evaluation, get_friend_info, get_evaluation_statistics, save_friend_info, update_actual_mbti
+from app.core.models_db import Pair
+from app.core.advice import MBTIAdvice
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -45,6 +47,11 @@ MBTI_QUESTIONS = [
     {"id": 22, "question": "그 사람은 기한이 다가와야 집중력이 높아진다.", "type": "J-P", "sign": -1},
     {"id": 23, "question": "그 사람은 결정된 뒤에도 더 나은 옵션을 계속 탐색한다.", "type": "J-P", "sign": -1},
     {"id": 24, "question": "그 사람은 미리 해야 할 일을 끝내야 마음이 편하다.", "type": "J-P", "sign": 1},
+]
+
+# 관계 옵션
+RELATION_OPTIONS = [
+    "friend", "boyfriend", "girlfriend", "family", "colleague", "acquaintance"
 ]
 
 # MBTI 결과 데이터
@@ -122,6 +129,79 @@ async def friend_input_post(request: Request,
     pair_id = await svc.create_pair("friend", friend_email)
     token = issue_token(pair_id)
     return RedirectResponse(f"/mbti/share/{token}", 303)
+
+@router.post("/share", response_class=HTMLResponse)
+async def make_share(request: Request,
+                    my_name: str = Form(...),
+                    my_email: str = Form(...),
+                    my_mbti: str = Form(...),
+                    friend_name: str = Form(...),
+                    friend_email: str = Form(...),
+                    relation: str = Form(...),
+                    session=Depends(get_session)):
+    """공유 링크 생성"""
+    svc = MBTIService(session)
+    
+    # Friend 정보 저장/업데이트
+    friend = await session.get(Friend, friend_email) or Friend(email=friend_email)
+    friend.name = friend_name
+    session.add(friend)
+    await session.commit()
+    
+    # Pair 생성
+    pair_id = await svc.create_pair(
+        mode="friend", 
+        email=friend_email,
+        my_name=my_name,
+        my_email=my_email,
+        my_mbti=my_mbti
+    )
+    
+    # 토큰 생성 (60분 TTL)
+    token = issue_token(pair_id, my_mbti)
+    
+    # 공유 성공 페이지로 리다이렉트
+    base_url = str(request.base_url).rstrip('/')
+    return RedirectResponse(f"/mbti/share_success?url={base_url}/mbti/quiz/{token}", 303)
+
+@router.get("/share_success", response_class=HTMLResponse)
+async def share_success(request: Request):
+    """공유 성공 페이지"""
+    share_url = request.query_params.get('url', '')
+    return templates.TemplateResponse("mbti/share_success.html", {
+        "request": request,
+        "share_url": share_url
+    })
+
+@router.get("/quiz/{token}", response_class=HTMLResponse)
+async def friend_test(request: Request, token: str, session=Depends(get_session)):
+    """친구 테스트 페이지"""
+    try:
+        pair_id, my_mbti = verify_token(token)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Invalid or expired token")
+    
+    # Pair 정보 가져오기
+    svc = MBTIService(session)
+    pair = await session.get(Pair, pair_id)
+    if not pair:
+        raise HTTPException(status_code=404, detail="Pair not found")
+    
+    # 친구 정보 가져오기
+    friend = await session.get(Friend, pair.friend_email) if pair.friend_email else None
+    
+    questions = MBTI_QUESTIONS.copy()
+    random.shuffle(questions)
+    
+    return templates.TemplateResponse("mbti/friend_test.html", {
+        "request": request,
+        "token": token,
+        "pair": pair,
+        "friend": friend,
+        "my_mbti": my_mbti,
+        "questions": questions,
+        "relations": RELATION_OPTIONS
+    })
 
 @router.post("/update_actual_mbti", response_class=HTMLResponse)
 async def update_actual_mbti_post(request: Request,
@@ -387,21 +467,69 @@ async def share_form(request: Request, token: str):
 @router.post("/result/{token}", response_class=HTMLResponse)
 async def mbti_result(token: str, request: Request, session=Depends(get_session)):
     try:
-        pair_id = verify_token(token)
+        pair_id, my_mbti = verify_token(token)
     except ValueError:
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, detail="Invalid or expired token")
+    
     form = await request.form()
-    answers = {int(k[1:]): int(v) for k, v in form.items() if k.startswith("q")}
+    
+    # 필수 필드 검증
+    relation = form.get("relation")
+    if not relation:
+        raise HTTPException(status_code=400, detail="Relation is required")
+    
+    # 답변 수집 및 검증
+    answers = {}
+    for k, v in form.items():
+        if k.startswith("q"):
+            try:
+                question_id = int(k[1:])
+                answer_value = int(v)
+                if answer_value < 1 or answer_value > 5:
+                    raise HTTPException(status_code=400, detail=f"Invalid answer value for question {question_id}")
+                answers[question_id] = answer_value
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Invalid answer format for question {k}")
+    
+    if len(answers) != 24:
+        raise HTTPException(status_code=400, detail="All 24 questions must be answered")
+    
+    # Pair 정보 가져오기
+    pair = await session.get(Pair, pair_id)
+    if not pair:
+        raise HTTPException(status_code=404, detail="Pair not found")
+    
+    # 친구 정보 가져오기
+    friend = await session.get(Friend, pair.friend_email) if pair.friend_email else None
+    
+    # Response 저장
     svc = MBTIService(session)
-    resp, mbti_type, scores, raw = await svc.save_response(pair_id, role="other", answers=answers, questions=MBTI_QUESTIONS)
+    resp, mbti_type, scores, raw = await svc.save_response(
+        pair_id, 
+        role="other", 
+        answers=answers, 
+        questions=MBTI_QUESTIONS,
+        relation=relation,
+        my_name=pair.my_name,
+        my_email=pair.my_email,
+        my_mbti=pair.my_mbti
+    )
+    
+    # Pair 완료 상태 업데이트
+    pair.completed = True
+    await session.commit()
+    
     return templates.TemplateResponse("mbti/result.html", {
         "request": request,
         "mbti_type": mbti_type,
         "result": MBTI_RESULTS.get(mbti_type, {"title": "알 수 없음", "description": "결과를 분석할 수 없습니다."}),
         "scores": scores,
         "raw_scores": raw,
-        "friend_email": resp.friend_email,
-        "evaluator_name": resp.evaluator_name
+        "pair_token": token,
+        "friend_name": friend.name if friend else "친구",
+        "friend_email": pair.friend_email,
+        "my_mbti": my_mbti,
+        "relation": relation
     })
 
 @router.post("/self-result", response_class=HTMLResponse)
@@ -498,4 +626,33 @@ async def self_mbti_result(request: Request):
 async def report_json(pair_id: str, session=Depends(get_session)):
     svc = MBTIService(session)
     resp = await svc.get_response(pair_id)
-    return {"labels": ["E","I","S","N","T","F","J","P"], "values": [resp.scores[k] for k in "EISNTFJP"]} 
+    return {"labels": ["E","I","S","N","T","F","J","P"], "values": [resp.scores[k] for k in "EISNTFJP"]}
+
+@router.get("/api/advice/{token}", response_class=JSONResponse)
+async def get_advice(token: str, session=Depends(get_session)):
+    """개인화된 조언 API"""
+    try:
+        pair_id, my_mbti = verify_token(token)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Invalid or expired token")
+    
+    # Pair 정보 가져오기
+    pair = await session.get(Pair, pair_id)
+    if not pair:
+        raise HTTPException(status_code=404, detail="Pair not found")
+    
+    # Response 정보 가져오기
+    svc = MBTIService(session)
+    response = await svc.get_response(pair_id)
+    if not response:
+        raise HTTPException(status_code=404, detail="Response not found")
+    
+    # 조언 생성
+    advice = MBTIAdvice.generate_advice(
+        my_mbti=my_mbti,
+        friend_mbti=response.mbti_type,
+        relation=response.relation or "friend",
+        scores=response.scores
+    )
+    
+    return {"advice": advice} 

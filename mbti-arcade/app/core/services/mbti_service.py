@@ -45,11 +45,22 @@ class MBTIService:
         await self.session.commit()
         return pair.id
 
-    async def save_response(self, pair_id: str, role: str, answers, questions):
+    async def save_response(self, pair_id: str, role: str, answers, questions, 
+                          relation: str = None, my_name: str = None, 
+                          my_email: str = None, my_mbti: str = None):
         mbti, scores, raw = self._calc_scores(answers, questions)
-        resp = Response(pair_id=pair_id, role=role,
-                        answers=answers, mbti_type=mbti,
-                        scores=scores, raw_scores=raw)
+        resp = Response(
+            pair_id=pair_id, 
+            role=role,
+            relation=relation,
+            my_name=my_name,
+            my_email=my_email,
+            my_mbti=my_mbti,
+            answers=answers, 
+            mbti_type=mbti,
+            scores=scores, 
+            raw_scores=raw
+        )
         self.session.add(resp)
         await self.session.commit()
         return resp, mbti, scores, raw 
