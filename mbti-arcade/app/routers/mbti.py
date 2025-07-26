@@ -651,7 +651,7 @@ async def get_advice(token: str, session=Depends(get_session)):
     advice = MBTIAdvice.generate_advice(
         my_mbti=my_mbti,
         friend_mbti=response.mbti_type,
-        relation=pair.relation or "friend",
+        relation=response.relation or "friend",
         scores=response.scores
     )
     
