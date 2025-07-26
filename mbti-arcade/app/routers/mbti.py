@@ -11,7 +11,6 @@ import random
 from app.database import save_evaluation, get_friend_info, get_evaluation_statistics, save_friend_info, update_actual_mbti
 from app.core.models_db import Pair
 from app.core.advice import MBTIAdvice
-from app.templates import templates
 import json
 from urllib.parse import urlencode
 
