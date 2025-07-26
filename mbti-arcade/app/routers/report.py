@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api", tags=["Report"])
 @router.get("/report/{token}")
 async def report(token: str, session=Depends(get_session)):
     try:
-        pair_id = verify_token(token)
+        pair_id, my_mbti = verify_token(token)
     except ValueError:
         raise HTTPException(status_code=404, detail="invalid link")
 
@@ -24,11 +24,16 @@ async def report(token: str, session=Depends(get_session)):
 
 @router.get("/advice/{token}")
 async def advice(token: str, session=Depends(get_session)):
-    pid, my_mbti = verify_token(token)
+    try:
+        pair_id, my_mbti = verify_token(token)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="invalid link")
+    
     svc = MBTIService(session)
-    data = await svc.get_pair_scores(pid)   # me + other
+    data = await svc.get_pair_scores(pair_id)   # me + other
     if not data or len(data) < 2:
         raise HTTPException(404)
+    
     mine, yours = sorted(data, key=lambda x: x["role"] == "other")
     advice = MBTIAdvice.generate_advice(mine["mbti"], yours["mbti"], "friend", mine.get("scores", {}))
     return {"my_mbti": mine["mbti"], "your_mbti": yours["mbti"], "advice": advice} 

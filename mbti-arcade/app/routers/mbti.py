@@ -1,17 +1,21 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException
-from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from sqlmodel import select
 from app.core.db import get_session
 from app.core.services.mbti_service import MBTIService
-from app.core.models_db import Friend
+from app.core.models_db import Friend, Pair, Response
 from app.core.token import issue_token, verify_token
-from typing import Optional
+from typing import Optional, Dict, Any
 import random
 from app.database import save_evaluation, get_friend_info, get_evaluation_statistics, save_friend_info, update_actual_mbti
 from app.core.models_db import Pair
 from app.core.advice import MBTIAdvice
+from app.templates import templates
+import json
+from urllib.parse import urlencode
 
-router = APIRouter()
+router = APIRouter(prefix="/mbti", tags=["MBTI"])
 templates = Jinja2Templates(directory="app/templates")
 
 # MBTI 질문 데이터 (24문항)
@@ -509,10 +513,7 @@ async def mbti_result(token: str, request: Request, session=Depends(get_session)
         role="other", 
         answers=answers, 
         questions=MBTI_QUESTIONS,
-        relation=relation,
-        my_name=pair.my_name,
-        my_email=pair.my_email,
-        my_mbti=pair.my_mbti
+        relation=relation
     )
     
     # Pair 완료 상태 업데이트
@@ -651,7 +652,7 @@ async def get_advice(token: str, session=Depends(get_session)):
     advice = MBTIAdvice.generate_advice(
         my_mbti=my_mbti,
         friend_mbti=response.mbti_type,
-        relation=response.relation or "friend",
+        relation=pair.relation or "friend",
         scores=response.scores
     )
     

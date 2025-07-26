@@ -3,151 +3,106 @@
 {% block title %}공유 링크 생성 완료 - MBTI & Arcade Web Service{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="max-w-2xl mx-auto">
     <div class="text-center mb-8">
-        <div class="text-6xl mb-4">🎉</div>
         <h1 class="text-3xl font-bold text-gray-800 mb-4">
-            공유 링크가 생성되었습니다!
+            🎉 공유 링크 생성 완료!
         </h1>
-        <p class="text-xl text-gray-600">
-            친구에게 링크를 공유하여 MBTI 테스트를 받아보세요.
+        <p class="text-xl text-gray-600 mb-6">
+            친구에게 링크를 보내서 MBTI 테스트를 받아보세요.
         </p>
     </div>
 
-    <!-- 공유 링크 카드 -->
-    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">📤 공유 링크</h2>
-        
-        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-            <div class="flex items-center justify-between">
-                <input type="text" id="shareUrl" value="{{ share_url }}" readonly 
-                       class="flex-1 bg-transparent border-none outline-none text-lg font-mono text-gray-700">
-                <button onclick="copyToClipboard()" 
-                        class="ml-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <!-- 생성된 링크 -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">🔗 생성된 공유 링크</h2>
+            <div class="flex">
+                <input type="text" 
+                       id="shareUrl" 
+                       value="{{ request.query_params.get('url', '') }}" 
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md text-sm"
+                       readonly>
+                <button onclick="copyText('shareUrl')" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
                     복사
                 </button>
             </div>
         </div>
 
-        <div class="text-center">
-            <p class="text-gray-600 mb-4">
-                이 링크는 <strong>60분</strong> 후에 만료됩니다.
-            </p>
-            <div class="flex justify-center space-x-4">
-                <a href="{{ share_url }}" target="_blank" 
-                   class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
-                    🔗 링크 테스트하기
-                </a>
-                <button onclick="shareToKakao()" 
-                        class="bg-yellow-400 text-black px-6 py-3 rounded-lg hover:bg-yellow-500 transition-colors">
-                    💬 카카오톡 공유
-                </button>
+        <!-- 공유 방법 -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">📤 공유 방법</h2>
+            <div class="space-y-4">
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">💬 메신저 공유</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        카카오톡, 텔레그램, 슬랙 등 메신저로 링크를 복사해서 보내세요.
+                    </p>
+                </div>
+
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">📧 이메일 공유</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        이메일로 링크를 보내서 친구가 테스트를 받을 수 있도록 하세요.
+                    </p>
+                </div>
+
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">📱 QR 코드 (선택사항)</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        모바일에서 QR 코드를 스캔하여 바로 접속할 수 있습니다.
+                    </p>
+                    <div class="text-center">
+                        <div class="inline-block p-4 bg-white rounded-lg">
+                            <div class="w-32 h-32 bg-gray-200 rounded flex items-center justify-center">
+                                <span class="text-gray-500 text-xs">QR Code</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 공유 방법 안내 -->
-    <div class="grid md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-blue-800 mb-3">📱 모바일 공유</h3>
-            <ul class="space-y-2 text-blue-700">
-                <li>• 카카오톡, 텔레그램 등 메신저로 링크 전송</li>
-                <li>• 문자메시지로 링크 공유</li>
-                <li>• QR코드 생성하여 공유</li>
-            </ul>
+        <!-- 안내사항 -->
+        <div class="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-blue-800 mb-3">ℹ️ 안내사항</h3>
+            <div class="text-blue-700 space-y-2">
+                <p>• 링크는 1시간 후 만료됩니다.</p>
+                <p>• 친구가 테스트를 완료하면 결과를 비교할 수 있습니다.</p>
+                <p>• 개인정보는 안전하게 보호됩니다.</p>
+            </div>
         </div>
-        
-        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-green-800 mb-3">💻 데스크톱 공유</h3>
-            <ul class="space-y-2 text-green-700">
-                <li>• 이메일로 링크 전송</li>
-                <li>• 슬랙, 디스코드 등 팀 협업 도구</li>
-                <li>• 소셜미디어에 링크 게시</li>
-            </ul>
-        </div>
-    </div>
 
-    <!-- 결과 확인 안내 -->
-    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-8">
-        <h3 class="text-lg font-semibold text-purple-800 mb-3">📊 결과 확인</h3>
-        <div class="text-purple-700">
-            <p class="mb-2">친구가 테스트를 완료하면:</p>
-            <ul class="space-y-1">
-                <li>• 친구의 MBTI 결과를 확인할 수 있습니다</li>
-                <li>• 당신의 자가 평가와 비교 분석을 볼 수 있습니다</li>
-                <li>• 차이점과 공통점을 통해 서로를 더 깊이 이해할 수 있습니다</li>
-            </ul>
+        <!-- 액션 버튼 -->
+        <div class="flex justify-center space-x-4">
+            <a href="/mbti" 
+               class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
+                🧠 다시 테스트하기
+            </a>
+            <a href="/mbti/types" 
+               class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition-colors">
+                📊 모든 유형 보기
+            </a>
+            <a href="/" 
+               class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors">
+                🏠 홈으로
+            </a>
         </div>
-    </div>
-
-    <!-- 액션 버튼들 -->
-    <div class="text-center space-x-4">
-        <a href="/mbti" 
-           class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-            🧠 내 MBTI 테스트하기
-        </a>
-        <a href="/mbti/friend" 
-           class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
-            👥 다른 친구 테스트하기
-        </a>
-        <a href="/" 
-           class="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
-            🏠 홈으로 돌아가기
-        </a>
     </div>
 </div>
 
 <script>
-function copyToClipboard() {
-    const urlInput = document.getElementById('shareUrl');
-    urlInput.select();
-    urlInput.setSelectionRange(0, 99999); // For mobile devices
-    
+async function copyText(id) {
+    const el = document.getElementById(id);
     try {
-        // Modern clipboard API
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(urlInput.value).then(() => {
-                showCopySuccess();
-            });
-        } else {
-            // Fallback for older browsers
-            document.execCommand('copy');
-            showCopySuccess();
-        }
-    } catch (err) {
-        console.error('Failed to copy: ', err);
-        alert('링크 복사에 실패했습니다. 수동으로 복사해주세요.');
+        await navigator.clipboard.writeText(el.value);
+        alert('링크가 복사되었습니다!');
+    } catch(_) {
+        el.select();
+        document.execCommand('copy');
+        alert('링크가 복사되었습니다!');
     }
-}
-
-function showCopySuccess() {
-    const button = event.target;
-    const originalText = button.textContent;
-    button.textContent = '복사됨!';
-    button.classList.add('bg-green-600');
-    button.classList.remove('bg-blue-600');
-    
-    setTimeout(() => {
-        button.textContent = originalText;
-        button.classList.remove('bg-green-600');
-        button.classList.add('bg-blue-600');
-    }, 2000);
-}
-
-function shareToKakao() {
-    const url = document.getElementById('shareUrl').value;
-    const text = 'MBTI 테스트를 받아보세요! 당신이 생각하는 나의 MBTI는 무엇일까요?';
-    
-    // 카카오톡 공유 URL 생성
-    const kakaoUrl = `https://story.kakao.com/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-    window.open(kakaoUrl, '_blank');
-}
-
-// QR 코드 생성 (선택적)
-function generateQRCode() {
-    const url = document.getElementById('shareUrl').value;
-    // QR 코드 라이브러리를 사용하여 QR 코드 생성
-    // 예: qrcode.js 라이브러리 사용
 }
 </script>
 {% endblock %} 

@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 import os
 
-from app.routers import mbti, arcade, report
+from app.routers import mbti, arcade, report, share, quiz
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
@@ -28,6 +28,8 @@ templates = Jinja2Templates(directory="app/templates")
 app.include_router(mbti.router, prefix="/mbti", tags=["MBTI"])
 app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
 app.include_router(report.router)
+app.include_router(share.router)
+app.include_router(quiz.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):

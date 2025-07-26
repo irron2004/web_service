@@ -37,7 +37,7 @@ class MBTIService:
         )
         return mbti, scores, raw
 
-    async def create_pair(self, mode: str, email: str | None,
+    async def create_pair(self, mode: str, email: str | None, 
                          my_name: str | None = None, my_email: str | None = None, my_mbti: str | None = None) -> str:
         pair = Pair(mode=mode, friend_email=email,
                     my_name=my_name, my_email=my_email, my_mbti=my_mbti)
@@ -46,16 +46,12 @@ class MBTIService:
         return pair.id
 
     async def save_response(self, pair_id: str, role: str, answers, questions, 
-                          relation: str = None, my_name: str = None, 
-                          my_email: str = None, my_mbti: str = None):
+                          relation: str = None):
         mbti, scores, raw = self._calc_scores(answers, questions)
         resp = Response(
             pair_id=pair_id, 
             role=role,
             relation=relation,
-            my_name=my_name,
-            my_email=my_email,
-            my_mbti=my_mbti,
             answers=answers, 
             mbti_type=mbti,
             scores=scores, 

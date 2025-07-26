@@ -16,10 +16,9 @@ class Pair(SQLModel, table=True):
     id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True)
     mode: str                      # self | friend
     friend_email: str | None = Field(foreign_key="friend.email")
-    my_name: str | None = None
-    my_email: str | None = None
-    my_mbti: str | None = None
-    relation: str | None = None    # friend | boyfriend | girlfriend | family | colleague
+    my_name: str | None = None     # 내 이름 (공유자 정보)
+    my_email: str | None = None    # 내 이메일 (공유자 정보)
+    my_mbti: str | None = None     # 내 MBTI (공유자 정보)
     completed: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -27,10 +26,7 @@ class Response(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     pair_id: str = Field(foreign_key="pair.id", index=True)
     role: str            # "me" | "other"
-    relation: str | None = None   # friend | boyfriend | ...
-    my_name: str | None = None    # 내 이름 (공유자 정보)
-    my_email: str | None = None   # 내 이메일 (공유자 정보)
-    my_mbti: str | None = None    # 내 MBTI (공유자 정보)
+    relation: str | None = None   # friend | boyfriend | girlfriend | family | colleague
     answers: str = Field(sa_column=JSON)  # JSON string으로 저장
     mbti_type: str
     scores: str = Field(sa_column=JSON)   # JSON string으로 저장

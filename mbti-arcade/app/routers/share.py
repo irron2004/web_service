@@ -4,10 +4,14 @@ from app.core.db import get_session
 from app.core.services.mbti_service import MBTIService
 from app.core.token import issue_token
 from urllib.parse import urlencode
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
+limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(tags=["Share"])
 
 @router.post("/share", response_class=HTMLResponse)
+@limiter.limit("1/minute")
 async def make_share_link(request: Request,
                           name: str = Form(...),
                           email: str = Form(None),
