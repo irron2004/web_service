@@ -1,7 +1,7 @@
-"""initial schema
+"""add share columns
 
-Revision ID: 001
-Revises: 
+Revision ID: 002
+Revises: 001
 Create Date: 2024-01-01 00:00:00.000000
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '001'
-down_revision = None
+revision = '002'
+down_revision = '001'
 branch_labels = None
 depends_on = None
 

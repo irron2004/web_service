@@ -273,10 +273,39 @@
 async function copyText(id){
   const el = document.getElementById(id);
   try {
+    // Modern Clipboard API 사용
     await navigator.clipboard.writeText(el.value);
-    alert('복사되었습니다!');
-  }catch(_){
-    el.select(); document.execCommand('copy');
+    showCopySuccess();
+  } catch(err) {
+    // Fallback: execCommand 사용
+    try {
+      el.select(); 
+      document.execCommand('copy');
+      showCopySuccess();
+    } catch(fallbackErr) {
+      // 최종 fallback: 수동 복사 안내
+      showManualCopy(el.value);
+    }
+  }
+}
+
+function showCopySuccess() {
+  const button = event.target;
+  const originalText = button.textContent;
+  button.textContent = '복사됨!';
+  button.classList.add('bg-green-600');
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.classList.remove('bg-green-600');
+  }, 2000);
+}
+
+function showManualCopy(text) {
+  const message = `링크를 수동으로 복사해주세요:\n${text}`;
+  if (confirm(message + '\n\n확인을 누르면 링크가 선택됩니다.')) {
+    const el = document.getElementById('shareUrl');
+    el.select();
+    el.focus();
   }
 }
 
