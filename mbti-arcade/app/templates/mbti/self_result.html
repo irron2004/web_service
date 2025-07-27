@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}내 MBTI 결과 - {{ mbti_type }} - MBTI & Arcade Web Service{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">
+            🎉 내 MBTI 결과
+        </h1>
+        <p class="text-xl text-gray-600">
+            자기 평가 테스트가 완료되었습니다!
+        </p>
+    </div>
+
+    <!-- MBTI Result Card -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-xl p-8 mb-8">
+        <div class="text-center">
+            <div class="text-8xl mb-4">🧠</div>
+            <h2 class="text-5xl font-bold mb-2">{{ mbti_type }}</h2>
+            <h3 class="text-2xl font-semibold mb-4">{{ result.title }}</h3>
+            <p class="text-xl opacity-90">{{ result.description }}</p>
+        </div>
+    </div>
+
+    <!-- Score Breakdown -->
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">성향 분석</h3>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">외향성 (E)</span>
+                        <span class="text-blue-600">{{ scores.E }}%</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">내향성 (I)</span>
+                        <span class="text-blue-600">{{ scores.I }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ scores.E }}%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">감각 (S)</span>
+                        <span class="text-green-600">{{ scores.S }}%</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">직관 (N)</span>
+                        <span class="text-green-600">{{ scores.N }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: {{ scores.S }}%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">사고 (T)</span>
+                        <span class="text-purple-600">{{ scores.T }}%</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">감정 (F)</span>
+                        <span class="text-purple-600">{{ scores.F }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full" style="width: {{ scores.T }}%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">판단 (J)</span>
+                        <span class="text-orange-600">{{ scores.J }}%</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">인식 (P)</span>
+                        <span class="text-orange-600">{{ scores.P }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-orange-600 h-2 rounded-full" style="width: {{ scores.J }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">MBTI 유형 설명</h3>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[0] }} - {{ "외향성" if mbti_type[0] == "E" else "내향성" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[0] == "E" %}
+                        활발하고 사교적이며, 다른 사람들과의 상호작용을 통해 에너지를 얻습니다.
+                        {% else %}
+                        조용하고 신중하며, 혼자만의 시간을 통해 에너지를 얻습니다.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[1] }} - {{ "감각" if mbti_type[1] == "S" else "직관" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[1] == "S" %}
+                        구체적이고 실용적이며, 현재의 사실과 세부사항에 집중합니다.
+                        {% else %}
+                        창의적이고 미래지향적이며, 가능성과 패턴을 추구합니다.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[2] }} - {{ "사고" if mbti_type[2] == "T" else "감정" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[2] == "T" %}
+                        논리적이고 객관적이며, 원칙과 일관성을 중시합니다.
+                        {% else %}
+                        공감적이고 주관적이며, 조화와 가치를 중시합니다.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ mbti_type[3] }} - {{ "판단" if mbti_type[3] == "J" else "인식" }}</h4>
+                    <p class="text-sm text-gray-600">
+                        {% if mbti_type[3] == "J" %}
+                        체계적이고 계획적이며, 결정을 내리고 마무리하는 것을 선호합니다.
+                        {% else %}
+                        유연하고 적응적이며, 선택지를 열어두고 상황에 따라 대응합니다.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center space-y-4">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/mbti/self-test" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                다시 테스트하기
+            </a>
+            <a href="/mbti/friend-system" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                친구 평가하기
+            </a>
+            <a href="/mbti/types" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                모든 MBTI 유형 보기
+            </a>
+        </div>
+        
+        <div class="mt-8">
+            <a href="/" class="text-gray-600 hover:text-gray-800 font-semibold transition duration-300">
+                ← 메인 페이지로 돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

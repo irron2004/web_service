@@ -25,11 +25,18 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 # 라우터 등록
-app.include_router(mbti.router, prefix="/mbti", tags=["MBTI"])
+app.include_router(mbti.router, tags=["MBTI"])
 app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
 app.include_router(report.router)
 app.include_router(share.router)
 app.include_router(quiz.router)
+
+# 디버깅을 위한 라우트 출력
+print("Registered routes:")
+for route in app.routes:
+    if hasattr(route, 'path'):
+        methods = getattr(route, 'methods', set())
+        print(f"  {methods} {route.path}")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):

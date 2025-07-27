@@ -1,13 +1,12 @@
 import pytest
-import httpx
 from fastapi.testclient import TestClient
 from app.main import app
-
-client = TestClient(app)
 
 @pytest.mark.asyncio
 async def test_share_flow():
     """공유 링크 생성 → 퀴즈 → 결과 플로우 테스트"""
+    
+    client = TestClient(app)
     
     # 1. 공유 링크 생성
     share_data = {
@@ -17,6 +16,9 @@ async def test_share_flow():
     }
     
     response = client.post("/share", data=share_data)
+    print(f"Response status: {response.status_code}")
+    print(f"Response headers: {response.headers}")
+    print(f"Response text: {response.text}")
     assert response.status_code == 303  # Redirect
     
     # 2. 퀴즈 페이지 접근 (토큰 추출)
@@ -45,6 +47,8 @@ async def test_share_flow():
 async def test_expired_token():
     """만료된 토큰 테스트"""
     
+    client = TestClient(app)
+    
     # 잘못된 토큰으로 접근
     response = client.get("/quiz/invalid_token")
     assert response.status_code == 403
@@ -52,6 +56,8 @@ async def test_expired_token():
 @pytest.mark.asyncio
 async def test_rate_limit():
     """Rate limiting 테스트"""
+    
+    client = TestClient(app)
     
     share_data = {
         "name": "테스트 사용자",
