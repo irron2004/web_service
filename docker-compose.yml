@@ -1,0 +1,83 @@
+services:
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - main-hub
+      - math-backend
+      - math-frontend
+      - mbti-arcade
+    networks:
+      - web-service-network
+    container_name: nginx-proxy
+
+  # Main Service Hub
+  main-hub:
+    build: ./main-service
+    expose:
+      - "8080"
+    volumes:
+      - ./main-service:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: main-hub
+
+  # Math App Backend
+  math-backend:
+    build: ./math-app/backend
+    expose:
+      - "8000"
+    environment:
+      - DATABASE_URL=sqlite:///./math_app.db
+    volumes:
+      - ./math-app/backend:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: math-backend
+
+  # Math App Frontend
+  math-frontend:
+    build: ./math-app/frontend
+    expose:
+      - "80"
+    depends_on:
+      - math-backend
+    networks:
+      - web-service-network
+    container_name: math-frontend
+
+  # MBTI Arcade Service
+  mbti-arcade:
+    build: ./mbti-arcade
+    expose:
+      - "8000"
+    volumes:
+      - ./mbti-arcade:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: mbti-arcade
+
+  # Calculate Service
+  calculate-service:
+    build: ./calculate-service
+    expose:
+      - "8000"
+    volumes:
+      - ./calculate-service:/app
+      - /app/__pycache__
+    networks:
+      - web-service-network
+    container_name: calculate-service
+
+networks:
+  web-service-network:
+    driver: bridge 

@@ -28,6 +28,9 @@
     <form method="POST" action="/mbti/result" class="bg-white rounded-lg shadow-lg p-8">
         <!-- 친구 평가 정보 (URL 파라미터에서 가져옴) -->
         <input type="hidden" name="friend_email" value="{{ request.query_params.get('friend_email', '') }}">
+        {% if friend_info and friend_info.my_perspective %}
+        <input type="hidden" name="my_perspective" value="{{ friend_info.my_perspective }}">
+        {% endif %}
         
         <!-- 평가자 정보 입력 -->
         {% if request.query_params.get('friend_email') %}
@@ -53,6 +56,21 @@
                         {% endif %}
                     </p>
                 </div>
+            </div>
+            
+            <!-- 상대방 입장에서 MBTI 평가 안내 -->
+            <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p class="text-sm text-yellow-800">
+                    <strong>🎯 평가 방식:</strong> 
+                    {% if friend_info %}
+                        "내가 <strong>{{ friend_info.name }}</strong>이라고 생각하고 MBTI를 작성해주세요"
+                    {% else %}
+                        "내가 [친구 이름]이라고 생각하고 MBTI를 작성해주세요"
+                    {% endif %}
+                </p>
+                <p class="text-xs text-yellow-700 mt-1">
+                    상대방의 입장에서 생각하고 답변해주세요. 객관적인 관찰을 바탕으로 평가해주세요.
+                </p>
             </div>
         </div>
         {% endif %}

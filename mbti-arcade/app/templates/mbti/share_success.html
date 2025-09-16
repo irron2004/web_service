@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}공유 링크 생성 완료 - MBTI & Arcade Web Service{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">
+            🎉 공유 링크 생성 완료!
+        </h1>
+        <p class="text-xl text-gray-600 mb-6">
+            친구에게 링크를 보내서 MBTI 테스트를 받아보세요.
+        </p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <!-- 생성된 링크 -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">🔗 생성된 공유 링크</h2>
+            <div class="flex">
+                <input type="text" 
+                       id="shareUrl" 
+                       value="{{ request.query_params.get('url', '') }}" 
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md text-sm"
+                       readonly>
+                <button onclick="copyText('shareUrl')" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
+                    복사
+                </button>
+            </div>
+        </div>
+
+        <!-- 공유 방법 -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">📤 공유 방법</h2>
+            <div class="space-y-4">
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">💬 메신저 공유</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        카카오톡, 텔레그램, 슬랙 등 메신저로 링크를 복사해서 보내세요.
+                    </p>
+                </div>
+
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">📧 이메일 공유</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        이메일로 링크를 보내서 친구가 테스트를 받을 수 있도록 하세요.
+                    </p>
+                </div>
+
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">📱 QR 코드 (선택사항)</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        모바일에서 QR 코드를 스캔하여 바로 접속할 수 있습니다.
+                    </p>
+                    <div class="text-center">
+                        <div class="inline-block p-4 bg-white rounded-lg">
+                            <div class="w-32 h-32 bg-gray-200 rounded flex items-center justify-center">
+                                <span class="text-gray-500 text-xs">QR Code</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 안내사항 -->
+        <div class="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-blue-800 mb-3">ℹ️ 안내사항</h3>
+            <div class="text-blue-700 space-y-2">
+                <p>• 링크는 1시간 후 만료됩니다.</p>
+                <p>• 친구가 테스트를 완료하면 결과를 비교할 수 있습니다.</p>
+                <p>• 개인정보는 안전하게 보호됩니다.</p>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="flex justify-center space-x-4">
+            <a href="/mbti" 
+               class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
+                🧠 다시 테스트하기
+            </a>
+            <a href="/mbti/types" 
+               class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition-colors">
+                📊 모든 유형 보기
+            </a>
+            <a href="/" 
+               class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors">
+                🏠 홈으로
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+async function copyText(id) {
+    const el = document.getElementById(id);
+    try {
+        // Modern Clipboard API 사용
+        await navigator.clipboard.writeText(el.value);
+        showCopySuccess();
+    } catch(err) {
+        // Fallback: execCommand 사용
+        try {
+            el.select();
+            document.execCommand('copy');
+            showCopySuccess();
+        } catch(fallbackErr) {
+            // 최종 fallback: 수동 복사 안내
+            showManualCopy(el.value);
+        }
+    }
+}
+
+function showCopySuccess() {
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = '복사됨!';
+    button.classList.add('bg-green-600');
+    setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('bg-green-600');
+    }, 2000);
+}
+
+function showManualCopy(text) {
+    const message = `링크를 수동으로 복사해주세요:\n${text}`;
+    if (confirm(message + '\n\n확인을 누르면 링크가 선택됩니다.')) {
+        const el = document.getElementById('shareUrl');
+        el.select();
+        el.focus();
+    }
+}
+</script>
+{% endblock %} 

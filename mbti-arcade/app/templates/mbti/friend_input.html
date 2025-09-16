@@ -4,14 +4,73 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md mx-auto">
+    <div class="max-w-2xl mx-auto">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">친구 MBTI 평가</h1>
-            <p class="text-gray-600">평가할 친구의 정보를 입력해주세요</p>
+            <p class="text-gray-600">상대방의 입장에서 MBTI를 평가해보세요</p>
+        </div>
+
+        <!-- 새로운 설명 섹션 추가 -->
+        <div class="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
+            <div class="text-center mb-4">
+                <h3 class="text-xl font-bold text-purple-800 mb-2">"내 MBTI는 F야!"</h3>
+                <h3 class="text-xl font-bold text-purple-800 mb-4">"무슨 소리야, 넌 완전 T거든?"</h3>
+            </div>
+            
+            <p class="text-gray-700 mb-4 text-left">
+                친구 · 연인과 이런 대화 한 번쯤 해보셨죠?<br>
+                알고 보면 <strong>'내가 보는 나'</strong>와 <strong>'상대가 보는 나'</strong> 사이엔 꽤 큰 간극이 숨어 있습니다.<br>
+                이 간극이 오해를 부르고, 때로는 서운함이나 다툼으로 이어지기도 해요.
+            </p>
+            
+            <div class="bg-white p-4 rounded-lg border border-purple-300 mb-4">
+                <p class="text-purple-800 font-semibold text-center">
+                    <strong>이 테스트는 그 차이를 눈으로 확인해 보는 작은 실험</strong>입니다.
+                </p>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+                <div class="flex items-center">
+                    <span class="bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3">1</span>
+                    <span class="text-gray-700"><strong>STEP 1</strong> 내 관점으로 문항에 답하기</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3">2</span>
+                    <span class="text-gray-700"><strong>STEP 2</strong> 상대도 같은 문항으로 내 성격을 평가하기</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3">3</span>
+                    <span class="text-gray-700"><strong>STEP 3</strong> 두 결과를 나란히 비교하고, 어떤 지표에서 차이가 컸는지 시각화로 확인!</span>
+                </div>
+            </div>
+            
+            <p class="text-gray-700 text-left">
+                서로가 기대하는 모습과 실제 모습을 이해하면,<br>
+                <strong>"아, 그래서 네가 그렇게 생각했구나!"</strong> 하고 웃으며 넘어갈 수 있겠죠?<br>
+                작은 깨달음이 쌓이면, 더 오래오래 — 그리고 편안하게 — 좋은 관계를 이어갈 수 있을 거예요. 😊
+            </p>
         </div>
 
         <div class="bg-white rounded-lg shadow-lg p-6">
             <form method="POST" class="space-y-6">
+                <!-- 미리 입력된 정보가 있는 경우 표시 -->
+                {% if prefill_name or prefill_email or prefill_mbti %}
+                <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+                    <h3 class="text-sm font-medium text-green-800 mb-2">✅ 미리 입력된 정보</h3>
+                    <div class="space-y-2 text-sm text-green-700">
+                        {% if prefill_name %}
+                        <div><strong>친구 이름:</strong> {{ prefill_name }}</div>
+                        {% endif %}
+                        {% if prefill_email %}
+                        <div><strong>친구 이메일:</strong> {{ prefill_email }}</div>
+                        {% endif %}
+                        {% if prefill_mbti %}
+                        <div><strong>친구 MBTI:</strong> {{ prefill_mbti }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
                 <div>
                     <label for="friend_name" class="block text-sm font-medium text-gray-700 mb-2">
                         친구 이름 *
@@ -20,6 +79,7 @@
                            id="friend_name" 
                            name="friend_name" 
                            required
+                           value="{{ prefill_name }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            placeholder="친구의 이름을 입력하세요">
                 </div>
@@ -32,11 +92,19 @@
                            id="friend_email" 
                            name="friend_email" 
                            required
+                           value="{{ prefill_email }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            placeholder="friend@example.com">
                     <p class="mt-1 text-sm text-gray-500">
                         이 이메일로 친구의 평가 결과를 확인할 수 있습니다
                     </p>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-2">
+                    <span class="text-sm text-yellow-800">
+                        <strong>안내:</strong> 아래 MBTI 테스트는 <span id="friend_name_display">친구</span>의 입장에서 답변해 주세요.<br>
+                        즉, "내가 <span id="friend_name_display2">친구</span>라고 생각하고" 각 문항에 답해주시면 됩니다.
+                    </span>
                 </div>
 
                 <div>
@@ -48,6 +116,21 @@
                               rows="3"
                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               placeholder="친구에 대한 간단한 설명을 입력하세요"></textarea>
+                </div>
+
+                <div>
+                    <label for="my_perspective" class="block text-sm font-medium text-gray-700 mb-2">
+                        나의 관점/관계 *
+                    </label>
+                    <input type="text" 
+                           id="my_perspective" 
+                           name="my_perspective" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="예: 대학 동기, 직장 동료, 가족 등">
+                    <p class="mt-1 text-sm text-gray-500">
+                        친구와의 관계나 평가하는 관점을 입력해주세요
+                    </p>
                 </div>
 
                 <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
@@ -83,4 +166,58 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const friendNameInput = document.getElementById('friend_name');
+    const friendNameDisplay = document.getElementById('friend_name_display');
+    const friendNameDisplay2 = document.getElementById('friend_name_display2');
+    
+    // 미리 입력된 정보가 있으면 즉시 표시
+    if (friendNameInput.value.trim()) {
+        friendNameDisplay.textContent = friendNameInput.value.trim();
+        friendNameDisplay2.textContent = friendNameInput.value.trim();
+    }
+    
+    friendNameInput.addEventListener('input', function() {
+        const friendName = this.value.trim();
+        if (friendName) {
+            friendNameDisplay.textContent = friendName;
+            friendNameDisplay2.textContent = friendName;
+        } else {
+            friendNameDisplay.textContent = '친구';
+            friendNameDisplay2.textContent = '친구';
+        }
+    });
+});
+
+// URL 파라미터로 input 자동 채우기
+(function() {
+    function getParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param) || '';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var prefillName = getParam('prefill_name');
+        var prefillEmail = getParam('prefill_email');
+        var prefillMbti = getParam('prefill_mbti');
+        if (prefillName) {
+            var nameInput = document.getElementById('friend_name');
+            if (nameInput) nameInput.value = prefillName;
+            var display1 = document.getElementById('friend_name_display');
+            var display2 = document.getElementById('friend_name_display2');
+            if (display1) display1.textContent = prefillName;
+            if (display2) display2.textContent = prefillName;
+        }
+        if (prefillEmail) {
+            var emailInput = document.getElementById('friend_email');
+            if (emailInput) emailInput.value = prefillEmail;
+        }
+        if (prefillMbti) {
+            var mbtiInput = document.getElementById('friend_mbti');
+            if (mbtiInput) mbtiInput.value = prefillMbti;
+        }
+    });
+})();
+</script>
 {% endblock %} 

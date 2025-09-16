@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}친구 MBTI 테스트 - MBTI & Arcade Web Service{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- 헤더 섹션 -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">
+            🎯 친구 MBTI 테스트
+        </h1>
+        <p class="text-xl text-gray-600 mb-6">
+            당신이 생각하는 <strong>{{ friend.name if friend else "친구" }}</strong>의 MBTI를 평가해보세요!
+        </p>
+    </div>
+
+    <!-- 공유자 정보 배너 -->
+    <div class="bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg p-6 mb-8">
+        <div class="text-center">
+            <h2 class="text-2xl font-bold mb-2">📤 공유자 정보</h2>
+            <div class="grid md:grid-cols-3 gap-4 text-lg">
+                <div>
+                    <span class="font-medium">이름:</span>
+                    <span class="ml-2">{{ friend_name }}</span>
+                </div>
+                <div>
+                    <span class="font-medium">MBTI:</span>
+                    <span class="ml-2 font-bold">{{ my_mbti }}</span>
+                </div>
+                <div>
+                    <span class="font-medium">관계:</span>
+                    <span class="ml-2">선택해주세요</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테스트 안내 -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">💡 테스트 안내</h3>
+        <div class="text-blue-700 space-y-2">
+            <p>• <strong>{{ friend.name if friend else "친구" }}</strong>의 입장에서 생각하며 답변해주세요.</p>
+            <p>• 객관적인 관찰을 바탕으로 솔직하게 평가해주세요.</p>
+            <p>• 각 문항에 대해 1(전혀 그렇지 않다) ~ 5(매우 그렇다) 중 선택해주세요.</p>
+        </div>
+    </div>
+
+    <!-- 테스트 폼 -->
+    <form action="/mbti/result/{{ token }}" method="POST" class="space-y-8">
+        <!-- Hidden fields -->
+        <input type="hidden" name="token" value="{{ token }}">
+        
+        <!-- 관계 선택 -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">🤝 당신과의 관계</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                {% for relation in relations %}
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <input type="radio" name="relation" value="{{ relation }}" required class="mr-3">
+                    <span class="font-medium">
+                        {% if relation == "friend" %}친구
+                        {% elif relation == "boyfriend" %}남자친구
+                        {% elif relation == "girlfriend" %}여자친구
+                        {% elif relation == "family" %}가족
+                        {% elif relation == "colleague" %}동료
+                        {% elif relation == "acquaintance" %}지인
+                        {% else %}{{ relation }}
+                        {% endif %}
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- MBTI 질문들 -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">📝 MBTI 평가 문항</h3>
+            
+            <div class="space-y-6">
+                {% for question in questions %}
+                <div class="border-b border-gray-200 pb-6 last:border-b-0">
+                    <h4 class="text-lg font-medium text-gray-800 mb-4">
+                        {{ loop.index }}. {{ question.question }}
+                    </h4>
+                    
+                    <div class="grid grid-cols-5 gap-3">
+                        <label class="flex flex-col items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="q{{ question.id }}" value="1" required class="mb-2">
+                            <span class="text-sm font-medium text-center">전혀<br>그렇지 않다</span>
+                        </label>
+                        <label class="flex flex-col items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="q{{ question.id }}" value="2" required class="mb-2">
+                            <span class="text-sm font-medium text-center">그렇지 않다</span>
+                        </label>
+                        <label class="flex flex-col items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="q{{ question.id }}" value="3" required class="mb-2">
+                            <span class="text-sm font-medium text-center">보통이다</span>
+                        </label>
+                        <label class="flex flex-col items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="q{{ question.id }}" value="4" required class="mb-2">
+                            <span class="text-sm font-medium text-center">그렇다</span>
+                        </label>
+                        <label class="flex flex-col items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="q{{ question.id }}" value="5" required class="mb-2">
+                            <span class="text-sm font-medium text-center">매우<br>그렇다</span>
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="text-center">
+            <button type="submit" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-12 py-4 rounded-lg text-xl font-bold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105">
+                🚀 결과 확인하기
+            </button>
+        </div>
+    </form>
+
+    <!-- 추가 안내 -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-8">
+        <h3 class="text-lg font-semibold text-yellow-800 mb-3">💡 평가 팁</h3>
+        <div class="grid md:grid-cols-2 gap-4 text-yellow-700">
+            <div>
+                <h4 class="font-medium mb-2">🎯 객관적 관찰</h4>
+                <ul class="space-y-1 text-sm">
+                    <li>• 일상적인 행동 패턴을 생각해보세요</li>
+                    <li>• 편견 없이 솔직하게 답변하세요</li>
+                    <li>• 대부분의 상황에서 보이는 성향을 기준으로 하세요</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2">📊 결과 비교</h4>
+                <ul class="space-y-1 text-sm">
+                    <li>• 공유자의 자가 평가와 비교됩니다</li>
+                    <li>• 차이점과 공통점을 확인할 수 있습니다</li>
+                    <li>• 서로를 더 깊이 이해하는 기회가 됩니다</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 폼 유효성 검사
+document.querySelector('form').addEventListener('submit', function(e) {
+    const questions = document.querySelectorAll('input[name^="q"]');
+    const relation = document.querySelector('input[name="relation"]:checked');
+    
+    let missingQuestions = 0;
+    questions.forEach(q => {
+        if (!q.checked) missingQuestions++;
+    });
+    
+    if (!relation) {
+        e.preventDefault();
+        alert('관계를 선택해주세요.');
+        return;
+    }
+    
+    if (missingQuestions > 0) {
+        e.preventDefault();
+        alert(`아직 답변하지 않은 문항이 ${missingQuestions}개 있습니다. 모든 문항에 답변해주세요.`);
+        return;
+    }
+});
+</script>
+{% endblock %} 

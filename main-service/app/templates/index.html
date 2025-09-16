@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Web Service Hub{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <div class="gradient-bg text-white py-16 rounded-2xl mb-12">
+        <h1 class="text-5xl font-bold mb-6">
+            🚀 Web Service Hub
+        </h1>
+        <p class="text-xl mb-8 max-w-3xl mx-auto">
+            다양한 웹 서비스를 한 곳에서 관리하고 접근할 수 있는 중앙 허브입니다.
+        </p>
+    </div>
+
+    <!-- 사용 가능한 서비스 -->
+    <div class="mb-16">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">🎯 사용 가능한 서비스</h2>
+        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <!-- 심리검사 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
+                <div class="text-6xl mb-4">🧠</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">심리검사</h3>
+                <a href="/mbti" class="block w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium mb-2">
+                    MBTI
+                </a>
+            </div>
+
+            <!-- 수학 게임 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
+                <div class="text-6xl mb-4">🧮</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">수학 게임</h3>
+                <a href="/math" class="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium mb-2">
+                    Math App 접속
+                </a>
+            </div>
+
+            <!-- Arcade -->
+            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
+                <div class="text-6xl mb-4">🎮</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Arcade</h3>
+                <a href="/arcade" class="block w-full bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium">
+                    게임
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

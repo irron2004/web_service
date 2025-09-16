@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category }} 문제 - Calculate Service{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- 헤더 -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">
+            🧮 {{ category }} 문제
+        </h1>
+        <p class="text-xl text-gray-600">
+            {{ category }} 연산 문제를 풀어보세요!
+        </p>
+    </div>
+
+    <!-- 문제 목록 -->
+    <div class="space-y-6">
+        {% for problem in problems %}
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                        문제 {{ loop.index }}: {{ problem.question }}
+                    </h3>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" 
+                               id="answer-{{ loop.index }}" 
+                               class="border-2 border-gray-300 rounded-lg px-4 py-2 text-lg focus:border-blue-500 focus:outline-none"
+                               placeholder="답을 입력하세요">
+                        <button onclick="checkAnswer({{ loop.index }}, {{ problem.answer }})"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            확인
+                        </button>
+                        <span id="result-{{ loop.index }}" class="text-lg font-bold"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 결과 요약 -->
+    <div class="mt-8 bg-blue-50 rounded-xl p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">📊 결과 요약</h2>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600" id="total-problems">{{ problems|length }}</div>
+                <div class="text-gray-600">총 문제</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600" id="correct-answers">0</div>
+                <div class="text-gray-600">정답</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-600" id="accuracy">0%</div>
+                <div class="text-gray-600">정답률</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 네비게이션 -->
+    <div class="mt-8 flex justify-center space-x-4">
+        <a href="/" 
+           class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+            🏠 홈으로
+        </a>
+        <a href="/problems?category=덧셈" 
+           class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            ➕ 덧셈
+        </a>
+        <a href="/problems?category=뺄셈" 
+           class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+            ➖ 뺄셈
+        </a>
+        <a href="/problems?category=곱셈" 
+           class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+            ✖️ 곱셈
+        </a>
+        <a href="/problems?category=나눗셈" 
+           class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors">
+            ➗ 나눗셈
+        </a>
+    </div>
+</div>
+
+<script>
+let correctCount = 0;
+const totalProblems = {{ problems|length }};
+
+function checkAnswer(problemIndex, correctAnswer) {
+    const input = document.getElementById(`answer-${problemIndex}`);
+    const result = document.getElementById(`result-${problemIndex}`);
+    const userAnswer = parseInt(input.value);
+    
+    if (userAnswer === correctAnswer) {
+        result.textContent = "✅ 정답!";
+        result.className = "text-lg font-bold text-green-600";
+        correctCount++;
+    } else {
+        result.textContent = `❌ 오답! 정답: ${correctAnswer}`;
+        result.className = "text-lg font-bold text-red-600";
+    }
+    
+    updateSummary();
+}
+
+function updateSummary() {
+    const accuracy = Math.round((correctCount / totalProblems) * 100);
+    document.getElementById('correct-answers').textContent = correctCount;
+    document.getElementById('accuracy').textContent = `${accuracy}%`;
+}
+</script>
+{% endblock %} 

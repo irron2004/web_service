@@ -1,0 +1,11 @@
+{% macro bar(label_a, label_b, val_a, val_b, color) -%}
+<div class="mb-3">
+  <div class="flex justify-between text-sm">
+    <span class="font-semibold">{{ label_a }} {{ val_a }}%</span>
+    <span class="font-semibold">{{ val_b }}% {{ label_b }}</span>
+  </div>
+  <div class="w-full bg-gray-200 h-2 rounded-full">
+    <div class="h-2 rounded-full" style="width: {{ val_a }}%; background-color: {{ color }};"></div>
+  </div>
+</div>
+{%- endmacro %} 
