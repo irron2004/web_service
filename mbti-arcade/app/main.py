@@ -1,37 +1,60 @@
-from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-import os
+﻿from __future__ import annotations
 
-from app.routers import mbti, arcade
+import logging
+from uuid import uuid4
+
+from fastapi import FastAPI, Request
+
+from app.core.config import REQUEST_ID_HEADER
+from app.data.loader import seed_questions
+from app.database import Base, engine, session_scope
+from app.routers import health
+from app.routers import responses as responses_router
+from app.routers import results as results_router
+from app.routers import sessions as sessions_router
+from app.utils.problem_details import ProblemDetailsException, from_exception
+
+log = logging.getLogger("perception_gap")
 
 app = FastAPI(
-    title="MBTI & Arcade Web Service",
-    description="MBTI 테스트와 아케이드 게임을 제공하는 웹 서비스",
-    version="1.0.0"
+    title="360Me Perception Gap Service",
+    description="Self vs Others perception gap scoring with RFC 9457 errors and observability hooks.",
+    version="0.9.0",
 )
 
-# 정적 파일 마운트
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.include_router(health.router)
+app.include_router(sessions_router.router)
+app.include_router(responses_router.router)
+app.include_router(results_router.router)
 
-# 템플릿 설정
-templates = Jinja2Templates(directory="app/templates")
 
-# 라우터 등록
-app.include_router(mbti.router, prefix="/mbti", tags=["MBTI"])
-app.include_router(arcade.router, prefix="/arcade", tags=["Arcade"])
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next):
+    request_id = request.headers.get(REQUEST_ID_HEADER, str(uuid4()))
+    request.state.request_id = request_id
+    response = await call_next(request)
+    response.headers[REQUEST_ID_HEADER] = request_id
+    return response
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    """메인 홈페이지"""
-    return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/health")
-async def health_check():
-    """헬스 체크 엔드포인트"""
-    return {"status": "healthy", "message": "MBTI & Arcade Web Service is running!"}
+@app.exception_handler(ProblemDetailsException)
+async def problem_details_handler(request: Request, exc: ProblemDetailsException):
+    return from_exception(request, exc)
+
+
+@app.on_event("startup")
+async def startup_event():
+    Base.metadata.create_all(bind=engine)
+    with session_scope() as db:
+        seed_questions(db)
+
+
+@app.get("/", tags=["system"])
+async def root():
+    return {"service": "perception-gap", "status": "online"}
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
