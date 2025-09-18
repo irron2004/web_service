@@ -1,49 +1,38 @@
-﻿**요약**
-작게 배포·테스트 동반·표준 우선. 이번 사이클 **Rule-Growing**에 ‘n<3 비공개’, ‘Ad 근접 배치 금지’, ‘GA4 이벤트 네이밍 규칙’, ‘429/Retry-After’ 등을 추가했다.
+﻿**요약(3–5줄)**
+작게 배포·테스트 동반·표준 우선을 기본으로 하고, **RFC 9457/WCAG 2.2/Web Vitals** 준수와 **요청ID/OTel** 관측성을 강제합니다. 이번 사이클에서는 **k≥3 익명 임계**, **AdSense 의도치 클릭 방지**, **noindex/X-Robots-Tag** 적용을 Rule-Growing으로 승격했습니다.
 
 ```yaml
-version: "0.9.0"
-date: "2025-09-16"
-domains: [process, qa, security]
-owner: "Tech Lead"
-source_of_truth: ["PRD.md", "Tasks.md"]
+---
+version: "1.0"
+date: "2025-09-17"
+owner: "PM: 이지율"
+domains: ["process", "qa", "security"]
+source_of_truth: "Claude.md"
+use_browsing: true
+---
 ```
 
 ### Golden Rules
 
-1. **작게 배포**(PR≤200줄), 기능 플래그·롤백.
-2. **테스트 동반**: 기능=테스트, 버그=회귀 테스트.
-3. **표준 우선**: RFC 9457 오류, WCAG 2.2, **Web Vitals(INP)**. ([RFC Editor][1])
-4. **데이터 보호**: 친구 **n<3 비공개**(연인은 1:1 예외).
-5. **관측성 선행**: OTel/FastAPI 자동계측 + **X-Request-ID**. ([opentelemetry-python-contrib.readthedocs.io][2])
-
-### 웹/API 규칙
-
-* **요청ID**: 수신/미수신 시 발급, 전구간 전파.
-* **오류 JSON**: RFC 9457 스키마 고정. ([RFC Editor][1])
-* **레이트리밋**: 429/Retry-After, 정책 문서화. ([IETF Datatracker][5])
-* **보안 헤더**: HSTS, CSP, Referrer-Policy.
-* **noindex**: 결과/공유 페이지에 권장. ([Google for Developers][12])
-
-### Growth/Ads 규칙
-
-* AdSense **유도/근접 클릭 금지**(버튼/공유 옆 X), 2~3 슬롯 상한. ([Google Help][7])
-* GA4 이벤트 네이밍: **소문자+언더스코어, 예약 접두어 금지**. ([Google Help][8])
+1. PR≤300줄, 기능 플래그·롤백 준비.
+2. 기능=테스트, 버그=회귀 테스트.
+3. **오류=RFC 9457 / 접근성=WCAG 2.2 / 성능=Web Vitals**. ([RFC Editor][1])
+4. **k≥3** 미만 결과 비공개(카드·공유 비활성). ([EPIC][2])
+5. **AdSense 레이아웃**: 버튼/내비/드롭다운 근접 금지. ([Google Help][3])
+6. 요청-트레이스-로그 **X-Request-ID/OTel** 상호탐색. ([opentelemetry-python-contrib][4])
 
 ### Rule-Growing(이번 사이클)
 
-* **R-G-01**: 친구 집계 n<3 비공개(역추적 방지).
-* **R-G-02**: 429 응답 시 **Retry-After** 포함. ([IETF Datatracker][5])
-* **R-G-03**: OG 이미지에 PII 미표시, **noindex** 병행. ([Google for Developers][12])
-* **R-G-04**: Ad 슬롯과 상호작용 요소 간 **간격 확보**(실수 클릭 방지). ([Google Help][7])
-* **R-G-05**: INP 중심 최적화 전환(속성 기반 측정). ([web.dev][16])
-* **R-G-06**: MBTI 상표 고지(공식 문항 불사용). ([mbtionline.com][3])
+* **R-G-01** 결과/공유 URL **noindex/X-Robots-Tag** 강제. ([Google for Developers][5])
+* **R-G-02** MBTI 상표 고지 & 공식 문항·타이포그래피 미사용. ([mbtionline.com][6])
 
-[1]: https://www.rfc-editor.org/rfc/rfc9457.html?utm_source=chatgpt.com "RFC 9457: Problem Details for HTTP APIs"
-[2]: https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/fastapi/fastapi.html?utm_source=chatgpt.com "OpenTelemetry FastAPI Instrumentation"
-[3]: https://www.mbtionline.com/en-US/Legal?utm_source=chatgpt.com "Legal"
-[5]: https://datatracker.ietf.org/doc/html/rfc6585?utm_source=chatgpt.com "RFC 6585 - Additional HTTP Status Codes"
-[7]: https://support.google.com/adsense/answer/1346295?hl=en&utm_source=chatgpt.com "Ad placement policies - Google AdSense Help"
-[8]: https://support.google.com/analytics/answer/13316687?hl=en&utm_source=chatgpt.com "[GA4] Event naming rules - Analytics Help"
-[12]: https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag?utm_source=chatgpt.com "Robots Meta Tags Specifications | Google Search Central"
-[16]: https://web.dev/blog/inp-cwv-launch?utm_source=chatgpt.com "Interaction to Next Paint is officially a Core Web Vital 🚀 | Blog"
+---
+
+## 참고 문헌
+
+[1]: https://www.rfc-editor.org/rfc/rfc9457.html "RFC 9457: Problem Details for HTTP APIs"  
+[2]: https://epic.org/wp-content/uploads/privacy/reidentification/Sweeney_Article.pdf "k-ANONYMITY: A MODEL FOR PROTECTING PRIVACY"  
+[3]: https://support.google.com/adsense/answer/1346295 "Ad placement policies - Google AdSense Help"  
+[4]: https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/fastapi/fastapi.html "OpenTelemetry FastAPI Instrumentation"  
+[5]: https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag "Robots Meta Tags Specifications"  
+[6]: https://www.mbtionline.com/en-US/Legal "Legal"

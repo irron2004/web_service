@@ -1,205 +1,166 @@
-ï»¿**ìš”ì•½(3â€“5ì¤„)**
-ì—°ì¸/ì¹œêµ¬ê°€ ë³´ëŠ” â€˜ë‚˜â€™ì™€ ìŠ¤ìŠ¤ë¡œ ì¸ì‹í•œ â€˜ë‚˜â€™ë¥¼ ë¹„êµí•´ **ì¸ì§€ ê²©ì°¨(Perception Gap)**ë¥¼ ìˆ˜ì¹˜í™”Â·ì‹œê°í™”í•˜ëŠ” ì›¹ ì„œë¹„ìŠ¤ë‹¤. **ê³µí†µ 24ë¬¸í•­ + ê´€ê³„ë³„ 8ë¬¸í•­**ìœ¼ë¡œ EI/SN/TF/JP ì ìˆ˜ë¥¼ ì‚°ì¶œí•˜ê³ , ë‹¤ì¤‘ í‰ê°€(ì—¬ëŸ¬ ì¹œêµ¬) ì§‘ê³„ë¡œ **í•©ì˜ë„(Ïƒ)**ì™€ **GapScore**ë¥¼ ì œê³µí•œë‹¤. 1ì°¨ ì‹œê°í™”ëŠ” **ë ˆì´ë” + ìŠ¤ìºí„°(Chart.js)**, ê²°ê³¼ëŠ” **OG ì´ë¯¸ì§€**ë¡œ ì†ì‰½ê²Œ ê³µìœ í•œë‹¤. ë°±ì—”ë“œëŠ” FastAPI, í”„ë¡ íŠ¸ëŠ” React(Vite)ë¡œ êµ¬í˜„í•˜ë©° **RFCâ€¯9457 ì˜¤ë¥˜ JSON**, **Web Vitals ìž„ê³„(LCPâ‰¤2.5s/INPâ‰¤200ms/CLSâ‰¤0.1)**, **WCAGâ€¯2.2 AA**ë¥¼ ì¤€ìˆ˜í•œë‹¤. ([RFC Editor][1])
+**¿ä¾à(3?5ÁÙ)**
+º» ¼­ºñ½º´Â **Self(º»ÀÎ) vs Others(Å¸ÀÎÀÇ ´«)**À» ºñ±³ÇØ **ÀÎÁö °ÝÂ÷(Perception Gap)**¸¦ ¼öÄ¡È­¡¤½Ã°¢È­ÇÕ´Ï´Ù. MVP´Â ¡°**°øÅë 24 + °ü°è ºÎ½ºÅÍ 8 = 32¹®Ç×**(Likert 1?5)¡±À¸·Î ½ÃÀÛÇÏ°í, **Self Á¡¼ö**¿Í **Other(¿¬ÀÎ/Ä£±¸ N¸í) Áý°è**¸¦ ºñ±³ÇØ **GapScore¡¤ÇÕÀÇµµ(¥ò)**¸¦ Á¦°øÇÕ´Ï´Ù. °á°ú´Â **·¹ÀÌ´õ/½ºÄ³ÅÍ** Â÷Æ®¿Í **°øÀ¯¿ë OG ÀÌ¹ÌÁö**·Î È®»êÀ» µ½°í, **RFC?9457 ¿À·ù Æ÷¸Ë**, **WCAG?2.2 AA**, **Web Vitals(LCP¡Â2.5s/INP¡Â200ms/CLS¡Â0.1)** ±âÁØÀ» ÁØ¼öÇÕ´Ï´Ù. **¿äÃ»ID/OTel**À» ±âº»°ªÀ¸·Î °èÃøÇÕ´Ï´Ù. ([RFC Editor][1])
 
 ```yaml
-version: "0.9.0"
-date: "2025-09-16"
-domains: [backend, react, analytics, growth]
-owner: "PM/Tech Writer"
-source_of_truth: ["ì´ PRD", "DesignOptions.md", "Tasks.md"]
+---
+version: "1.0"
+date: "2025-09-17"
+product: "360Me ? Perception Gap (If I were you)"
+domains: ["backend", "frontend", "growth"]
+owner: "PM: ÀÌÁöÀ²"
+source_of_truth: "PRD.md"
+use_browsing: true
+---
 ```
 
-### 0) Assumptions(ê°€ì •)
+### 0) Assumptions(°¡Á¤)
 
-* Stack: **FastAPI + PostgreSQL + Redis + OTel**, **React + Vite + React Router + TanStack Query + Zustand**. ([opentelemetry-python-contrib.readthedocs.io][2])
-* Use_Browsing: yes(í‘œì¤€ ì¸ìš© í¬í•¨).
-* ê°œì¸ì •ë³´/KR: ì´ë©”ì¼, ë‹‰ë„¤ìž„(ì„ íƒ: ì—°ë ¹ëŒ€). ë¯¼ê°ì •ë³´Â·ì‹¬ë¦¬ê²€ì‚¬ ê²°ê³¼ì˜ **ì›ë¬¸ ì‘ë‹µì€ ë¹„ì‹ë³„ ì €ìž¥**(ì„¸ì…˜ ë‹¨ìœ„ í† í°)Â·ì‚­ì œê¶Œ ë³´ìž¥.
-* **MBTI ê³µì‹ ë¬¸í•­/í•´ì„¤/ìƒí‘œ ë¯¸ì‚¬ìš©**. â€˜MBTIâ€™ ë“±ì€ Myers & Briggs Foundationì˜ ìƒí‘œìž„ì„ ê³ ì§€. ([mbtionline.com][3])
+* **Stack:** FastAPI + PostgreSQL + Redis(¹é¿£µå), React + Vite + React Router + TanStack Query + Zustand(ÇÁ·ÐÆ®), Chart.js(·¹ÀÌ´õ/½ºÄ³ÅÍ). ([chartjs.org][2])
+* **Ç¥ÁØ:** ¿À·ù ÀÀ´ä **RFC?9457**, Á¢±Ù¼º **WCAG?2.2 AA**, ¼º´É **Web Vitals**. ([RFC Editor][1])
+* **ÇÁ¶óÀÌ¹ö½Ã:** Áý°è ±âÁØ **k¡Ã3**(k-anonymity ¿øÄ¢ Â÷¿ë)·Î °á°ú °ø°³, ¿ø½Ã ÀÀ´äÀº ºñ½Äº° Ã³¸®. ([EPIC][3])
+* **¹ýÀû ÁÖÀÇ:** **MBTI/¸¶ÀÌ¾î½º-ºê¸¯½º**´Â µî·Ï»óÇ¥ÀÌ¸ç **°ø½Ä ¹®Ç×/ÇØ¼³ ºÒ»ç¿ë**(¡°MBTI-style¡± ¾ð¾î¸¸ »ç¿ë). ([mbtionline.com][4])
 
-### 1) ë¹„ì „/í•µì‹¬ ê°€ì¹˜/ë¬¸ì œì •ì˜
+### 1) °³¿ä/ºñÀü/¹®Á¦Á¤ÀÇ/Å¸±ê
 
-* **If I were you**: â€œë‚´ê°€ ë„ˆë¼ë©´ ì´ë ‡ê²Œ ë³¼ ê±°ì•¼.â€
-* í•µì‹¬ ê°€ì¹˜: (1) **ê´€ê³„ ë§¥ë½**(ì—°ì¸/ì¹œêµ¬) ë°˜ì˜ ë¬¸í•­, (2) **ë‹¤ì¤‘ í‰ê°€ í•©ì˜ë„/ë¶ˆì¼ì¹˜** ì‹œê°í™”, (3) **ì‰¬ìš´ ê³µìœ **ë¡œ ë°”ì´ëŸ´.
-* ë¬¸ì œ: ìžê¸°í™•ì¦ íŽ¸í–¥ìœ¼ë¡œ **ìžê¸°-íƒ€ìž ì¸ì‹ ê²©ì°¨**ê°€ ì»¤ì§ â†’ **ì•ˆì „í•˜ê³  êµ¬ì¡°í™”ëœ í”¼ë“œë°±** í•„ìš”.
+* **ÄÁ¼Á:** *If I were you* ? ¡°³»°¡ ³Ê¶ó¸é ÀÌ·¸°Ô º¼ °Å¾ß.¡± Self vs Others °£ **Perception Gap**À» Àç¹Õ°í ¾ÈÀüÇÏ°Ô º¸¿©ÁÖ´Â **¿£ÅÍÅ×ÀÎ¸ÕÆ®/¼¿ÇÁÀÎ»çÀÌÆ®**.
+* **ÇÙ½É °¡Ä¡:** ¨ç **°ü°è ¸Æ¶ô**(¿¬ÀÎ/Ä£±¸) ¨è **´ÙÁß Æò°¡** ÇÕÀÇµµ/ºÒÀÏÄ¡ ¨é **½¬¿î °øÀ¯**·Î ¹ÙÀÌ·².
+* **Å¸±ê:** ¿¬ÀÎ/Ä£±¸/´ëÇÐ»ý¡¤Á÷Àå ÃÊ³â»ý Áß½É 20?30´ë.
 
-### 2) ë²”ìœ„/ë¹„ë²”ìœ„
+### 2) ¹üÀ§/ºñ¹üÀ§
 
-**In scope(MVP)**: ëª¨ë“œì„ íƒ(ì—°ì¸/ì¹œêµ¬/ê¸°ë³¸), **Self 24(+8)** ì‘ë‹µ, **íƒ€ì¸ ë§í¬ ì´ˆëŒ€/ìµëª…**, ì§‘ê³„/ì‹œê°í™”(ë ˆì´ë”Â·ìŠ¤ìºí„°), **OG ê³µìœ **, ê°„ë‹¨í•œ ì¸ì‚¬ì´íŠ¸ ì¹´ë“œ, **AdSense ìŠ¬ë¡¯(ìµœëŒ€ 3)**.
-**Out**: ì•±(ëª¨ë°”ì¼), ì¡°ì§í˜• ê¶Œí•œ, ìœ ë£Œê²°ì œ, ê³ ê¸‰ ë¶„ì„(ížˆíŠ¸ë§µ/ë°”ì´ì˜¬ë¦°ì€ ì°¨ê¸°), ì»¤ìŠ¤í…€ AI ëŒ€í™”ìš”ì•½.
+**In Scope:** ¸ðµå ¼±ÅÃ, ¹®Ç×(°øÅë 24 + ºÎ½ºÅÍ 8), Self Ã¤Á¡, ÃÊ´ë/ÀÀ´ä ¼öÁý(N¸í), Áý°è/GapScore/ÇÕÀÇµµ, °á°ú ½Ã°¢È­(·¹ÀÌ´õ/½ºÄ³ÅÍ), OG °øÀ¯ ÀÌ¹ÌÁö, AdSense ¾ÈÀü ¹èÄ¡, RFC?9457 ¿À·ù, OTel/Request-ID. ([RFC Editor][1])
+**Out of Scope(ÀÌ¹ø ºÐ±â):** Á¶Á÷/¿£ÅÍÇÁ¶óÀÌÁî ±ÇÇÑ, À¯·á ÇÃ·£, ¸ð¹ÙÀÏ ¾Û, °í±Þ È÷Æ®¸Ê¡¤°ü°è ÇÊÅÍ(Â÷±â).
 
-### 3) ì‚¬ìš©ìž í”Œë¡œìš°(IA)
+### 3) »ç¿ëÀÚ ½Ã³ª¸®¿À(¿ä¾à)
 
-```
-ëžœë”© â†’ [ì—°ì¸/ì¹œêµ¬/ê¸°ë³¸] ì„ íƒ
- â†’ (ì„ íƒ) Self 24(+8) ë¬¸í•­ â†’ Self ì ìˆ˜
- â†’ íƒ€ì¸ ë§í¬ ìƒì„±(ë§Œë£Œ, ìµëª…/ê¸°ëª…) â†’ ì‘ë‹µ ìˆ˜ì§‘ ëŒ€ì‹œë³´ë“œ
- â†’ ê²°ê³¼(ë ˆì´ë”/ìŠ¤ìºí„°, í•©ì˜ë„, GapScore) â†’ ê³µìœ (OG ì´ë¯¸ì§€)
-```
+* **S-1(Ä¿ÇÃ):** ¿¬ÀÎ¸ðµå 32¹®Ç× ¡æ ÆÄÆ®³Ê 1:1 ÃÊ´ë ¡æ **Self vs Partner ·¹ÀÌ´õ/½ºÄ³ÅÍ** ¡æ °øÀ¯ ÀÌ¹ÌÁö.
+* **S-2(Ä£±¸ N):** Ä£±¸¸ðµå ¸µÅ© ¹èÆ÷(ÀÍ¸í/±â¸í) ¡æ **Other Æò±Õ¡¤¥ò¡¤Gap** ¡æ ¡°ÇÕÀÇ ³ôÀ½/ºÒÀÏÄ¡ ¿µ¿ª¡± Ä«µå.
+* **S-3(¹ÙÀÌ·²):** 3¸í ÀÌ»ó ÀÀ´ä ½Ã **Ãß°¡ ÀÎ»çÀÌÆ® ÇØÁ¦** ¡æ OG ÀÌ¹ÌÁö·Î SNS °øÀ¯ 1Å¬¸¯.
+* **S-4(¸®ÅÙ¼Ç):** ¸¸·á ¾Ë¸², °á°ú PDF/¸µÅ© ÀúÀå, **noindex/X-Robots-Tag**·Î °Ë»ö ³ëÃâ Á¦¾î. ([Google for Developers][5])
 
-### 4) ë¬¸í•­ ì„¤ê³„
+### 4) ±â´É ¿ä±¸(Functional Requirements)
 
-* **ê³µí†µ 24ë¬¸í•­**: EI/SN/TF/JP ê° 6. Likert 1â€“5.
-* **ë¶€ìŠ¤í„° 8ë¬¸í•­**: ì—°ì¸/ì¹œêµ¬ ë³„ í”„ë¦¬ì…‹(ìš”ì²­ì•ˆ ë°˜ì˜).
-* **ì±„ì  ë¶€í˜¸**: (E,S,T,J)=+1, (I,N,F,P)=-1.
+| ID      | ¿ä¾à              | ¼³¸í                            | ÀÇÁ¸¼º   | À§Çè | **¼ö¶ô ±âÁØ(¿ä¾à)**                                                                  |
+| ------- | ----------------- | ------------------------------- | ------ | --- | ----------------------------------------------------------------------------------- |
+| R-101   | ¸ðµå ¼±ÅÃ         | [¿¬ÀÎ/Ä£±¸/±âº»]                | FE     | ¿ÀÇØ | 10ÃÊ ³» Ã¹ Å¬¸¯¡æ¸ðµå ÁøÀÔ·ü ¡Ã70%                                                     |
+| R-102   | Self Å×½ºÆ®       | °øÅë 24 + ¸ðµå 8(32)            | R-101  | ÀÌÅ» | ¿ÏÁÖÀ² ¡Ã75%, 400/422´Â **RFC?9457** ¿À·ù ±¸Á¶. ([RFC Editor][1])                     |
+| R-103   | ÃÊ´ë ¸µÅ©         | ¸¸·á¡¤ÃÖ´ëÀÎ¿ø¡¤ÀÍ¸í/±â¸í¡¤°ü°èÅÂ±× | Auth/DB| ³²¿ë | ¸µÅ© »ý¼º 201, ÅäÅ« À§Á¶ ¹æÁö, 429 ·¹ÀÌÆ®¸®¹Ô                                        |
+| R-104   | Å¸ÀÎ ÀÀ´ä Á¦Ãâ    | ÅäÅ« °ËÁõ/Áßº¹Á¦Ãâ ¹æÁö         | R-103  | º¿  | µ¿½Ã 20¸í P95<1s, Áßº¹¡¤º¿ Â÷´Ü                                                        |
+| R-105   | Áý°è/GapScore   | °¡ÁßÆò±Õ, ¥ò, Gap °è»ê          | R-102/104 | ÆíÇâ | °ø½Ä(¡×4.1/4.2)´ë·Î °è»ê, ´ÜÀ§Å×½ºÆ® 100%                                               |
+| R-106   | k-ÀÍ¸í °ø°³ ÀÓ°è  | k<3 ºñ°ø°³                     | R-105  | ¿ªÃßÀû | k<3 °á°ú Â÷Æ®/°øÀ¯ ºñÈ°¼ºÈ­. ([EPIC][3])                                             |
+| R-107   | ½Ã°¢È­            | ·¹ÀÌ´õ(4Ãà)/½ºÄ³ÅÍ(2D)         | FE Charts | °ú¹Ð | Chart.js ·¹ÀÌ´õ¡¤½ºÄ³ÅÍ ±¸Çö, ¸ð¹ÙÀÏ 30fps. ([chartjs.org][2])                        |
+| R-108   | °øÀ¯ OG ÀÌ¹ÌÁö    | Self vs Other ¿ä¾à¡¤Gap º¤ÅÍ    | FE/BE  | ¼º´É | 1200¡¿630, 200ms ³» »ý¼º, ¸ÞÅ¸ÅÂ±× Á¤È®. ([ogp.me][6])                                 |
+| R-109   | ½Ç½Ã°£ ´ë½Ãº¸µå   | ÀÀ´ä Ä«¿îÆ®/¹Ì¸®º¸±â           | FE/BE  | ºÎÇÏ | 3s Æú¸µ(¶Ç´Â SSE), ¹«ÇÑ·Îµå ¹æÁö                                                      |
+| R-110   | AdSense ¾ÈÀü ½½·Ô | »ó´Ü/º»¹®Áß/ÇÏ´Ü 2?3°³         | FE     | Á¤Ã¥ | ¹öÆ°/³»ºñ ±ÙÁ¢ ¹èÄ¡ ±ÝÁö, Á¤Ã¥ À§¹Ý 0°Ç. ([Google Help][7])                          |
+| R-111   | ºÐ¼®/¹ÙÀÌ·² ÃøÁ¤  | GA4 ÀÌº¥Æ®¡¤UTM                 | FE     | ´©¶ô | ½ÃÀÛ/¿Ï·á/ÃÊ´ë/°øÀ¯/Á¶È¸ ÀÌº¥Æ® ·Î±ë, UTM ±Ô¾à Àû¿ë. ([Google for Developers][8])    |
+| R-112   | ¿À·ù Ç¥ÁØÈ­       | RFC?9457 ¹®Á¦»ó¼¼(JSON)        | BE     | ´©¶ô | ¸ðµç 4xx/5xx `type/title/status/detail/instance` Æ÷ÇÔ. ([RFC Editor][1])              |
+| R-113   | °üÃø¼º            | X-Request-ID, OTel Æ®·¹ÀÌ½º    | BE/FE  | ´©¶ô | ¸ðµç ¿äÃ» ÃßÀû °¡´É, ÀÚµ¿ °èÃø °¡ÀÌµå ÁØ¼ö. ([opentelemetry-python-contrib][9])     |
+| R-114   | noindex Á¦¾î      | °á°ú/°øÀ¯ ¸µÅ© °Ë»öÁ¦¿Ü         | BE     | À¯Ãâ | `<meta name="robots" content="noindex">` È¤Àº `X-Robots-Tag` Àû¿ë. ([Google for Developers][5]) |
 
-> *MVP: 24 + 8 = 32ë¬¸í•­(íŒŒì¼ëŸ¿ í›„ 24â€“40 ìµœì í™”).*
+### 5) Á¡¼ö °è»ê & Áý°è(°ø½Ä)
 
-### 5) ì ìˆ˜ ê³„ì‚°(ë‹¨ì¼ í‰ê°€ìž)
+**4.1 ´ÜÀÏ Æò°¡ÀÚ(Self/Other) ? Á¤±ÔÈ­**  
+°¢ ÀÀ´ä `v¡ô{1..5}` ¡æ ÆíÂ÷ `d=v?3 ¡ô{?2..+2}`; `sign=+1(E/S/T/J), ?1(I/N/F/P)`  
+ÁöÇ¥ÇÕ `score_dim=¥Ò(sign_q¡¤d_q)` ¡æ **Á¤±ÔÈ­** `norm=score_dim/(2¡¤n_dim_q) ¡ô[?1,+1]`.
 
-* ê° ì‘ë‹µ `vâˆˆ{1..5}` â†’ **íŽ¸ì°¨** `d=v-3 âˆˆ {-2..+2}`
-* ì§€í‘œë³„ í•© `score_dim = Î£(sign_q * d_q)`
-* **ì •ê·œí™”** `norm = score_dim / (2 * n_dim_q)` â†’ **[-1,+1]**
+**4.2 ´ÙÁß Æò°¡ÀÚ Áý°è(Other Æò±Õ¡¤ÇÕÀÇµµ¡¤Gap)**  
+°ü°è °¡Áß `weight_r`(¿¬ÀÎ 1.5, ÇÙ½ÉÄ£±¸ 1.2, ±âº» 1.0)  
+`other_norm_dim = (¥Ò_r w_r¡¤norm_r) / ¥Ò_r w_r`  
+**ÇÕÀÇµµ** `¥ò_dim = stdev({norm_r})`(³·À»¼ö·Ï ÀÏÄ¡)  
+**ÀÎÁö °ÝÂ÷** `gap_dim = other_norm_dim ? self_norm_dim`  
+**ÃÑ°ý ÁöÇ¥** `GapScore = mean(|gap_dim|)¡¿100 (0..100)`.
 
-### 6) ë‹¤ì¤‘ í‰ê°€ ì§‘ê³„
+### 6) NFR(¼öÄ¡+°ËÁõ)
 
-* í‰ê°€ìž rì˜ ê°€ì¤‘ì¹˜ `weight_r`(ê¸°ë³¸ 1.0, ì—°ì¸ 1.5, í•µì‹¬ì¹œêµ¬ 1.2 ì˜µì…˜)
-* **Other í‰ê· ** `other_norm_dim = (Î£ weight_r*norm_r) / Î£ weight_r`
-* **í•©ì˜ë„** `Ïƒ_dim`(í‘œì¤€íŽ¸ì°¨)
-* **ì¸ì§€ ê²©ì°¨** `gap_dim = other_norm_dim - self_norm_dim`
-* **GapScore** `= mean(|gap_dim|) Ã— 100` (0â€“100)
+* **¼º´É(¹é¿£µå):** Æò±Õ<500ms, **P95<1s**, ¿¡·¯À²<1%.
+* **À¥¹ÙÀÌÅ»(75p):** **LCP¡Â2.5s / INP¡Â200ms / CLS¡Â0.1** ? ·¦(Lighthouse)+ÇÊµå(RUM/CrUX) ÀÌÁß °ËÁõ. ([web.dev][10])
+* **Á¢±Ù¼º:** **WCAG?2.2 AA**¡¤APG ÆÐÅÏ, Æ÷Ä¿½º Ç¥½Ã¡¤Å°º¸µå ÀüÅ½»ö. ([W3C][11])
+* **¿À·ù Ç¥ÁØÈ­:** **RFC?9457** °íÁ¤ ½ºÅ°¸¶ Ã¤ÅÃ(7807 ´ëÃ¼). ([RFC Editor][1])
+* **°üÃø¼º:** FastAPI OTel ÀÚµ¿°èÃø¡¤ÃßÀû Á¶ÀÎ °¡´É. ([opentelemetry-python-contrib][9])
+* **±¤°í ¾ÈÀü:** AdSense **ÀÇµµÄ¡ Å¬¸¯ ¹æÁö**¡¤À§¹Ý 0°Ç. ([Google Help][7])
 
-### 7) ì‹œê°í™”(Chart.js)
+### 7) ¸±¸®Áî ¼ö¶ô ±âÁØ
 
-* **ë ˆì´ë”(EI/SN/TF/JP, 0â€“100 ë³€í™˜)**: Self vs Other í‰ê· , (ì˜µì…˜) ê°œë³„ ë¼ì¸ ìƒ˜í”Œë§.
-* **ìŠ¤ìºí„°**: (EI vs SN) / (TF vs JP) í‰ë©´, SelfÂ·OtherÂ·ê°œë³„ ë¶„í¬.
-* ì°¨ê¸°: **ížˆíŠ¸ë§µ(ë¶„í¬)** â†’ `chartjs-chart-matrix` ë˜ëŠ” ECharts Heatmap. ([Chart.js][4])
+1. **E2E 5½Ã³ª¸®¿À**(Self¡æÃÊ´ë¡æN ÀÀ´ä¡æÁý°è¡æ°á°ú/°øÀ¯) ¹«ÇÃ·¹ÀÌÅ© ÇÕ°Ý.
+2. Web Vitals(75p) ±âÁØ Åë°ú(·¦/ÇÊµå). ([web.dev][10])
+3. ¸ðµç ¿À·ù ÀÀ´äÀÌ **RFC?9457 JSON** ½ºÅ°¸¶. ([RFC Editor][1])
+4. **k-ÀÍ¸í ÀÓ°è(k¡Ã3)** ¹Ì¸¸ °á°ú ºñ°ø°³ ·ÎÁ÷ °ËÁõ. ([EPIC][3])
+5. **AdSense ·¹ÀÌ¾Æ¿ô °Ë»ç**(Á¤Ã¥ ÆäÀÌÁö Ã¼Å©¸®½ºÆ®) À§¹Ý 0°Ç. ([Google Help][7])
 
-### 8) ê¸°ëŠ¥ ìš”êµ¬(ì¶”ì ì„± í‘œ)
+### 8) º¸¾È/ÇÁ¶óÀÌ¹ö½Ã
 
-| **ID**    | ìš”ì•½         | ì„¤ëª…                              | ì˜ì¡´ì„±       | ìœ„í—˜    | **ìˆ˜ë½ ê¸°ì¤€(ìš”ì•½)**                                                            |
-| --------- | ---------- | ------------------------------- | --------- | ----- | ------------------------------------------------------------------------ |
-| **R-101** | ëª¨ë“œ ì„ íƒ      | ì—°ì¸/ì¹œêµ¬/ê¸°ë³¸ ëª¨ë“œ ë¼ìš°íŒ…                 | FE Router | í˜¼ëž€    | ë¼ìš°íŒ…/URL ì¿¼ë¦¬ ìœ ì§€, Lighthouse A11yâ‰¥90                                        |
-| **R-102** | Self ì‘ë‹µÂ·ì±„ì  | ê³µí†µ24+ëª¨ë“œ8 ì±„ì /ì •ê·œí™”                 | R-101     | í’ˆì§ˆ    | ìƒ˜í”Œ ìž…ë ¥â†’ì§€í‘œë³„ norm ì •í™•(ë‹¨ìœ„í…ŒìŠ¤íŠ¸ í†µê³¼)                                              |
-| **R-103** | ì´ˆëŒ€ ë§í¬      | ë§Œë£Œ/ìµœëŒ€ì¸ì›/ìµëª… ì„¤ì •, í† í° ìƒì„±            | Auth/DB   | ì˜¤ë‚¨ìš©   | 201 ìƒì„±, ë§Œë£Œ/ìƒí•œ ë™ìž‘, í† í° 1íšŒìš©                                                 |
-| **R-104** | íƒ€ì¸ ì‘ë‹µ ìˆ˜ì§‘   | ë¹„ì •ìƒ ì‘ë‹µ ë°©ì§€(ì†ë„, ì¤‘ë³µ)               | R-103     | ìŠ¤íŒ¸    | 10ëª… ë™ì‹œ ì‘ë‹µ P95<1s, ì¤‘ë³µ ì°¨ë‹¨, 429 í•¸ë“¤ë§ ([IETF Datatracker][5])                 |
-| **R-105** | ì§‘ê³„/í†µê³„      | other_norm, Ïƒ, GapScore        | R-102/104 | ì™œê³¡    | ê°€ì¤‘ì¹˜ ì ìš©/ìˆ«ìž ì•ˆì •ì„± ê²€ì¦(ê²½ê³„ê°’ í…ŒìŠ¤íŠ¸)                                                |
-| **R-106** | ì‹œê°í™”        | ë ˆì´ë”+ìŠ¤ìºí„°(Chart.js)               | FE Chart  | ì„±ëŠ¥    | 60fps, ìº”ë²„ìŠ¤ ë¦¬ì‚¬ì´ì¦ˆ ì•ˆì •, ìƒ˜í”Œ 10ëª… í‘œì‹œ ([Chart.js][4])                            |
-| **R-107** | ê´€ê³„ í•„í„°      | ì „ì²´/ì—°ì¸/ì¹œêµ¬/íƒœê·¸ í•„í„°                  | R-104/105 | ë³µìž¡ì„±   | í•„í„° ì „í™˜<100ms, ê²°ê³¼ ì¼ê´€ì„±                                                      |
-| **R-108** | ê³µìœ (OG)     | ê²°ê³¼ ìš”ì•½ OG ì´ë¯¸ì§€/ë§í¬ ìƒì„±              | R-106     | ì €ìž‘ê¶Œ   | 200 ìƒì„±, **noindex** ë©”íƒ€ ì ìš© ê¶Œìž¥ ([ogp.me][6])                               |
-| **R-109** | í”„ë¼ì´ë²„ì‹œ      | **ì¹œêµ¬ ì§‘ê³„ëŠ” nâ‰¥3** ê³µê°œ, 1:1 ì—°ì¸ì€ ìŒ ë¹„êµ | Auth      | ì—­ì¶”ì    | ìž„ê³„ ìœ„ë°˜ì‹œ ë¸”ëŸ¬/ë¹„ê³µê°œ                                                            |
-| **R-110** | AdSense    | ê²°ê³¼ ìƒë‹¨/ì¤‘ë‹¨/í•˜ë‹¨ â‰¤3ê°œ, ì •ì±… ì¤€ìˆ˜          | FE/BE     | ì‹¤ìˆ˜ í´ë¦­ | ë²„íŠ¼ ê·¼ì ‘ ë°°ì¹˜ ê¸ˆì§€, ì •ì±… ì²´í¬ë¦¬ìŠ¤íŠ¸ í†µê³¼ ([Google Help][7])                              |
-| **R-111** | ë¶„ì„/ë°”ì´ëŸ´     | GA4 ì´ë²¤íŠ¸/UTM, ê³µìœ ì „í™˜ ì¸¡ì •            | FE        | ëª…ëª…    | **ì˜ë¬¸ì†Œë¬¸ìž/ì–¸ë”ìŠ¤ì½”ì–´** ê·œì¹™ ì¤€ìˆ˜ ([Google Help][8])                                 |
-| **R-112** | ê´€ì¸¡ì„±        | OTel íŠ¸ë ˆì´ìŠ¤/ë©”íŠ¸ë¦­, X-Request-ID     | Infra     | ëˆ„ë½    | FastAPI ìžë™ê³„ì¸¡, ëŒ€ì‹œë³´ë“œ ì—°ê²° ([opentelemetry-python-contrib.readthedocs.io][2]) |
-| **R-113** | ì˜¤ë¥˜ í‘œì¤€      | **RFCâ€¯9457 Problem Details**    | BE        | ëˆ„ë½    | ëª¨ë“  4xx/5xx ìŠ¤í‚¤ë§ˆ í†µì¼(ê³„ì•½ í…ŒìŠ¤íŠ¸) ([RFC Editor][1])                              |
-| **R-114** | ë ˆì´íŠ¸ë¦¬ë°‹      | IP/ì„¸ì…˜ë³„ í•œë„, 429 + Retry-After    | BE/Edge   | ì°¨ë‹¨    | í—¤ë”/ë°”ë””ì— ì •ì±… ì•ˆë‚´(ë¬¸ì„œí™”) ([IETF Datatracker][5])                                |
-| **R-115** | ëŒ€ì‹œë³´ë“œ       | ì‹¤ì‹œê°„ ì‘ë‹µ ì¹´ìš´íŠ¸/ë¯¸ë¦¬ë³´ê¸°                 | R-104     | ì¡°ìž‘    | ì§€ì—°<1s, í´ë§/ SSE ì¤‘ íƒ1                                                      |
-| **R-116** | ì ‘ê·¼ì„±        | **WCAGâ€¯2.2 AA**                 | FE        | ë¯¸ì¤€ìˆ˜   | í‚¤ë³´ë“œ 100%, ëŒ€ë¹„â‰¥4.5:1 ([W3C][9])                                            |
+* ÀÀ´äÀº ¼¼¼Ç ÅäÅ« ±â¹Ý, ÃÖ¼Ò PII(´Ð³×ÀÓ ¼±ÅÃ).
+* °ø°³ °øÀ¯´Â ¿ä¾à Åë°è¸¸, °³º° ¿øÀÀ´ä/½Äº°ÀÚ ºñ³ëÃâ(k-anonymity »ç»ó). ([EPIC][3])
+* °á°ú/°øÀ¯ ÆäÀÌÁö¿¡´Â `noindex`/`X-Robots-Tag` ±ÇÀå. ([Google for Developers][5])
 
-### 9) API ì„¤ê³„(ë°œì·Œ)
+### 9) °á°ú ½Ã°¢È­(Â÷Æ®)
 
-* `POST /api/self/submit` â†’ `{answers:[{qid, value}]}` â†’ `{self_norm:{EI,SN,TF,JP}}`
-* `POST /api/invite/create` â†’ `{mode, expires_at, max_n, anonymous}` â†’ `{invite_token}`
-* `POST /api/other/submit` â†’ `{invite_token, relation_tag?, answers:[...]}`
-* `GET /api/result/{token}` â†’ `{self_norm, other_norm, gap, sigma, n, weights}`
-* ì˜¤ë¥˜: **RFCâ€¯9457 Problem Details** JSON (`type/title/status/detail/instance`) ì‚¬ìš©. ([RFC Editor][1])
+* **·¹ÀÌ´õ(4Ãà: EI/SN/TF/JP)** ? Self/Other Æò±Õ Æú¸®°ï.
+* **½ºÄ³ÅÍ(2D)** ? EI vs SN, TF vs JP Æò¸é; °³º° Æò°¡ÀÚ Á¡ ÇÃ·Ô(ÃÖ´ë 10 Ç¥½Ã).
+* **MVP:** Chart.js(°ø½Ä ·¹ÀÌ´õ/½ºÄ³ÅÍ) ¡æ ÃßÈÄ È÷Æ®¸Ê ÇÃ·¯±×ÀÎ/ECharts °í·Á. ([chartjs.org][2])
 
-### 10) ë°ì´í„° ìŠ¤í‚¤ë§ˆ(ìš”ì•½ DDL)
+### 10) ¿£µåÆ÷ÀÎÆ®(¿¹)
 
-```sql
-create table users (
-  id bigserial primary key,
-  email citext unique,
-  nickname text,
-  created_at timestamptz default now()
-);
-create table sessions (
-  id uuid primary key,
-  owner_id bigint references users(id),
-  mode text check (mode in ('basic','couple','friend')),
-  invite_token text unique not null,
-  is_anonymous boolean default true,
-  expires_at timestamptz not null,
-  max_raters int default 50,
-  created_at timestamptz default now()
-);
-create table questions (
-  id serial primary key,
-  dim text check (dim in ('EI','SN','TF','JP')),
-  sign smallint check (sign in (-1,1)),
-  context text check (context in ('common','couple','friend')),
-  text text not null
-);
-create table responses_self (
-  session_id uuid references sessions(id),
-  question_id int references questions(id),
-  value smallint check (value between 1 and 5),
-  primary key(session_id, question_id)
-);
-create table responses_other (
-  session_id uuid references sessions(id),
-  rater_hash text, -- ë¹„ì‹ë³„
-  relation_tag text,
-  question_id int references questions(id),
-  value smallint check (value between 1 and 5),
-  created_at timestamptz default now(),
-  primary key(session_id, rater_hash, question_id)
-);
-create table aggregates (
-  session_id uuid primary key references sessions(id),
-  ei_self real, sn_self real, tf_self real, jp_self real,
-  ei_other real, sn_other real, tf_other real, jp_other real,
-  ei_gap real, sn_gap real, tf_gap real, jp_gap real,
-  ei_sigma real, sn_sigma real, tf_sigma real, jp_sigma real,
-  n int, gap_score real
-);
-```
+`POST /api/self/submit`, `POST /api/invite/create`, `POST /api/other/submit`,  
+`GET /api/result/{token}`, `GET /share/og/{token}.png`(OG ÀÌ¹ÌÁö). **¿À·ù´Â RFC?9457**. ([RFC Editor][1])
 
-### 11) ë¹„ê¸°ëŠ¥ ìš”êµ¬(NFR, ìˆ˜ì¹˜+ê²€ì¦)
+### 11) µ¥ÀÌÅÍ ½ºÅ°¸¶(¿ä¾à)
 
-* ê°€ìš©ì„± **99.9%/ì›”**.
-* ë°±ì—”ë“œ ì„±ëŠ¥: í‰ê· <**500ms**, P95<**1s**(í•µì‹¬ API). ì—ëŸ¬ìœ¨<**1%**.
-* ì›¹ë°”ì´íƒˆ(75p): **LCPâ‰¤2.5s / INPâ‰¤200ms / CLSâ‰¤0.1**. INPëŠ” 2024.3 Core Web Vitalsë¡œ FIDë¥¼ ëŒ€ì²´. ([web.dev][10])
-* ë³´ì•ˆ: **OWASP ASVS v5.0 L2** ê¸°ì¤€ ì ê²€. ([OWASP Foundation][11])
-* ì ‘ê·¼ì„±: **WCAGâ€¯2.2 AA**. ([W3C][9])
-* ì˜¤ë¥˜ í‘œì¤€: **RFCâ€¯9457**. ([RFC Editor][1])
-* ê´€ì¸¡ì„±: OTel ìžë™ê³„ì¸¡(FastAPI), **X-Request-ID** ì „ êµ¬ê°„ ì „íŒŒ. ([opentelemetry-python-contrib.readthedocs.io][2])
+`users(id, nickname, created_at)`  
+`sessions(id, user_id, mode, invite_token, is_anonymous, expires_at, max_raters)`  
+`questions(id, dim, sign, text, context)`  
+`responses_self(session_id, question_id, value)`  
+`responses_other(session_id, rater_id?, relation_tag, question_id, value, created_at)`  
+`aggregates(session_id, dim, self_norm, other_norm, gap, sigma, n_raters, updated_at)`
 
-### 12) ë¦´ë¦¬ì¦ˆ ìˆ˜ë½ ê¸°ì¤€
+### 12) ¸¶ÄÉÆÃ/¹ÙÀÌ·²
 
-1. í•µì‹¬ í”Œë¡œìš° 5ê°œ E2E(ëžœë”©â†’ëª¨ë“œâ†’Selfâ†’ì´ˆëŒ€â†’3ì¸ ì§‘ê³„â†’ê²°ê³¼) **ë¬´í”Œë ˆì´í¬**.
-2. Web Vitals 75p **í•©ê²©**(Lighthouse ëž© + RUM í•„ë“œ). ([web.dev][10])
-3. ëª¨ë“  4xx/5xxëŠ” **RFCâ€¯9457 JSON** ìŠ¤í‚¤ë§ˆë¡œ ê³„ì•½ í…ŒìŠ¤íŠ¸ í†µê³¼. ([RFC Editor][1])
-4. **ASVS v5.0 L2** ì²´í¬ë¦¬ìŠ¤íŠ¸ 100% ê¸°ë¡, ì°¨ë‹¨ê¸‰ ì·¨ì•½ì  0ê±´. ([OWASP Foundation][11])
-5. OTel ëŒ€ì‹œë³´ë“œì—ì„œ **ìš”ì²­â†”íŠ¸ë ˆì´ìŠ¤â†”ë¡œê·¸** ìƒí˜¸íƒìƒ‰(X-Request-ID) ê°€ëŠ¥. ([opentelemetry-python-contrib.readthedocs.io][2])
-6. AdSense **ë°°ì¹˜ ì •ì±…** ìœ„ë°˜ ì—†ìŒ(ë²„íŠ¼ ê·¼ì ‘ ê¸ˆì§€/ìœ ë„ ê¸ˆì§€). ([Google Help][7])
+* **¾ð¶ô ±âÁ¦:** Æò°¡ÀÚ **3¸í ÀÌ»ó** µµÂø ½Ã ¡°Ãß°¡ ÀÎ»çÀÌÆ®¡± ¿ÀÇÂ.
+* **°øÀ¯:** OG ÀÌ¹ÌÁö 1200¡¿630 ±ÇÀå, ÁÖ¿ä ÅÂ±× `og:title/description/image/url`. ([ogp.me][6])
+* **±¤°í:** »ó´Ü Á¦¸ñ ¾Æ·¡ 1, º»¹® Áß´Ü 1, ÇÏ´Ü 1(2?3°³), **Å¬¸¯ À¯µµ/±ÙÁ¢ ¹èÄ¡ ±ÝÁö**. ([Google Help][7])
 
-### 13) ë¦¬ìŠ¤í¬/ì™„í™”
+### 13) KPI/ÁöÇ¥(Metrics)
 
-* **ì•…ì„± ì‘ë‹µ/ë´‡**: ì†ë„<0.3sÂ·íŒ¨í„´ íƒì§€, IP/í† í° í•œë„, 429/Retry-After. ([IETF Datatracker][5])
-* **í”„ë¼ì´ë²„ì‹œ**: ì¹œêµ¬ n<3 ë¹„ê³µê°œ, ê²°ê³¼ íŽ˜ì´ì§€ **noindex** ê¶Œìž¥. ([Google for Developers][12])
-* **ìƒí‘œ/ì €ìž‘ê¶Œ**: MBTI ìƒí‘œ ê³ ì§€, ê³µì‹ ë¬¸í•­Â·í•´ì„¤ ë¯¸ì‚¬ìš©. ([mbtionline.com][3])
-* **ì •ì„œì  ì˜í–¥**: ê²°ê³¼ ë¬¸êµ¬ ê°€ì´ë“œ(ë¹„ë‚œ/ë‚™ì¸ ê¸ˆì§€)Â·ì‹ ê³ /ê°€ë¦¼.
+* **M-101** Self ¿Ï·áÀ², **M-102** Æò±Õ ÀÀ´äÀÚ ¼ö, **M-103** GapScore Áß¾Ó°ª, **M-104** ÇÕÀÇµµ(¥ò) Áß¾Ó°ª, **M-105** °øÀ¯ CTR, **M-106** OG »ý¼º ¼º°ø·ü, **M-107** WebVitals(LCP/INP/CLS 75p), **M-108** RFC?9457 Ä¿¹ö¸®Áö, **M-109** Confirmed-Click ¹ß»ý·ü(0¿¡ ¼ö·Å), **M-110** k-ÀÓ°è ÁØ¼öÀ². ([web.dev][10])
 
-### 14) KPI
+### 14) Å×½ºÆ® ÄÉÀÌ½º
 
-* Activation: Self ì™„ë£Œìœ¨, ì´ˆëŒ€ ìƒì„±ìœ¨, ìµœì´ˆ íƒ€ì¸ì‘ë‹µ ë„ì°©ìœ¨
-* Engagement: í‰ê·  ì‘ë‹µìž ìˆ˜/ì„¸ì…˜, ê³µìœ  í´ë¦­ë¥ , **Gap ì¸ì‚¬ì´íŠ¸ ì—´ëžŒìœ¨**
-* Viral(K): 1ì¸ë‹¹ ì´ˆëŒ€ ìˆ˜ Ã— ì´ˆëŒ€ ì „í™˜ìœ¨
-* Monetize: íŽ˜ì´ì§€ RPM/ê°€ì‹œì„±(Active View) ì¶”ì 
+* **T-101** Self 32¹®Ç× Ã¤Á¡/Á¤±ÔÈ­ Á¤È®¼º(°æ°è°ª¡¤¹«ÀÀ´ä Ã³¸®)
+* **T-102** Other 10µ¿½Ã ÀÀ´ä¡¤Áßº¹ ¹æÁö¡¤P95<1s
+* **T-103** Áý°è/°¡ÁßÄ¡/¥ò/Gap °ø½Ä ´ÜÀ§¡¤¼Ó¼º Å×½ºÆ®
+* **T-104** ·¹ÀÌ´õ/½ºÄ³ÅÍ ·»´õ¡¤¸ð¹ÙÀÏ ¼º´É(>30fps)
+* **T-105** **k<3 Â÷´Ü** ¹× °øÀ¯ ºñÈ°¼ºÈ­
+* **T-106** RFC?9457 ½º³À¼¦(4xx/5xx) ([RFC Editor][1])
+* **T-107** `noindex`/`X-Robots-Tag` Àû¿ë È®ÀÎ(°á°ú/°øÀ¯) ([Google for Developers][5])
+* **T-108** AdSense **ÀÇµµÄ¡ Å¬¸¯ ¹æÁö** ±ÔÁ¤ Ã¼Å©¸®½ºÆ® Åë°ú(¹öÆ° ±ÙÁ¢ ±ÝÁö) ([Google Help][7])
+* **T-109** OTel Æ®·¹ÀÌ½º-·Î±×-¿äÃ»ID Á¶ÀÎ
 
-### 15) Ask ê²Œì´íŠ¸(ìŠ¹ì¸ í•„ìš” ë³€ê²½)
+### 15) Traceability(¿ä±¸¡êÅ×½ºÆ®¡êÁöÇ¥)
 
-* (a) **ê³µê°œ API/ìŠ¤í‚¤ë§ˆ ë³€ê²½**(ì™¸ë¶€ ì†Œë¹„ ì‹œ), (b) **ë ˆì´íŠ¸ë¦¬ë°‹ ì •ì±… ë³€ê²½**, (c) **AdSense ìŠ¬ë¡¯/ì •ì±… ë³€ê²½**, (d) **ë°ì´í„° ë³´ì¡´ê¸°ê°„ ë³€ê²½**.
-
-### 16) ì¶”ì ì„± êµì°¨í‘œ(Râ†”Tâ†”M)
-
-* **R-102(Self ì±„ì )** â†” **T-102(ì±„ì  ì •ê·œí™” ê²½ê³„ê°’/ì†ì„± ê¸°ë°˜ í…ŒìŠ¤íŠ¸)** â†” **M-102(ì±„ì  ì˜¤ë¥˜ìœ¨, í‰ê·  ì²˜ë¦¬ì‹œê°„)**
-* **R-105(ì§‘ê³„/GapScore)** â†” **T-105(ê°€ì¤‘ì¹˜/í‘œì¤€íŽ¸ì°¨/ì˜(0)Â·ìµœëŒ€ê°’ ì‹œë‚˜ë¦¬ì˜¤)** â†” **M-105(GapScore ë¶„í¬, Ïƒ í‰ê· )**
-* **R-106(ì‹œê°í™”)** â†” **T-106(Canvas ë¦¬ì‚¬ì´ì¦ˆ/ìƒ˜í”Œë§/ìŠ¤í¬ë¦°ë¦¬ë”)** â†” **M-106(í”„ë¡ íŠ¸ ë Œë”ì‹œê°„, INP/LCP)**
-* **R-108(ê³µìœ /OG)** â†” **T-108(OG Validator/ì´ë¯¸ì§€ ìƒì„± ì„±ê³µë¥ )** â†” **M-108(ê³µìœ  CTR, ì´ë¯¸ì§€ ìƒì„± P95)**
-* **R-110(AdSense)** â†” **T-110(ë²„íŠ¼ ê·¼ì ‘/ìœ ë„ ë¬¸êµ¬ ì—†ìŒ ì‹œê°ê²€ìˆ˜)** â†” **M-110(Invalid CTR ë¹„ìœ¨)**
+| ¿ä±¸(R)     | Å×½ºÆ®(T)        | ÁöÇ¥(M)         |
+| ----------- | ---------------- | --------------- |
+| R-102       | T-101/T-106      | M-101/M-108     |
+| R-103/104   | T-102            | M-102/M-107     |
+| R-105       | T-103            | M-103/M-104     |
+| R-106       | T-105            | M-110           |
+| R-107       | T-104            | M-107           |
+| R-108       | T-104            | M-106/M-105     |
+| R-110       | T-108            | M-109           |
+| R-112/113/114 | T-106/T-109/T-107 | M-108/M-107    |
 
 ---
 
-[1]: https://www.rfc-editor.org/rfc/rfc9457.html?utm_source=chatgpt.com "RFC 9457: Problem Details for HTTP APIs"
-[2]: https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/fastapi/fastapi.html?utm_source=chatgpt.com "OpenTelemetry FastAPI Instrumentation"
-[3]: https://www.mbtionline.com/en-US/Legal?utm_source=chatgpt.com "Legal"
-[4]: https://www.chartjs.org/docs/latest/charts/radar.html?utm_source=chatgpt.com "Radar Chart"
-[5]: https://datatracker.ietf.org/doc/html/rfc6585?utm_source=chatgpt.com "RFC 6585 - Additional HTTP Status Codes"
-[6]: https://ogp.me/?utm_source=chatgpt.com "The Open Graph protocol"
-[7]: https://support.google.com/adsense/answer/1346295?hl=en&utm_source=chatgpt.com "Ad placement policies - Google AdSense Help"
-[8]: https://support.google.com/analytics/answer/13316687?hl=en&utm_source=chatgpt.com "[GA4] Event naming rules - Analytics Help"
-[9]: https://www.w3.org/TR/WCAG22/?utm_source=chatgpt.com "Web Content Accessibility Guidelines (WCAG) 2.2"
-[10]: https://web.dev/articles/vitals?utm_source=chatgpt.com "Web Vitals | Articles"
-[11]: https://owasp.org/www-project-application-security-verification-standard/?utm_source=chatgpt.com "OWASP Application Security Verification Standard (ASVS)"
-[12]: https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag?utm_source=chatgpt.com "Robots Meta Tags Specifications | Google Search Central"
+## Âü°í ¹®Çå
+
+[1]: https://www.rfc-editor.org/rfc/rfc9457.html "RFC 9457: Problem Details for HTTP APIs"  
+[2]: https://www.chartjs.org/docs/latest/charts/radar.html "Radar Chart"  
+[3]: https://epic.org/wp-content/uploads/privacy/reidentification/Sweeney_Article.pdf "k-ANONYMITY: A MODEL FOR PROTECTING PRIVACY"  
+[4]: https://www.mbtionline.com/en-US/Legal "Legal"  
+[5]: https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag "Robots Meta Tags Specifications"  
+[6]: https://ogp.me/ "The Open Graph protocol"  
+[7]: https://support.google.com/adsense/answer/1346295 "Ad placement policies - Google AdSense Help"  
+[8]: https://developers.google.com/analytics/devguides/collection/ga4/reference/events "Recommended events | Google Analytics"  
+[9]: https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/fastapi/fastapi.html "OpenTelemetry FastAPI Instrumentation"  
+[10]: https://web.dev/articles/vitals "Web Vitals | Articles"  
+[11]: https://www.w3.org/TR/WCAG22/ "Web Content Accessibility Guidelines (WCAG) 2.2"
+

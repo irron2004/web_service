@@ -1,4 +1,6 @@
-﻿from datetime import datetime
+from __future__ import annotations
+
+from datetime import datetime
 from typing import List
 
 from sqlalchemy import (
@@ -56,7 +58,7 @@ class Session(Base, TimestampMixin):
     other_responses: Mapped[List["OtherResponse"]] = relationship(
         back_populates="session", cascade="all, delete-orphan"
     )
-    aggregate: Mapped["Aggregate" | None] = relationship(
+    aggregate: Mapped[Aggregate | None] = relationship(
         back_populates="session", uselist=False, cascade="all, delete-orphan"
     )
 
@@ -65,10 +67,14 @@ class Question(Base):
     __tablename__ = "questions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    code: Mapped[str] = mapped_column(String(40), unique=True, nullable=False)
     dim: Mapped[str] = mapped_column(String(4), nullable=False)
     sign: Mapped[int] = mapped_column(Integer, nullable=False)
     context: Mapped[str] = mapped_column(String(20), nullable=False)
-    text: Mapped[str] = mapped_column(String(512), nullable=False)
+    prompt_self: Mapped[str] = mapped_column(String(512), nullable=False)
+    prompt_other: Mapped[str] = mapped_column(String(512), nullable=False)
+    theme: Mapped[str] = mapped_column(String(60), nullable=False)
+    scenario: Mapped[str] = mapped_column(String(120), nullable=False)
 
 
 class SelfResponse(Base, TimestampMixin):

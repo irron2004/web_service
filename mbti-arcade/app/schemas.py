@@ -2,19 +2,37 @@
 
 from datetime import datetime
 from typing import Dict, List, Optional
-from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 DIMENSIONS = ("EI", "SN", "TF", "JP")
 
 
 class QuestionSchema(BaseModel):
     id: int
+    code: str
     dim: str
     sign: int
     context: str
-    text: str
+    prompt_self: str
+    prompt_other: str
+    theme: str
+    scenario: str
+
+    @field_validator("dim")
+    @classmethod
+    def validate_dim(cls, value: str) -> str:
+        normalized = value.upper()
+        if normalized not in DIMENSIONS:
+            raise ValueError(f"Unsupported dimension '{value}'")
+        return normalized
+
+    @field_validator("sign")
+    @classmethod
+    def validate_sign(cls, value: int) -> int:
+        if value not in (-1, 1):
+            raise ValueError("sign must be -1 or 1")
+        return value
 
 
 class SessionCreate(BaseModel):
