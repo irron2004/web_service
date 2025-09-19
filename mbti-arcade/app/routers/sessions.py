@@ -7,14 +7,9 @@ from app.data.questions import questions_for_mode
 from app.database import get_db
 from app.models import Session as SessionModel, User
 from app.schemas import InviteUpdate, QuestionSchema, SessionCreate, SessionResponse
-from app.utils.problem_details import ProblemDetailsException, from_exception
+from app.utils.problem_details import ProblemDetailsException
 
 router = APIRouter(prefix="/api", tags=["sessions"])
-
-
-@router.exception_handler(ProblemDetailsException)
-async def problem_exception_handler(request: Request, exc: ProblemDetailsException):
-    return from_exception(request, exc)
 
 
 @router.post("/sessions", response_model=SessionResponse, status_code=201)
