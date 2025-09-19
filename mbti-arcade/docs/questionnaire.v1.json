@@ -1,0 +1,495 @@
+{
+  "metadata": {
+    "version": "2025-09-17",
+    "revision": "v1",
+    "scale": "Likert 1-5 (1=Strongly disagree, 5=Strongly agree)",
+    "languages": [
+      "en-US"
+    ],
+    "default_counts": {
+      "common": 24,
+      "romance": 8,
+      "friend": 8
+    },
+    "notes": [
+      "Avoid trademarked MBTI terms; dimensions use neutral language.",
+      "Apply the gap scoring formula described in PRD.md section 4."
+    ]
+  },
+  "dimensions": {
+    "EI": {
+      "name": "Energy Exchange",
+      "positive_pole": "Expressive",
+      "negative_pole": "Reflective",
+      "description": "Preference for processing stimulation through external interaction versus internal reflection."
+    },
+    "SN": {
+      "name": "Information Style",
+      "positive_pole": "Grounded detail",
+      "negative_pole": "Pattern seeking",
+      "description": "How a person attends to concrete detail or underlying patterns when interpreting situations."
+    },
+    "TF": {
+      "name": "Decision Lens",
+      "positive_pole": "Analytical",
+      "negative_pole": "Relational",
+      "description": "Balance between objective criteria and interpersonal impact while deciding."
+    },
+    "JP": {
+      "name": "Planning Rhythm",
+      "positive_pole": "Structured",
+      "negative_pole": "Adaptive",
+      "description": "Orientation toward scheduling and closure versus flexibility and openness."
+    }
+  },
+  "questions": {
+    "common": [
+      {
+        "id": "C-EI-01",
+        "dim": "EI",
+        "sign": 1,
+        "prompt_self": "I feel energized after spontaneous group hangouts or events.",
+        "prompt_other": "They look energized after spontaneous group hangouts or events.",
+        "context": {
+          "theme": "social_energy",
+          "scenario": "Post-event mood check"
+        }
+      },
+      {
+        "id": "C-EI-02",
+        "dim": "EI",
+        "sign": -1,
+        "prompt_self": "I plan quiet buffer time before or after packed social weekends to recharge.",
+        "prompt_other": "They plan quiet buffer time before or after packed social weekends to recharge.",
+        "context": {
+          "theme": "energy_pacing",
+          "scenario": "Recovery planning"
+        }
+      },
+      {
+        "id": "C-EI-03",
+        "dim": "EI",
+        "sign": 1,
+        "prompt_self": "I strike up conversations with new people without much hesitation.",
+        "prompt_other": "They strike up conversations with new people without much hesitation.",
+        "context": {
+          "theme": "social_initiation",
+          "scenario": "Meeting new people"
+        }
+      },
+      {
+        "id": "C-EI-04",
+        "dim": "EI",
+        "sign": -1,
+        "prompt_self": "I prefer observing a room before I join the conversation.",
+        "prompt_other": "They prefer observing a room before joining the conversation.",
+        "context": {
+          "theme": "observation",
+          "scenario": "Group discussion entry"
+        }
+      },
+      {
+        "id": "C-EI-05",
+        "dim": "EI",
+        "sign": 1,
+        "prompt_self": "I think through ideas by talking them out loud with others.",
+        "prompt_other": "They think through ideas by talking them out loud with others.",
+        "context": {
+          "theme": "idea_processing",
+          "scenario": "Collaborative problem solving"
+        }
+      },
+      {
+        "id": "C-EI-06",
+        "dim": "EI",
+        "sign": -1,
+        "prompt_self": "I process ideas internally before I share my conclusion.",
+        "prompt_other": "They process ideas internally before sharing their conclusion.",
+        "context": {
+          "theme": "idea_processing",
+          "scenario": "Preparing input"
+        }
+      },
+      {
+        "id": "C-SN-01",
+        "dim": "SN",
+        "sign": 1,
+        "prompt_self": "I look for proven examples before trying a new approach.",
+        "prompt_other": "They look for proven examples before trying a new approach.",
+        "context": {
+          "theme": "problem_solving",
+          "scenario": "Decision research"
+        }
+      },
+      {
+        "id": "C-SN-02",
+        "dim": "SN",
+        "sign": -1,
+        "prompt_self": "I get excited by experimenting even when the path forward is unclear.",
+        "prompt_other": "They get excited by experimenting even when the path forward is unclear.",
+        "context": {
+          "theme": "innovation",
+          "scenario": "Trying new ideas"
+        }
+      },
+      {
+        "id": "C-SN-03",
+        "dim": "SN",
+        "sign": 1,
+        "prompt_self": "I notice small practical details that others often miss.",
+        "prompt_other": "They notice small practical details that others often miss.",
+        "context": {
+          "theme": "observation",
+          "scenario": "Daily routines"
+        }
+      },
+      {
+        "id": "C-SN-04",
+        "dim": "SN",
+        "sign": -1,
+        "prompt_self": "I connect day-to-day stories into bigger themes quickly.",
+        "prompt_other": "They connect day-to-day stories into bigger themes quickly.",
+        "context": {
+          "theme": "pattern_spotting",
+          "scenario": "Meaning making"
+        }
+      },
+      {
+        "id": "C-SN-05",
+        "dim": "SN",
+        "sign": 1,
+        "prompt_self": "I prefer instructions that spell out concrete steps.",
+        "prompt_other": "They prefer instructions that spell out concrete steps.",
+        "context": {
+          "theme": "learning_style",
+          "scenario": "Instructions intake"
+        }
+      },
+      {
+        "id": "C-SN-06",
+        "dim": "SN",
+        "sign": -1,
+        "prompt_self": "I enjoy brainstorming wild scenarios to see what could happen.",
+        "prompt_other": "They enjoy brainstorming wild scenarios to see what could happen.",
+        "context": {
+          "theme": "ideation",
+          "scenario": "Future possibilities"
+        }
+      },
+      {
+        "id": "C-TF-01",
+        "dim": "TF",
+        "sign": 1,
+        "prompt_self": "I rely on measurable criteria when I evaluate options.",
+        "prompt_other": "They rely on measurable criteria when evaluating options.",
+        "context": {
+          "theme": "decision_making",
+          "scenario": "Comparing choices"
+        }
+      },
+      {
+        "id": "C-TF-02",
+        "dim": "TF",
+        "sign": -1,
+        "prompt_self": "I weigh how choices will affect the feelings of other people before deciding.",
+        "prompt_other": "They weigh how choices will affect the feelings of other people before deciding.",
+        "context": {
+          "theme": "empathy",
+          "scenario": "Decision trade-offs"
+        }
+      },
+      {
+        "id": "C-TF-03",
+        "dim": "TF",
+        "sign": 1,
+        "prompt_self": "I appreciate direct critiques, even if the wording is blunt.",
+        "prompt_other": "They appreciate direct critiques, even if the wording is blunt.",
+        "context": {
+          "theme": "feedback",
+          "scenario": "Receiving input"
+        }
+      },
+      {
+        "id": "C-TF-04",
+        "dim": "TF",
+        "sign": -1,
+        "prompt_self": "I soften my words to keep harmony during tough feedback.",
+        "prompt_other": "They soften their words to keep harmony during tough feedback.",
+        "context": {
+          "theme": "feedback",
+          "scenario": "Delivering input"
+        }
+      },
+      {
+        "id": "C-TF-05",
+        "dim": "TF",
+        "sign": 1,
+        "prompt_self": "I separate a problem from the person who caused it.",
+        "prompt_other": "They separate a problem from the person who caused it.",
+        "context": {
+          "theme": "analysis",
+          "scenario": "Conflict review"
+        }
+      },
+      {
+        "id": "C-TF-06",
+        "dim": "TF",
+        "sign": -1,
+        "prompt_self": "I track the emotional tone in a group and adjust my approach.",
+        "prompt_other": "They track the emotional tone in a group and adjust their approach.",
+        "context": {
+          "theme": "awareness",
+          "scenario": "Group dynamics"
+        }
+      },
+      {
+        "id": "C-JP-01",
+        "dim": "JP",
+        "sign": 1,
+        "prompt_self": "I map out plans and timelines early so nothing sneaks up on me.",
+        "prompt_other": "They map out plans and timelines early so nothing sneaks up on them.",
+        "context": {
+          "theme": "planning",
+          "scenario": "Project kickoff"
+        }
+      },
+      {
+        "id": "C-JP-02",
+        "dim": "JP",
+        "sign": -1,
+        "prompt_self": "I keep plans loose so we can adjust at the last minute.",
+        "prompt_other": "They keep plans loose so the group can adjust at the last minute.",
+        "context": {
+          "theme": "flexibility",
+          "scenario": "Scheduling"
+        }
+      },
+      {
+        "id": "C-JP-03",
+        "dim": "JP",
+        "sign": 1,
+        "prompt_self": "I use lists or tools to keep track of tasks systematically.",
+        "prompt_other": "They use lists or tools to keep track of tasks systematically.",
+        "context": {
+          "theme": "organization",
+          "scenario": "Task tracking"
+        }
+      },
+      {
+        "id": "C-JP-04",
+        "dim": "JP",
+        "sign": -1,
+        "prompt_self": "I jump on unexpected opportunities even if the schedule shifts.",
+        "prompt_other": "They jump on unexpected opportunities even if the schedule shifts.",
+        "context": {
+          "theme": "spontaneity",
+          "scenario": "Last-minute invites"
+        }
+      },
+      {
+        "id": "C-JP-05",
+        "dim": "JP",
+        "sign": 1,
+        "prompt_self": "I like to close decisions once we have enough data to move forward.",
+        "prompt_other": "They like to close decisions once there is enough data to move forward.",
+        "context": {
+          "theme": "closure",
+          "scenario": "Decision follow-up"
+        }
+      },
+      {
+        "id": "C-JP-06",
+        "dim": "JP",
+        "sign": -1,
+        "prompt_self": "I prefer leaving room for open-ended exploration before locking plans.",
+        "prompt_other": "They prefer leaving room for open-ended exploration before locking plans.",
+        "context": {
+          "theme": "exploration",
+          "scenario": "Plan formation"
+        }
+      }
+    ],
+    "modes": {
+      "romance": [
+        {
+          "id": "R-EI-01",
+          "dim": "EI",
+          "sign": 1,
+          "prompt_self": "I enjoy planning double dates or group activities for us.",
+          "prompt_other": "They enjoy planning double dates or group activities for the relationship.",
+          "context": {
+            "theme": "shared_social",
+            "scenario": "Couple with friends"
+          }
+        },
+        {
+          "id": "R-EI-02",
+          "dim": "EI",
+          "sign": -1,
+          "prompt_self": "I prefer intimate one-on-one time over crowded date settings.",
+          "prompt_other": "They prefer intimate one-on-one time over crowded date settings.",
+          "context": {
+            "theme": "quality_time",
+            "scenario": "Date planning"
+          }
+        },
+        {
+          "id": "R-SN-01",
+          "dim": "SN",
+          "sign": 1,
+          "prompt_self": "I track the small routines that make my partner feel cared for.",
+          "prompt_other": "They track the small routines that make their partner feel cared for.",
+          "context": {
+            "theme": "attunement",
+            "scenario": "Daily care"
+          }
+        },
+        {
+          "id": "R-SN-02",
+          "dim": "SN",
+          "sign": -1,
+          "prompt_self": "I love dreaming up new experiences we could try together.",
+          "prompt_other": "They love dreaming up new experiences the couple could try together.",
+          "context": {
+            "theme": "future_focus",
+            "scenario": "Experience design"
+          }
+        },
+        {
+          "id": "R-TF-01",
+          "dim": "TF",
+          "sign": 1,
+          "prompt_self": "I bring up concerns quickly even when the conversation might feel intense.",
+          "prompt_other": "They bring up concerns quickly even when the conversation might feel intense.",
+          "context": {
+            "theme": "communication",
+            "scenario": "Conflict navigation"
+          }
+        },
+        {
+          "id": "R-TF-02",
+          "dim": "TF",
+          "sign": -1,
+          "prompt_self": "I phrase feedback gently so our emotions stay protected.",
+          "prompt_other": "They phrase feedback gently so emotions stay protected.",
+          "context": {
+            "theme": "emotional_safety",
+            "scenario": "Sensitive topics"
+          }
+        },
+        {
+          "id": "R-JP-01",
+          "dim": "JP",
+          "sign": 1,
+          "prompt_self": "I set relationship checkpoints like budgets, trips, or family plans.",
+          "prompt_other": "They set relationship checkpoints like budgets, trips, or family plans.",
+          "context": {
+            "theme": "long_range_planning",
+            "scenario": "Milestone setting"
+          }
+        },
+        {
+          "id": "R-JP-02",
+          "dim": "JP",
+          "sign": -1,
+          "prompt_self": "I enjoy spontaneous gestures more than sticking to fixed plans.",
+          "prompt_other": "They enjoy spontaneous gestures more than sticking to fixed plans.",
+          "context": {
+            "theme": "surprise",
+            "scenario": "Relationship rituals"
+          }
+        }
+      ],
+      "friend": [
+        {
+          "id": "F-EI-01",
+          "dim": "EI",
+          "sign": 1,
+          "prompt_self": "I rally friends for group hangouts or game nights.",
+          "prompt_other": "They rally friends for group hangouts or game nights.",
+          "context": {
+            "theme": "community_builder",
+            "scenario": "Group coordination"
+          }
+        },
+        {
+          "id": "F-EI-02",
+          "dim": "EI",
+          "sign": -1,
+          "prompt_self": "I prefer deeper one-on-one catch-ups over large group chats.",
+          "prompt_other": "They prefer deeper one-on-one catch-ups over large group chats.",
+          "context": {
+            "theme": "connection_depth",
+            "scenario": "Friend check-ins"
+          }
+        },
+        {
+          "id": "F-SN-01",
+          "dim": "SN",
+          "sign": 1,
+          "prompt_self": "I remember the small preferences my friends mention when making plans.",
+          "prompt_other": "They remember the small preferences friends mention when making plans.",
+          "context": {
+            "theme": "practical_care",
+            "scenario": "Planning details"
+          }
+        },
+        {
+          "id": "F-SN-02",
+          "dim": "SN",
+          "sign": -1,
+          "prompt_self": "I pitch imaginative adventures for the crew even if we have not done them before.",
+          "prompt_other": "They pitch imaginative adventures for the crew even if they have not done them before.",
+          "context": {
+            "theme": "adventure",
+            "scenario": "Plan ideation"
+          }
+        },
+        {
+          "id": "F-TF-01",
+          "dim": "TF",
+          "sign": 1,
+          "prompt_self": "I give straightforward advice when friends ask for help.",
+          "prompt_other": "They give straightforward advice when friends ask for help.",
+          "context": {
+            "theme": "support_style",
+            "scenario": "Problem solving"
+          }
+        },
+        {
+          "id": "F-TF-02",
+          "dim": "TF",
+          "sign": -1,
+          "prompt_self": "I focus on validating feelings before suggesting solutions.",
+          "prompt_other": "They focus on validating feelings before suggesting solutions.",
+          "context": {
+            "theme": "emotional_support",
+            "scenario": "Friend venting"
+          }
+        },
+        {
+          "id": "F-JP-01",
+          "dim": "JP",
+          "sign": 1,
+          "prompt_self": "I coordinate schedules early so everyone can commit.",
+          "prompt_other": "They coordinate schedules early so everyone can commit.",
+          "context": {
+            "theme": "coordination",
+            "scenario": "Event planning"
+          }
+        },
+        {
+          "id": "F-JP-02",
+          "dim": "JP",
+          "sign": -1,
+          "prompt_self": "I am comfortable letting plans evolve the day of the hangout.",
+          "prompt_other": "They are comfortable letting plans evolve the day of the hangout.",
+          "context": {
+            "theme": "spontaneity",
+            "scenario": "Day-of adjustments"
+          }
+        }
+      ]
+    }
+  }
+}
