@@ -37,16 +37,16 @@ class MBTIService:
         )
         return mbti, scores, raw
 
-    async def create_pair(self, mode: str, email: str | None, 
-                         my_name: str | None = None, my_email: str | None = None, my_mbti: str | None = None) -> str:
+    def create_pair(self, mode: str, email: str | None, 
+                   my_name: str | None = None, my_email: str | None = None, my_mbti: str | None = None) -> str:
         pair = Pair(mode=mode, friend_email=email,
                     my_name=my_name, my_email=my_email, my_mbti=my_mbti)
         self.session.add(pair)
-        await self.session.commit()
+        self.session.commit()
         return pair.id
 
-    async def save_response(self, pair_id: str, role: str, answers, questions, 
-                          relation: str = None):
+    def save_response(self, pair_id: str, role: str, answers, questions, 
+                     relation: str = None):
         mbti, scores, raw = self._calc_scores(answers, questions)
         resp = Response(
             pair_id=pair_id, 
@@ -58,18 +58,18 @@ class MBTIService:
             raw_scores=raw
         )
         self.session.add(resp)
-        await self.session.commit()
+        self.session.commit()
         return resp, mbti, scores, raw 
 
-    async def get_response(self, pair_id: str):
+    def get_response(self, pair_id: str):
         from sqlmodel import select
-        result = await self.session.execute(select(Response).where(Response.pair_id == pair_id))
+        result = self.session.execute(select(Response).where(Response.pair_id == pair_id))
         return result.scalars().first() 
 
-    async def get_pair_scores(self, pair_id: str):
+    def get_pair_scores(self, pair_id: str):
         from sqlmodel import select
         stmt = select(Response).where(Response.pair_id == pair_id)
-        res = (await self.session.execute(stmt)).scalars().all()
+        res = self.session.execute(stmt).scalars().all()
         if not res:
             return None
         latest = sorted(res, key=lambda r: r.created_at)[-2:]

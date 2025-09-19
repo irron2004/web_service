@@ -39,14 +39,14 @@ MBTI_QUESTIONS = [
 RELATIONS_ENUM = ["friend", "boyfriend", "girlfriend", "spouse", "colleague", "family"]
 
 @router.get("/{token}", response_class=HTMLResponse)
-async def quiz_prefill(request: Request, token: str, session=Depends(get_session)):
+def quiz_prefill(request: Request, token: str, session=Depends(get_session)):
     try:
         pair_id, my_mbti = verify_token(token)
     except ValueError:
         raise HTTPException(status_code=403, detail="expired link")
     
     svc = MBTIService(session)
-    pair = await svc.session.get(Pair, pair_id)
+    pair = svc.session.get(Pair, pair_id)
     if not pair:
         raise HTTPException(status_code=404)
     

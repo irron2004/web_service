@@ -86,7 +86,8 @@ cd mbti-arcade
 pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-- Health check: `GET http://localhost:8000/health`
+- **Live Demo**: https://webservice-production-c039.up.railway.app/
+- Health check: `GET http://localhost:8000/healthz`
 - Primary endpoints: `/api/sessions`, `/api/self/submit`, `/api/other/submit`, `/api/result/{token}` (errors return RFC 9457 JSON)
 
 ### Hub service (`main-service`)

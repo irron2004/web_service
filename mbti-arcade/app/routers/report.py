@@ -10,14 +10,14 @@ router = APIRouter(prefix="/api", tags=["Report"])
 templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/report/{token}")
-async def report(token: str, session=Depends(get_session)):
+def report(token: str, session=Depends(get_session)):
     try:
         pair_id, my_mbti = verify_token(token)
     except ValueError:
         raise HTTPException(status_code=404, detail="invalid link")
 
     svc = MBTIService(session)
-    data = await svc.get_pair_scores(pair_id)
+    data = svc.get_pair_scores(pair_id)
     if not data:
         raise HTTPException(status_code=404, detail="no data")
 
@@ -25,14 +25,14 @@ async def report(token: str, session=Depends(get_session)):
     return JSONResponse({"labels": labels, "datasets": data})
 
 @router.get("/advice/{token}")
-async def advice(token: str, session=Depends(get_session)):
+def advice(token: str, session=Depends(get_session)):
     try:
         pair_id, my_mbti = verify_token(token)
     except ValueError:
         raise HTTPException(status_code=404, detail="invalid link")
     
     svc = MBTIService(session)
-    data = await svc.get_pair_scores(pair_id)   # me + other
+    data = svc.get_pair_scores(pair_id)   # me + other
     if not data or len(data) < 2:
         raise HTTPException(404)
     
