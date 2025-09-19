@@ -4,6 +4,8 @@ import logging
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 from app.core.config import REQUEST_ID_HEADER
 from app.data.loader import seed_questions
@@ -12,6 +14,9 @@ from app.routers import health
 from app.routers import responses as responses_router
 from app.routers import results as results_router
 from app.routers import sessions as sessions_router
+from app.routers import share as share_router
+from app.routers import quiz as quiz_router
+from app.routers import report as report_router
 from app.utils.problem_details import ProblemDetailsException, from_exception
 
 log = logging.getLogger("perception_gap")
@@ -22,10 +27,15 @@ app = FastAPI(
     version="0.9.0",
 )
 
+templates = Jinja2Templates(directory="app/templates")
+
 app.include_router(health.router)
 app.include_router(sessions_router.router)
 app.include_router(responses_router.router)
 app.include_router(results_router.router)
+app.include_router(share_router.router)
+app.include_router(quiz_router.router)
+app.include_router(report_router.router)
 
 
 @app.middleware("http")
@@ -49,8 +59,12 @@ async def startup_event():
         seed_questions(db)
 
 
-@app.get("/", tags=["system"])
-async def root():
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    return templates.TemplateResponse("mbti/index.html", {"request": request})
+
+@app.get("/api", tags=["system"])
+async def api_root():
     return {"service": "perception-gap", "status": "online"}
 
 
