@@ -2,9 +2,9 @@
   "metadata": {
     "version": "2025-09-17",
     "revision": "v1",
-    "scale": "Likert 1-5 (1=Strongly disagree, 5=Strongly agree)",
+    "scale": "리커트 1-5 (1=전혀 그렇지 않다, 5=매우 그렇다)",
     "languages": [
-      "en-US"
+      "ko-KR"
     ],
     "default_counts": {
       "common": 24,
@@ -48,8 +48,8 @@
         "id": "C-EI-01",
         "dim": "EI",
         "sign": 1,
-        "prompt_self": "I feel energized after spontaneous group hangouts or events.",
-        "prompt_other": "They look energized after spontaneous group hangouts or events.",
+        "prompt_self": "나는 즉흥적인 모임이나 행사를 다녀온 뒤에도 에너지가 충전된다고 느낀다.",
+        "prompt_other": "그 사람은 즉흥적인 모임이나 행사를 다녀온 뒤에도 에너지가 충전된 모습이다.",
         "context": {
           "theme": "social_energy",
           "scenario": "Post-event mood check"
@@ -59,8 +59,8 @@
         "id": "C-EI-02",
         "dim": "EI",
         "sign": -1,
-        "prompt_self": "I plan quiet buffer time before or after packed social weekends to recharge.",
-        "prompt_other": "They plan quiet buffer time before or after packed social weekends to recharge.",
+        "prompt_self": "나는 빡빡한 주말 약속 전후에 재충전을 위한 조용한 시간을 일부러 챙긴다.",
+        "prompt_other": "그 사람은 빡빡한 주말 약속 전후에 재충전을 위한 조용한 시간을 일부러 챙긴다.",
         "context": {
           "theme": "energy_pacing",
           "scenario": "Recovery planning"
@@ -70,8 +70,8 @@
         "id": "C-EI-03",
         "dim": "EI",
         "sign": 1,
-        "prompt_self": "I strike up conversations with new people without much hesitation.",
-        "prompt_other": "They strike up conversations with new people without much hesitation.",
+        "prompt_self": "나는 새로운 사람에게도 큰 망설임 없이 먼저 말을 건다.",
+        "prompt_other": "그 사람은 새로운 사람에게도 큰 망설임 없이 먼저 말을 건다.",
         "context": {
           "theme": "social_initiation",
           "scenario": "Meeting new people"
@@ -81,8 +81,8 @@
         "id": "C-EI-04",
         "dim": "EI",
         "sign": -1,
-        "prompt_self": "I prefer observing a room before I join the conversation.",
-        "prompt_other": "They prefer observing a room before joining the conversation.",
+        "prompt_self": "나는 대화에 참여하기 전에 먼저 분위기와 흐름을 살펴본다.",
+        "prompt_other": "그 사람은 대화에 참여하기 전에 먼저 분위기와 흐름을 살펴본다.",
         "context": {
           "theme": "observation",
           "scenario": "Group discussion entry"
@@ -92,8 +92,8 @@
         "id": "C-EI-05",
         "dim": "EI",
         "sign": 1,
-        "prompt_self": "I think through ideas by talking them out loud with others.",
-        "prompt_other": "They think through ideas by talking them out loud with others.",
+        "prompt_self": "나는 다른 사람과 소리 내어 대화하며 생각을 정리하는 편이다.",
+        "prompt_other": "그 사람은 다른 사람과 소리 내어 대화하며 생각을 정리하는 편이다.",
         "context": {
           "theme": "idea_processing",
           "scenario": "Collaborative problem solving"
@@ -103,8 +103,8 @@
         "id": "C-EI-06",
         "dim": "EI",
         "sign": -1,
-        "prompt_self": "I process ideas internally before I share my conclusion.",
-        "prompt_other": "They process ideas internally before sharing their conclusion.",
+        "prompt_self": "나는 결론을 말하기 전에 머릿속에서 생각을 충분히 정리한다.",
+        "prompt_other": "그 사람은 결론을 말하기 전에 머릿속에서 생각을 충분히 정리한다.",
         "context": {
           "theme": "idea_processing",
           "scenario": "Preparing input"
@@ -114,8 +114,8 @@
         "id": "C-SN-01",
         "dim": "SN",
         "sign": 1,
-        "prompt_self": "I look for proven examples before trying a new approach.",
-        "prompt_other": "They look for proven examples before trying a new approach.",
+        "prompt_self": "나는 새로운 방식을 시도하기 전에 입증된 사례를 먼저 확인한다.",
+        "prompt_other": "그 사람은 새로운 방식을 시도하기 전에 입증된 사례를 먼저 확인한다.",
         "context": {
           "theme": "problem_solving",
           "scenario": "Decision research"
@@ -125,8 +125,8 @@
         "id": "C-SN-02",
         "dim": "SN",
         "sign": -1,
-        "prompt_self": "I get excited by experimenting even when the path forward is unclear.",
-        "prompt_other": "They get excited by experimenting even when the path forward is unclear.",
+        "prompt_self": "나는 앞길이 불확실해도 새로운 시도를 하면 설렌다.",
+        "prompt_other": "그 사람은 앞길이 불확실해도 새로운 시도를 하면 설렌다.",
         "context": {
           "theme": "innovation",
           "scenario": "Trying new ideas"
@@ -136,8 +136,8 @@
         "id": "C-SN-03",
         "dim": "SN",
         "sign": 1,
-        "prompt_self": "I notice small practical details that others often miss.",
-        "prompt_other": "They notice small practical details that others often miss.",
+        "prompt_self": "나는 다른 사람들이 놓치기 쉬운 실용적인 디테일을 잘 알아차린다.",
+        "prompt_other": "그 사람은 다른 사람들이 놓치기 쉬운 실용적인 디테일을 잘 알아차린다.",
         "context": {
           "theme": "observation",
           "scenario": "Daily routines"
@@ -147,8 +147,8 @@
         "id": "C-SN-04",
         "dim": "SN",
         "sign": -1,
-        "prompt_self": "I connect day-to-day stories into bigger themes quickly.",
-        "prompt_other": "They connect day-to-day stories into bigger themes quickly.",
+        "prompt_self": "나는 일상의 이야기들을 금세 큰 주제나 의미로 연결해 본다.",
+        "prompt_other": "그 사람은 일상의 이야기들을 금세 큰 주제나 의미로 연결해 본다.",
         "context": {
           "theme": "pattern_spotting",
           "scenario": "Meaning making"
@@ -158,8 +158,8 @@
         "id": "C-SN-05",
         "dim": "SN",
         "sign": 1,
-        "prompt_self": "I prefer instructions that spell out concrete steps.",
-        "prompt_other": "They prefer instructions that spell out concrete steps.",
+        "prompt_self": "나는 구체적인 단계가 명확히 제시된 지침을 선호한다.",
+        "prompt_other": "그 사람은 구체적인 단계가 명확히 제시된 지침을 선호한다.",
         "context": {
           "theme": "learning_style",
           "scenario": "Instructions intake"
@@ -169,8 +169,8 @@
         "id": "C-SN-06",
         "dim": "SN",
         "sign": -1,
-        "prompt_self": "I enjoy brainstorming wild scenarios to see what could happen.",
-        "prompt_other": "They enjoy brainstorming wild scenarios to see what could happen.",
+        "prompt_self": "나는 상상력을 열어 두고 별별 가능성을 떠올리며 아이디어 회의를 즐긴다.",
+        "prompt_other": "그 사람은 상상력을 열어 두고 별별 가능성을 떠올리며 아이디어 회의를 즐긴다.",
         "context": {
           "theme": "ideation",
           "scenario": "Future possibilities"
@@ -180,8 +180,8 @@
         "id": "C-TF-01",
         "dim": "TF",
         "sign": 1,
-        "prompt_self": "I rely on measurable criteria when I evaluate options.",
-        "prompt_other": "They rely on measurable criteria when evaluating options.",
+        "prompt_self": "나는 선택지를 평가할 때 수치나 근거처럼 측정 가능한 기준을 중시한다.",
+        "prompt_other": "그 사람은 선택지를 평가할 때 수치나 근거처럼 측정 가능한 기준을 중시한다.",
         "context": {
           "theme": "decision_making",
           "scenario": "Comparing choices"
@@ -191,8 +191,8 @@
         "id": "C-TF-02",
         "dim": "TF",
         "sign": -1,
-        "prompt_self": "I weigh how choices will affect the feelings of other people before deciding.",
-        "prompt_other": "They weigh how choices will affect the feelings of other people before deciding.",
+        "prompt_self": "나는 결정을 내리기 전에 선택이 다른 사람의 감정에 어떤 영향을 줄지 먼저 생각한다.",
+        "prompt_other": "그 사람은 결정을 내리기 전에 선택이 다른 사람의 감정에 어떤 영향을 줄지 먼저 생각한다.",
         "context": {
           "theme": "empathy",
           "scenario": "Decision trade-offs"
@@ -202,8 +202,8 @@
         "id": "C-TF-03",
         "dim": "TF",
         "sign": 1,
-        "prompt_self": "I appreciate direct critiques, even if the wording is blunt.",
-        "prompt_other": "They appreciate direct critiques, even if the wording is blunt.",
+        "prompt_self": "나는 말이 다소 직설적이더라도 솔직한 비판을 고맙게 받아들인다.",
+        "prompt_other": "그 사람은 말이 다소 직설적이더라도 솔직한 비판을 고맙게 받아들인다.",
         "context": {
           "theme": "feedback",
           "scenario": "Receiving input"
@@ -213,8 +213,8 @@
         "id": "C-TF-04",
         "dim": "TF",
         "sign": -1,
-        "prompt_self": "I soften my words to keep harmony during tough feedback.",
-        "prompt_other": "They soften their words to keep harmony during tough feedback.",
+        "prompt_self": "나는 힘든 피드백을 할 때도 조심스럽게 말해 분위기를 지키려 한다.",
+        "prompt_other": "그 사람은 힘든 피드백을 할 때도 조심스럽게 말해 분위기를 지키려 한다.",
         "context": {
           "theme": "feedback",
           "scenario": "Delivering input"
@@ -224,8 +224,8 @@
         "id": "C-TF-05",
         "dim": "TF",
         "sign": 1,
-        "prompt_self": "I separate a problem from the person who caused it.",
-        "prompt_other": "They separate a problem from the person who caused it.",
+        "prompt_self": "나는 문제와 그 문제를 만든 사람을 분리해서 생각하려고 한다.",
+        "prompt_other": "그 사람은 문제와 그 문제를 만든 사람을 분리해서 생각하려고 한다.",
         "context": {
           "theme": "analysis",
           "scenario": "Conflict review"
@@ -235,8 +235,8 @@
         "id": "C-TF-06",
         "dim": "TF",
         "sign": -1,
-        "prompt_self": "I track the emotional tone in a group and adjust my approach.",
-        "prompt_other": "They track the emotional tone in a group and adjust their approach.",
+        "prompt_self": "나는 모임의 감정 분위기를 살피고 그에 맞게 태도를 조절한다.",
+        "prompt_other": "그 사람은 모임의 감정 분위기를 살피고 그에 맞게 태도를 조절한다.",
         "context": {
           "theme": "awareness",
           "scenario": "Group dynamics"
@@ -246,8 +246,8 @@
         "id": "C-JP-01",
         "dim": "JP",
         "sign": 1,
-        "prompt_self": "I map out plans and timelines early so nothing sneaks up on me.",
-        "prompt_other": "They map out plans and timelines early so nothing sneaks up on them.",
+        "prompt_self": "나는 예상치 못한 일이 생기지 않도록 계획과 일정을 미리 세세하게 정리한다.",
+        "prompt_other": "그 사람은 예상치 못한 일이 생기지 않도록 계획과 일정을 미리 세세하게 정리한다.",
         "context": {
           "theme": "planning",
           "scenario": "Project kickoff"
@@ -257,8 +257,8 @@
         "id": "C-JP-02",
         "dim": "JP",
         "sign": -1,
-        "prompt_self": "I keep plans loose so we can adjust at the last minute.",
-        "prompt_other": "They keep plans loose so the group can adjust at the last minute.",
+        "prompt_self": "나는 마지막 순간까지 조정할 수 있도록 계획을 느슨하게 잡아 둔다.",
+        "prompt_other": "그 사람은 모임이 마지막 순간까지 조정될 수 있도록 계획을 느슨하게 잡아 둔다.",
         "context": {
           "theme": "flexibility",
           "scenario": "Scheduling"
@@ -268,8 +268,8 @@
         "id": "C-JP-03",
         "dim": "JP",
         "sign": 1,
-        "prompt_self": "I use lists or tools to keep track of tasks systematically.",
-        "prompt_other": "They use lists or tools to keep track of tasks systematically.",
+        "prompt_self": "나는 체크리스트나 도구를 활용해 일을 체계적으로 관리한다.",
+        "prompt_other": "그 사람은 체크리스트나 도구를 활용해 일을 체계적으로 관리한다.",
         "context": {
           "theme": "organization",
           "scenario": "Task tracking"
@@ -279,8 +279,8 @@
         "id": "C-JP-04",
         "dim": "JP",
         "sign": -1,
-        "prompt_self": "I jump on unexpected opportunities even if the schedule shifts.",
-        "prompt_other": "They jump on unexpected opportunities even if the schedule shifts.",
+        "prompt_self": "나는 일정이 바뀌더라도 뜻밖의 기회가 오면 바로 잡으려 한다.",
+        "prompt_other": "그 사람은 일정이 바뀌더라도 뜻밖의 기회가 오면 바로 잡으려 한다.",
         "context": {
           "theme": "spontaneity",
           "scenario": "Last-minute invites"
@@ -290,8 +290,8 @@
         "id": "C-JP-05",
         "dim": "JP",
         "sign": 1,
-        "prompt_self": "I like to close decisions once we have enough data to move forward.",
-        "prompt_other": "They like to close decisions once there is enough data to move forward.",
+        "prompt_self": "나는 충분한 정보가 모이면 결정을 빠르게 마무리하고 나아가고 싶어 한다.",
+        "prompt_other": "그 사람은 충분한 정보가 모이면 결정을 빠르게 마무리하고 나아가고 싶어 한다.",
         "context": {
           "theme": "closure",
           "scenario": "Decision follow-up"
@@ -301,8 +301,8 @@
         "id": "C-JP-06",
         "dim": "JP",
         "sign": -1,
-        "prompt_self": "I prefer leaving room for open-ended exploration before locking plans.",
-        "prompt_other": "They prefer leaving room for open-ended exploration before locking plans.",
+        "prompt_self": "나는 계획을 확정하기 전에 변화를 탐색할 여지를 남겨 두는 편이다.",
+        "prompt_other": "그 사람은 계획을 확정하기 전에 변화를 탐색할 여지를 남겨 두는 편이다.",
         "context": {
           "theme": "exploration",
           "scenario": "Plan formation"
@@ -315,8 +315,8 @@
           "id": "R-EI-01",
           "dim": "EI",
           "sign": 1,
-          "prompt_self": "I enjoy planning double dates or group activities for us.",
-          "prompt_other": "They enjoy planning double dates or group activities for the relationship.",
+          "prompt_self": "나는 우리를 위한 더블 데이트나 단체 활동을 계획하는 일을 즐긴다.",
+          "prompt_other": "그 사람은 우리 관계를 위해 더블 데이트나 단체 활동을 계획하는 일을 즐긴다.",
           "context": {
             "theme": "shared_social",
             "scenario": "Couple with friends"
@@ -326,8 +326,8 @@
           "id": "R-EI-02",
           "dim": "EI",
           "sign": -1,
-          "prompt_self": "I prefer intimate one-on-one time over crowded date settings.",
-          "prompt_other": "They prefer intimate one-on-one time over crowded date settings.",
+          "prompt_self": "나는 붐비는 장소보다 아늑한 1:1 시간을 더 선호한다.",
+          "prompt_other": "그 사람은 붐비는 장소보다 아늑한 1:1 시간을 더 선호한다.",
           "context": {
             "theme": "quality_time",
             "scenario": "Date planning"
@@ -337,8 +337,8 @@
           "id": "R-SN-01",
           "dim": "SN",
           "sign": 1,
-          "prompt_self": "I track the small routines that make my partner feel cared for.",
-          "prompt_other": "They track the small routines that make their partner feel cared for.",
+          "prompt_self": "나는 파트너가 돌봄을 느끼는 작은 루틴들을 꾸준히 챙긴다.",
+          "prompt_other": "그 사람은 파트너가 돌봄을 느끼는 작은 루틴들을 꾸준히 챙긴다.",
           "context": {
             "theme": "attunement",
             "scenario": "Daily care"
@@ -348,8 +348,8 @@
           "id": "R-SN-02",
           "dim": "SN",
           "sign": -1,
-          "prompt_self": "I love dreaming up new experiences we could try together.",
-          "prompt_other": "They love dreaming up new experiences the couple could try together.",
+          "prompt_self": "나는 우리가 함께 해 볼 새로운 경험을 상상하는 것을 좋아한다.",
+          "prompt_other": "그 사람은 우리가 함께 해 볼 새로운 경험을 상상하는 것을 좋아한다.",
           "context": {
             "theme": "future_focus",
             "scenario": "Experience design"
@@ -359,8 +359,8 @@
           "id": "R-TF-01",
           "dim": "TF",
           "sign": 1,
-          "prompt_self": "I bring up concerns quickly even when the conversation might feel intense.",
-          "prompt_other": "They bring up concerns quickly even when the conversation might feel intense.",
+          "prompt_self": "나는 대화 분위기가 격해져도 걱정되는 부분은 곧바로 이야기한다.",
+          "prompt_other": "그 사람은 대화 분위기가 격해져도 걱정되는 부분은 곧바로 이야기한다.",
           "context": {
             "theme": "communication",
             "scenario": "Conflict navigation"
@@ -370,8 +370,8 @@
           "id": "R-TF-02",
           "dim": "TF",
           "sign": -1,
-          "prompt_self": "I phrase feedback gently so our emotions stay protected.",
-          "prompt_other": "They phrase feedback gently so emotions stay protected.",
+          "prompt_self": "나는 서로의 감정을 지키기 위해 피드백을 부드럽게 표현한다.",
+          "prompt_other": "그 사람은 서로의 감정을 지키기 위해 피드백을 부드럽게 표현한다.",
           "context": {
             "theme": "emotional_safety",
             "scenario": "Sensitive topics"
@@ -381,8 +381,8 @@
           "id": "R-JP-01",
           "dim": "JP",
           "sign": 1,
-          "prompt_self": "I set relationship checkpoints like budgets, trips, or family plans.",
-          "prompt_other": "They set relationship checkpoints like budgets, trips, or family plans.",
+          "prompt_self": "나는 예산, 여행, 가족 계획처럼 관계의 이정표를 미리 세워 둔다.",
+          "prompt_other": "그 사람은 예산, 여행, 가족 계획처럼 관계의 이정표를 미리 세워 둔다.",
           "context": {
             "theme": "long_range_planning",
             "scenario": "Milestone setting"
@@ -392,8 +392,8 @@
           "id": "R-JP-02",
           "dim": "JP",
           "sign": -1,
-          "prompt_self": "I enjoy spontaneous gestures more than sticking to fixed plans.",
-          "prompt_other": "They enjoy spontaneous gestures more than sticking to fixed plans.",
+          "prompt_self": "나는 정해진 계획을 지키는 것보다 즉흥적인 제스처를 더 즐긴다.",
+          "prompt_other": "그 사람은 정해진 계획을 지키는 것보다 즉흥적인 제스처를 더 즐긴다.",
           "context": {
             "theme": "surprise",
             "scenario": "Relationship rituals"
@@ -405,8 +405,8 @@
           "id": "F-EI-01",
           "dim": "EI",
           "sign": 1,
-          "prompt_self": "I rally friends for group hangouts or game nights.",
-          "prompt_other": "They rally friends for group hangouts or game nights.",
+          "prompt_self": "나는 친구들을 모아 단체 모임이나 보드게임 밤을 자주 주선한다.",
+          "prompt_other": "그 사람은 친구들을 모아 단체 모임이나 보드게임 밤을 자주 주선한다.",
           "context": {
             "theme": "community_builder",
             "scenario": "Group coordination"
@@ -416,8 +416,8 @@
           "id": "F-EI-02",
           "dim": "EI",
           "sign": -1,
-          "prompt_self": "I prefer deeper one-on-one catch-ups over large group chats.",
-          "prompt_other": "They prefer deeper one-on-one catch-ups over large group chats.",
+          "prompt_self": "나는 큰 모임보다 깊이 있는 1:1 대화를 더 선호한다.",
+          "prompt_other": "그 사람은 큰 모임보다 깊이 있는 1:1 대화를 더 선호한다.",
           "context": {
             "theme": "connection_depth",
             "scenario": "Friend check-ins"
@@ -427,8 +427,8 @@
           "id": "F-SN-01",
           "dim": "SN",
           "sign": 1,
-          "prompt_self": "I remember the small preferences my friends mention when making plans.",
-          "prompt_other": "They remember the small preferences friends mention when making plans.",
+          "prompt_self": "나는 계획을 세울 때 친구들이 말했던 작은 취향까지 잘 기억해 둔다.",
+          "prompt_other": "그 사람은 계획을 세울 때 친구들이 말했던 작은 취향까지 잘 기억해 둔다.",
           "context": {
             "theme": "practical_care",
             "scenario": "Planning details"
@@ -438,8 +438,8 @@
           "id": "F-SN-02",
           "dim": "SN",
           "sign": -1,
-          "prompt_self": "I pitch imaginative adventures for the crew even if we have not done them before.",
-          "prompt_other": "They pitch imaginative adventures for the crew even if they have not done them before.",
+          "prompt_self": "나는 해 본 적 없는 상상 가득한 활동도 친구들에게 제안하곤 한다.",
+          "prompt_other": "그 사람은 해 본 적 없는 상상 가득한 활동도 친구들에게 제안하곤 한다.",
           "context": {
             "theme": "adventure",
             "scenario": "Plan ideation"
@@ -449,8 +449,8 @@
           "id": "F-TF-01",
           "dim": "TF",
           "sign": 1,
-          "prompt_self": "I give straightforward advice when friends ask for help.",
-          "prompt_other": "They give straightforward advice when friends ask for help.",
+          "prompt_self": "나는 친구가 도움을 청하면 돌려 말하지 않고 솔직하게 조언한다.",
+          "prompt_other": "그 사람은 친구가 도움을 청하면 돌려 말하지 않고 솔직하게 조언한다.",
           "context": {
             "theme": "support_style",
             "scenario": "Problem solving"
@@ -460,8 +460,8 @@
           "id": "F-TF-02",
           "dim": "TF",
           "sign": -1,
-          "prompt_self": "I focus on validating feelings before suggesting solutions.",
-          "prompt_other": "They focus on validating feelings before suggesting solutions.",
+          "prompt_self": "나는 해결책을 제시하기 전에 먼저 감정을 공감하고 인정해 주려 한다.",
+          "prompt_other": "그 사람은 해결책을 제시하기 전에 먼저 감정을 공감하고 인정해 주려 한다.",
           "context": {
             "theme": "emotional_support",
             "scenario": "Friend venting"
@@ -471,8 +471,8 @@
           "id": "F-JP-01",
           "dim": "JP",
           "sign": 1,
-          "prompt_self": "I coordinate schedules early so everyone can commit.",
-          "prompt_other": "They coordinate schedules early so everyone can commit.",
+          "prompt_self": "나는 모두가 참여할 수 있도록 일정을 미리 조율하는 편이다.",
+          "prompt_other": "그 사람은 모두가 참여할 수 있도록 일정을 미리 조율하는 편이다.",
           "context": {
             "theme": "coordination",
             "scenario": "Event planning"
@@ -482,8 +482,8 @@
           "id": "F-JP-02",
           "dim": "JP",
           "sign": -1,
-          "prompt_self": "I am comfortable letting plans evolve the day of the hangout.",
-          "prompt_other": "They are comfortable letting plans evolve the day of the hangout.",
+          "prompt_self": "나는 약속 당일에도 상황에 맞춰 계획을 유연하게 바꾸는 편이다.",
+          "prompt_other": "그 사람은 약속 당일에도 상황에 맞춰 계획을 유연하게 바꾸는 편이다.",
           "context": {
             "theme": "spontaneity",
             "scenario": "Day-of adjustments"
