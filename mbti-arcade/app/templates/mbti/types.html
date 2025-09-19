@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}MBTI 유형 안내{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">16가지 MBTI 유형</h1>
+        <p class="text-lg text-gray-600">각 유형의 핵심 특징을 간단히 정리했습니다.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+        {% for mbti, summary in summaries %}
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-3xl font-extrabold text-blue-600">{{ mbti }}</span>
+                <span class="text-sm uppercase tracking-wide text-gray-400">{{ summary.title }}</span>
+            </div>
+            <p class="text-sm text-gray-700 leading-relaxed">{{ summary.description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-10">
+        <a href="/mbti" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+            ← MBTI 홈으로 돌아가기
+        </a>
+    </div>
+</div>
+{% endblock %}
