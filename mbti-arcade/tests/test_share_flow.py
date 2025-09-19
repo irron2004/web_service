@@ -15,17 +15,26 @@ async def test_share_flow():
         "my_mbti": "INTJ"
     }
     
-    response = client.post("/share", data=share_data)
+    response = client.post("/share", data=share_data, follow_redirects=False)
     print(f"Response status: {response.status_code}")
     print(f"Response headers: {response.headers}")
     print(f"Response text: {response.text}")
     assert response.status_code == 303  # Redirect
     
-    # 2. 퀴즈 페이지 접근 (토큰 추출)
-    # 실제로는 share_success 페이지에서 토큰을 추출해야 함
-    # 여기서는 간단한 테스트를 위해 토큰을 직접 생성
-    from app.core.token import issue_token
-    test_token = issue_token("test_pair_id", "INTJ")
+    # 2. 퀴즈 페이지 접근 (리다이렉트 URL에서 토큰 추출)
+    # 리다이렉트 URL에서 토큰을 추출
+    redirect_url = response.headers.get("location")
+    assert redirect_url is not None
+    assert "/mbti/share_success?url=" in redirect_url
+    
+    # URL에서 토큰 추출
+    from urllib.parse import urlparse, parse_qs
+    parsed_url = urlparse(redirect_url)
+    query_params = parse_qs(parsed_url.query)
+    share_url = query_params.get("url", [None])[0]
+    assert share_url is not None
+    assert "/quiz/" in share_url
+    test_token = share_url.split("/quiz/")[1]
     
     response = client.get(f"/quiz/{test_token}")
     assert response.status_code == 200
@@ -36,11 +45,14 @@ async def test_share_flow():
         "relation": "friend"
     }
     
-    # 24개 질문에 대한 답변 추가
-    for i in range(1, 25):
-        quiz_data[f"q{i}"] = "3"  # 보통이다
+    # 24개 질문에 대한 답변 추가 (실제 데이터베이스 질문 ID 사용)
+    question_ids = [1, 2, 101, 102, 201, 202, 3, 4, 103, 104, 203, 204, 5, 6, 105, 106, 205, 206, 301, 302, 401, 402, 501, 502]
+    for qid in question_ids:
+        quiz_data[f"q{qid}"] = "3"  # 보통이다
     
     response = client.post(f"/mbti/result/{test_token}", data=quiz_data)
+    print(f"Result response status: {response.status_code}")
+    print(f"Result response text: {response.text}")
     assert response.status_code == 200
 
 @pytest.mark.asyncio

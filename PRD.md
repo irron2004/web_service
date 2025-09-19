@@ -1,166 +1,157 @@
-**¿ä¾à(3?5ÁÙ)**
-º» ¼­ºñ½º´Â **Self(º»ÀÎ) vs Others(Å¸ÀÎÀÇ ´«)**À» ºñ±³ÇØ **ÀÎÁö °ÝÂ÷(Perception Gap)**¸¦ ¼öÄ¡È­¡¤½Ã°¢È­ÇÕ´Ï´Ù. MVP´Â ¡°**°øÅë 24 + °ü°è ºÎ½ºÅÍ 8 = 32¹®Ç×**(Likert 1?5)¡±À¸·Î ½ÃÀÛÇÏ°í, **Self Á¡¼ö**¿Í **Other(¿¬ÀÎ/Ä£±¸ N¸í) Áý°è**¸¦ ºñ±³ÇØ **GapScore¡¤ÇÕÀÇµµ(¥ò)**¸¦ Á¦°øÇÕ´Ï´Ù. °á°ú´Â **·¹ÀÌ´õ/½ºÄ³ÅÍ** Â÷Æ®¿Í **°øÀ¯¿ë OG ÀÌ¹ÌÁö**·Î È®»êÀ» µ½°í, **RFC?9457 ¿À·ù Æ÷¸Ë**, **WCAG?2.2 AA**, **Web Vitals(LCP¡Â2.5s/INP¡Â200ms/CLS¡Â0.1)** ±âÁØÀ» ÁØ¼öÇÕ´Ï´Ù. **¿äÃ»ID/OTel**À» ±âº»°ªÀ¸·Î °èÃøÇÕ´Ï´Ù. ([RFC Editor][1])
+## PRD.md â€” 360Me Couple Insight (*If I were you â†’ ë¶€ë¶€ í™•ìž¥*)
+
+**ìš”ì•½ (3â€“5ì¤„)**
+ì´ ì„œë¹„ìŠ¤ëŠ” â€œë‚´ê°€ ë„ˆë¼ë©´â€ ê²€ì‚¬(1ë‹¨ê³„)ì™€ ë°°ìš°ìž ìžê¸°Â·ìƒëŒ€ ì¸ì‹ ë¹„êµ(2ë‹¨ê³„), ë¶€ë¶€ ì‹¬ì¸µ ì„¤ë¬¸(3ë‹¨ê³„)ì„ ê²°í•©í•´ ê´€ì  ì°¨(Î”), ë°˜ë³µ ê°ˆë“± íŒ¨í„´, ìˆ˜ë¦¬(Repair) í–‰ë™ì„ ë„ì¶œí•©ë‹ˆë‹¤. ê²°ê³¼ëŠ” í•˜ìœ„ì²™ë„ ì ìˆ˜(8ì¶•), Î” ížˆíŠ¸ë§µ, Topâ€‘3 ì´ìŠˆÂ·ì‹¤ìŠµ ì•ˆë‚´ë¡œ ì œê³µë˜ë©°, ìœ„ê¸° ì‹ í˜¸ëŠ” ì•ˆì „ í”„ë¡œí† ì½œë¡œ ìš°íšŒí•©ë‹ˆë‹¤. ëª¨ë“  ê³„ì‚°ê³¼ ì¸ì‚¬ì´íŠ¸ëŠ” **ê²°ì • íŒ¨í‚·(decision_packet)**ìœ¼ë¡œ ë´‰ì¸ë˜ì–´ ìž¬í˜„ì„±ê³¼ ì±…ìž„ ì¶”ì ì´ ê°€ëŠ¥í•©ë‹ˆë‹¤.
 
 ```yaml
 ---
 version: "1.0"
-date: "2025-09-17"
-product: "360Me ? Perception Gap (If I were you)"
-domains: ["backend", "frontend", "growth"]
-owner: "PM: ÀÌÁöÀ²"
+date: "2025-09-19"
+product: "360Me Couple Insight"
+domains: ["backend", "frontend", "data", "safety"]
+owner: "PM/Forensic Eng: ì´ì§€ìœ¨"
 source_of_truth: "PRD.md"
-use_browsing: true
+use_browsing: false
 ---
 ```
 
-### 0) Assumptions(°¡Á¤)
+### 0) Assumptions (ê°€ì •)
 
-* **Stack:** FastAPI + PostgreSQL + Redis(¹é¿£µå), React + Vite + React Router + TanStack Query + Zustand(ÇÁ·ÐÆ®), Chart.js(·¹ÀÌ´õ/½ºÄ³ÅÍ). ([chartjs.org][2])
-* **Ç¥ÁØ:** ¿À·ù ÀÀ´ä **RFC?9457**, Á¢±Ù¼º **WCAG?2.2 AA**, ¼º´É **Web Vitals**. ([RFC Editor][1])
-* **ÇÁ¶óÀÌ¹ö½Ã:** Áý°è ±âÁØ **k¡Ã3**(k-anonymity ¿øÄ¢ Â÷¿ë)·Î °á°ú °ø°³, ¿ø½Ã ÀÀ´äÀº ºñ½Äº° Ã³¸®. ([EPIC][3])
-* **¹ýÀû ÁÖÀÇ:** **MBTI/¸¶ÀÌ¾î½º-ºê¸¯½º**´Â µî·Ï»óÇ¥ÀÌ¸ç **°ø½Ä ¹®Ç×/ÇØ¼³ ºÒ»ç¿ë**(¡°MBTI-style¡± ¾ð¾î¸¸ »ç¿ë). ([mbtionline.com][4])
-
-### 1) °³¿ä/ºñÀü/¹®Á¦Á¤ÀÇ/Å¸±ê
-
-* **ÄÁ¼Á:** *If I were you* ? ¡°³»°¡ ³Ê¶ó¸é ÀÌ·¸°Ô º¼ °Å¾ß.¡± Self vs Others °£ **Perception Gap**À» Àç¹Õ°í ¾ÈÀüÇÏ°Ô º¸¿©ÁÖ´Â **¿£ÅÍÅ×ÀÎ¸ÕÆ®/¼¿ÇÁÀÎ»çÀÌÆ®**.
-* **ÇÙ½É °¡Ä¡:** ¨ç **°ü°è ¸Æ¶ô**(¿¬ÀÎ/Ä£±¸) ¨è **´ÙÁß Æò°¡** ÇÕÀÇµµ/ºÒÀÏÄ¡ ¨é **½¬¿î °øÀ¯**·Î ¹ÙÀÌ·².
-* **Å¸±ê:** ¿¬ÀÎ/Ä£±¸/´ëÇÐ»ý¡¤Á÷Àå ÃÊ³â»ý Áß½É 20?30´ë.
-
-### 2) ¹üÀ§/ºñ¹üÀ§
-
-**In Scope:** ¸ðµå ¼±ÅÃ, ¹®Ç×(°øÅë 24 + ºÎ½ºÅÍ 8), Self Ã¤Á¡, ÃÊ´ë/ÀÀ´ä ¼öÁý(N¸í), Áý°è/GapScore/ÇÕÀÇµµ, °á°ú ½Ã°¢È­(·¹ÀÌ´õ/½ºÄ³ÅÍ), OG °øÀ¯ ÀÌ¹ÌÁö, AdSense ¾ÈÀü ¹èÄ¡, RFC?9457 ¿À·ù, OTel/Request-ID. ([RFC Editor][1])
-**Out of Scope(ÀÌ¹ø ºÐ±â):** Á¶Á÷/¿£ÅÍÇÁ¶óÀÌÁî ±ÇÇÑ, À¯·á ÇÃ·£, ¸ð¹ÙÀÏ ¾Û, °í±Þ È÷Æ®¸Ê¡¤°ü°è ÇÊÅÍ(Â÷±â).
-
-### 3) »ç¿ëÀÚ ½Ã³ª¸®¿À(¿ä¾à)
-
-* **S-1(Ä¿ÇÃ):** ¿¬ÀÎ¸ðµå 32¹®Ç× ¡æ ÆÄÆ®³Ê 1:1 ÃÊ´ë ¡æ **Self vs Partner ·¹ÀÌ´õ/½ºÄ³ÅÍ** ¡æ °øÀ¯ ÀÌ¹ÌÁö.
-* **S-2(Ä£±¸ N):** Ä£±¸¸ðµå ¸µÅ© ¹èÆ÷(ÀÍ¸í/±â¸í) ¡æ **Other Æò±Õ¡¤¥ò¡¤Gap** ¡æ ¡°ÇÕÀÇ ³ôÀ½/ºÒÀÏÄ¡ ¿µ¿ª¡± Ä«µå.
-* **S-3(¹ÙÀÌ·²):** 3¸í ÀÌ»ó ÀÀ´ä ½Ã **Ãß°¡ ÀÎ»çÀÌÆ® ÇØÁ¦** ¡æ OG ÀÌ¹ÌÁö·Î SNS °øÀ¯ 1Å¬¸¯.
-* **S-4(¸®ÅÙ¼Ç):** ¸¸·á ¾Ë¸², °á°ú PDF/¸µÅ© ÀúÀå, **noindex/X-Robots-Tag**·Î °Ë»ö ³ëÃâ Á¦¾î. ([Google for Developers][5])
-
-### 4) ±â´É ¿ä±¸(Functional Requirements)
-
-| ID      | ¿ä¾à              | ¼³¸í                            | ÀÇÁ¸¼º   | À§Çè | **¼ö¶ô ±âÁØ(¿ä¾à)**                                                                  |
-| ------- | ----------------- | ------------------------------- | ------ | --- | ----------------------------------------------------------------------------------- |
-| R-101   | ¸ðµå ¼±ÅÃ         | [¿¬ÀÎ/Ä£±¸/±âº»]                | FE     | ¿ÀÇØ | 10ÃÊ ³» Ã¹ Å¬¸¯¡æ¸ðµå ÁøÀÔ·ü ¡Ã70%                                                     |
-| R-102   | Self Å×½ºÆ®       | °øÅë 24 + ¸ðµå 8(32)            | R-101  | ÀÌÅ» | ¿ÏÁÖÀ² ¡Ã75%, 400/422´Â **RFC?9457** ¿À·ù ±¸Á¶. ([RFC Editor][1])                     |
-| R-103   | ÃÊ´ë ¸µÅ©         | ¸¸·á¡¤ÃÖ´ëÀÎ¿ø¡¤ÀÍ¸í/±â¸í¡¤°ü°èÅÂ±× | Auth/DB| ³²¿ë | ¸µÅ© »ý¼º 201, ÅäÅ« À§Á¶ ¹æÁö, 429 ·¹ÀÌÆ®¸®¹Ô                                        |
-| R-104   | Å¸ÀÎ ÀÀ´ä Á¦Ãâ    | ÅäÅ« °ËÁõ/Áßº¹Á¦Ãâ ¹æÁö         | R-103  | º¿  | µ¿½Ã 20¸í P95<1s, Áßº¹¡¤º¿ Â÷´Ü                                                        |
-| R-105   | Áý°è/GapScore   | °¡ÁßÆò±Õ, ¥ò, Gap °è»ê          | R-102/104 | ÆíÇâ | °ø½Ä(¡×4.1/4.2)´ë·Î °è»ê, ´ÜÀ§Å×½ºÆ® 100%                                               |
-| R-106   | k-ÀÍ¸í °ø°³ ÀÓ°è  | k<3 ºñ°ø°³                     | R-105  | ¿ªÃßÀû | k<3 °á°ú Â÷Æ®/°øÀ¯ ºñÈ°¼ºÈ­. ([EPIC][3])                                             |
-| R-107   | ½Ã°¢È­            | ·¹ÀÌ´õ(4Ãà)/½ºÄ³ÅÍ(2D)         | FE Charts | °ú¹Ð | Chart.js ·¹ÀÌ´õ¡¤½ºÄ³ÅÍ ±¸Çö, ¸ð¹ÙÀÏ 30fps. ([chartjs.org][2])                        |
-| R-108   | °øÀ¯ OG ÀÌ¹ÌÁö    | Self vs Other ¿ä¾à¡¤Gap º¤ÅÍ    | FE/BE  | ¼º´É | 1200¡¿630, 200ms ³» »ý¼º, ¸ÞÅ¸ÅÂ±× Á¤È®. ([ogp.me][6])                                 |
-| R-109   | ½Ç½Ã°£ ´ë½Ãº¸µå   | ÀÀ´ä Ä«¿îÆ®/¹Ì¸®º¸±â           | FE/BE  | ºÎÇÏ | 3s Æú¸µ(¶Ç´Â SSE), ¹«ÇÑ·Îµå ¹æÁö                                                      |
-| R-110   | AdSense ¾ÈÀü ½½·Ô | »ó´Ü/º»¹®Áß/ÇÏ´Ü 2?3°³         | FE     | Á¤Ã¥ | ¹öÆ°/³»ºñ ±ÙÁ¢ ¹èÄ¡ ±ÝÁö, Á¤Ã¥ À§¹Ý 0°Ç. ([Google Help][7])                          |
-| R-111   | ºÐ¼®/¹ÙÀÌ·² ÃøÁ¤  | GA4 ÀÌº¥Æ®¡¤UTM                 | FE     | ´©¶ô | ½ÃÀÛ/¿Ï·á/ÃÊ´ë/°øÀ¯/Á¶È¸ ÀÌº¥Æ® ·Î±ë, UTM ±Ô¾à Àû¿ë. ([Google for Developers][8])    |
-| R-112   | ¿À·ù Ç¥ÁØÈ­       | RFC?9457 ¹®Á¦»ó¼¼(JSON)        | BE     | ´©¶ô | ¸ðµç 4xx/5xx `type/title/status/detail/instance` Æ÷ÇÔ. ([RFC Editor][1])              |
-| R-113   | °üÃø¼º            | X-Request-ID, OTel Æ®·¹ÀÌ½º    | BE/FE  | ´©¶ô | ¸ðµç ¿äÃ» ÃßÀû °¡´É, ÀÚµ¿ °èÃø °¡ÀÌµå ÁØ¼ö. ([opentelemetry-python-contrib][9])     |
-| R-114   | noindex Á¦¾î      | °á°ú/°øÀ¯ ¸µÅ© °Ë»öÁ¦¿Ü         | BE     | À¯Ãâ | `<meta name="robots" content="noindex">` È¤Àº `X-Robots-Tag` Àû¿ë. ([Google for Developers][5]) |
-
-### 5) Á¡¼ö °è»ê & Áý°è(°ø½Ä)
-
-**4.1 ´ÜÀÏ Æò°¡ÀÚ(Self/Other) ? Á¤±ÔÈ­**  
-°¢ ÀÀ´ä `v¡ô{1..5}` ¡æ ÆíÂ÷ `d=v?3 ¡ô{?2..+2}`; `sign=+1(E/S/T/J), ?1(I/N/F/P)`  
-ÁöÇ¥ÇÕ `score_dim=¥Ò(sign_q¡¤d_q)` ¡æ **Á¤±ÔÈ­** `norm=score_dim/(2¡¤n_dim_q) ¡ô[?1,+1]`.
-
-**4.2 ´ÙÁß Æò°¡ÀÚ Áý°è(Other Æò±Õ¡¤ÇÕÀÇµµ¡¤Gap)**  
-°ü°è °¡Áß `weight_r`(¿¬ÀÎ 1.5, ÇÙ½ÉÄ£±¸ 1.2, ±âº» 1.0)  
-`other_norm_dim = (¥Ò_r w_r¡¤norm_r) / ¥Ò_r w_r`  
-**ÇÕÀÇµµ** `¥ò_dim = stdev({norm_r})`(³·À»¼ö·Ï ÀÏÄ¡)  
-**ÀÎÁö °ÝÂ÷** `gap_dim = other_norm_dim ? self_norm_dim`  
-**ÃÑ°ý ÁöÇ¥** `GapScore = mean(|gap_dim|)¡¿100 (0..100)`.
-
-### 6) NFR(¼öÄ¡+°ËÁõ)
-
-* **¼º´É(¹é¿£µå):** Æò±Õ<500ms, **P95<1s**, ¿¡·¯À²<1%.
-* **À¥¹ÙÀÌÅ»(75p):** **LCP¡Â2.5s / INP¡Â200ms / CLS¡Â0.1** ? ·¦(Lighthouse)+ÇÊµå(RUM/CrUX) ÀÌÁß °ËÁõ. ([web.dev][10])
-* **Á¢±Ù¼º:** **WCAG?2.2 AA**¡¤APG ÆÐÅÏ, Æ÷Ä¿½º Ç¥½Ã¡¤Å°º¸µå ÀüÅ½»ö. ([W3C][11])
-* **¿À·ù Ç¥ÁØÈ­:** **RFC?9457** °íÁ¤ ½ºÅ°¸¶ Ã¤ÅÃ(7807 ´ëÃ¼). ([RFC Editor][1])
-* **°üÃø¼º:** FastAPI OTel ÀÚµ¿°èÃø¡¤ÃßÀû Á¶ÀÎ °¡´É. ([opentelemetry-python-contrib][9])
-* **±¤°í ¾ÈÀü:** AdSense **ÀÇµµÄ¡ Å¬¸¯ ¹æÁö**¡¤À§¹Ý 0°Ç. ([Google Help][7])
-
-### 7) ¸±¸®Áî ¼ö¶ô ±âÁØ
-
-1. **E2E 5½Ã³ª¸®¿À**(Self¡æÃÊ´ë¡æN ÀÀ´ä¡æÁý°è¡æ°á°ú/°øÀ¯) ¹«ÇÃ·¹ÀÌÅ© ÇÕ°Ý.
-2. Web Vitals(75p) ±âÁØ Åë°ú(·¦/ÇÊµå). ([web.dev][10])
-3. ¸ðµç ¿À·ù ÀÀ´äÀÌ **RFC?9457 JSON** ½ºÅ°¸¶. ([RFC Editor][1])
-4. **k-ÀÍ¸í ÀÓ°è(k¡Ã3)** ¹Ì¸¸ °á°ú ºñ°ø°³ ·ÎÁ÷ °ËÁõ. ([EPIC][3])
-5. **AdSense ·¹ÀÌ¾Æ¿ô °Ë»ç**(Á¤Ã¥ ÆäÀÌÁö Ã¼Å©¸®½ºÆ®) À§¹Ý 0°Ç. ([Google Help][7])
-
-### 8) º¸¾È/ÇÁ¶óÀÌ¹ö½Ã
-
-* ÀÀ´äÀº ¼¼¼Ç ÅäÅ« ±â¹Ý, ÃÖ¼Ò PII(´Ð³×ÀÓ ¼±ÅÃ).
-* °ø°³ °øÀ¯´Â ¿ä¾à Åë°è¸¸, °³º° ¿øÀÀ´ä/½Äº°ÀÚ ºñ³ëÃâ(k-anonymity »ç»ó). ([EPIC][3])
-* °á°ú/°øÀ¯ ÆäÀÌÁö¿¡´Â `noindex`/`X-Robots-Tag` ±ÇÀå. ([Google for Developers][5])
-
-### 9) °á°ú ½Ã°¢È­(Â÷Æ®)
-
-* **·¹ÀÌ´õ(4Ãà: EI/SN/TF/JP)** ? Self/Other Æò±Õ Æú¸®°ï.
-* **½ºÄ³ÅÍ(2D)** ? EI vs SN, TF vs JP Æò¸é; °³º° Æò°¡ÀÚ Á¡ ÇÃ·Ô(ÃÖ´ë 10 Ç¥½Ã).
-* **MVP:** Chart.js(°ø½Ä ·¹ÀÌ´õ/½ºÄ³ÅÍ) ¡æ ÃßÈÄ È÷Æ®¸Ê ÇÃ·¯±×ÀÎ/ECharts °í·Á. ([chartjs.org][2])
-
-### 10) ¿£µåÆ÷ÀÎÆ®(¿¹)
-
-`POST /api/self/submit`, `POST /api/invite/create`, `POST /api/other/submit`,  
-`GET /api/result/{token}`, `GET /share/og/{token}.png`(OG ÀÌ¹ÌÁö). **¿À·ù´Â RFC?9457**. ([RFC Editor][1])
-
-### 11) µ¥ÀÌÅÍ ½ºÅ°¸¶(¿ä¾à)
-
-`users(id, nickname, created_at)`  
-`sessions(id, user_id, mode, invite_token, is_anonymous, expires_at, max_raters)`  
-`questions(id, dim, sign, text, context)`  
-`responses_self(session_id, question_id, value)`  
-`responses_other(session_id, rater_id?, relation_tag, question_id, value, created_at)`  
-`aggregates(session_id, dim, self_norm, other_norm, gap, sigma, n_raters, updated_at)`
-
-### 12) ¸¶ÄÉÆÃ/¹ÙÀÌ·²
-
-* **¾ð¶ô ±âÁ¦:** Æò°¡ÀÚ **3¸í ÀÌ»ó** µµÂø ½Ã ¡°Ãß°¡ ÀÎ»çÀÌÆ®¡± ¿ÀÇÂ.
-* **°øÀ¯:** OG ÀÌ¹ÌÁö 1200¡¿630 ±ÇÀå, ÁÖ¿ä ÅÂ±× `og:title/description/image/url`. ([ogp.me][6])
-* **±¤°í:** »ó´Ü Á¦¸ñ ¾Æ·¡ 1, º»¹® Áß´Ü 1, ÇÏ´Ü 1(2?3°³), **Å¬¸¯ À¯µµ/±ÙÁ¢ ¹èÄ¡ ±ÝÁö**. ([Google Help][7])
-
-### 13) KPI/ÁöÇ¥(Metrics)
-
-* **M-101** Self ¿Ï·áÀ², **M-102** Æò±Õ ÀÀ´äÀÚ ¼ö, **M-103** GapScore Áß¾Ó°ª, **M-104** ÇÕÀÇµµ(¥ò) Áß¾Ó°ª, **M-105** °øÀ¯ CTR, **M-106** OG »ý¼º ¼º°ø·ü, **M-107** WebVitals(LCP/INP/CLS 75p), **M-108** RFC?9457 Ä¿¹ö¸®Áö, **M-109** Confirmed-Click ¹ß»ý·ü(0¿¡ ¼ö·Å), **M-110** k-ÀÓ°è ÁØ¼öÀ². ([web.dev][10])
-
-### 14) Å×½ºÆ® ÄÉÀÌ½º
-
-* **T-101** Self 32¹®Ç× Ã¤Á¡/Á¤±ÔÈ­ Á¤È®¼º(°æ°è°ª¡¤¹«ÀÀ´ä Ã³¸®)
-* **T-102** Other 10µ¿½Ã ÀÀ´ä¡¤Áßº¹ ¹æÁö¡¤P95<1s
-* **T-103** Áý°è/°¡ÁßÄ¡/¥ò/Gap °ø½Ä ´ÜÀ§¡¤¼Ó¼º Å×½ºÆ®
-* **T-104** ·¹ÀÌ´õ/½ºÄ³ÅÍ ·»´õ¡¤¸ð¹ÙÀÏ ¼º´É(>30fps)
-* **T-105** **k<3 Â÷´Ü** ¹× °øÀ¯ ºñÈ°¼ºÈ­
-* **T-106** RFC?9457 ½º³À¼¦(4xx/5xx) ([RFC Editor][1])
-* **T-107** `noindex`/`X-Robots-Tag` Àû¿ë È®ÀÎ(°á°ú/°øÀ¯) ([Google for Developers][5])
-* **T-108** AdSense **ÀÇµµÄ¡ Å¬¸¯ ¹æÁö** ±ÔÁ¤ Ã¼Å©¸®½ºÆ® Åë°ú(¹öÆ° ±ÙÁ¢ ±ÝÁö) ([Google Help][7])
-* **T-109** OTel Æ®·¹ÀÌ½º-·Î±×-¿äÃ»ID Á¶ÀÎ
-
-### 15) Traceability(¿ä±¸¡êÅ×½ºÆ®¡êÁöÇ¥)
-
-| ¿ä±¸(R)     | Å×½ºÆ®(T)        | ÁöÇ¥(M)         |
-| ----------- | ---------------- | --------------- |
-| R-102       | T-101/T-106      | M-101/M-108     |
-| R-103/104   | T-102            | M-102/M-107     |
-| R-105       | T-103            | M-103/M-104     |
-| R-106       | T-105            | M-110           |
-| R-107       | T-104            | M-107           |
-| R-108       | T-104            | M-106/M-105     |
-| R-110       | T-108            | M-109           |
-| R-112/113/114 | T-106/T-109/T-107 | M-108/M-107    |
+- ëŒ€ìƒ: ë²•ì Â·ì‚¬ì‹¤í˜¼ í¬í•¨ ì»¤í”Œ(ì„±ë³„ ë¶ˆë¬¸), í•œêµ­ì–´ ìš°ì„ .
+- ë°ì´í„° ìž…ë ¥: ê° íŒŒíŠ¸ë„ˆê°€ SELF / GUESS 2ì—´ ì‘ë‹µ, 0â€“4 ì²™ë„(ì¼ë¶€ 0â€“10).
+- 1ë‹¨ê³„: â€œë‚´ê°€ ë„ˆë¼ë©´â€ ê¸°ì¡´ ë°ì´í„°(íƒ€ì¸ì˜ ë‚¨íŽ¸ ì¸ì‹) ìž¬ì‚¬ìš©. ê³µê°œëŠ” kâ‰¥3ì¼ ë•Œë§Œ.
+- ë³´ì•ˆ/í”„ë¼ì´ë²„ì‹œ: ê²°ê³¼ëŠ” ìš”ì•½ê°’ ê¸°ì¤€. ë¯¼ê° í…ìŠ¤íŠ¸ëŠ” ì•”í˜¸í™” ì €ìž¥, ë§í¬ ê³µìœ ëŠ” noindex.
+- ìŠ¤íƒ(ìš”ì•½): BE=FastAPI(Python), FE=React+TS+Vite, DB=PostgreSQL, ìºì‹œ=Redis.
 
 ---
 
-## Âü°í ¹®Çå
+### 1) ë¹„ì „Â·ë¬¸ì œ ì •ì˜Â·íƒ€ê¹ƒ
 
-[1]: https://www.rfc-editor.org/rfc/rfc9457.html "RFC 9457: Problem Details for HTTP APIs"  
-[2]: https://www.chartjs.org/docs/latest/charts/radar.html "Radar Chart"  
-[3]: https://epic.org/wp-content/uploads/privacy/reidentification/Sweeney_Article.pdf "k-ANONYMITY: A MODEL FOR PROTECTING PRIVACY"  
-[4]: https://www.mbtionline.com/en-US/Legal "Legal"  
-[5]: https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag "Robots Meta Tags Specifications"  
-[6]: https://ogp.me/ "The Open Graph protocol"  
-[7]: https://support.google.com/adsense/answer/1346295 "Ad placement policies - Google AdSense Help"  
-[8]: https://developers.google.com/analytics/devguides/collection/ga4/reference/events "Recommended events | Google Analytics"  
-[9]: https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/fastapi/fastapi.html "OpenTelemetry FastAPI Instrumentation"  
-[10]: https://web.dev/articles/vitals "Web Vitals | Articles"  
-[11]: https://www.w3.org/TR/WCAG22/ "Web Content Accessibility Guidelines (WCAG) 2.2"
+- ë¹„ì „: ë¶€ë¶€ê°€ ì˜¤í•´â†’ì´í•´â†’í•©ì˜ë¡œ ì´ë™í•˜ëŠ” â€œì•ˆì „í•œ ëŒ€í™” ì»¨í…Œì´ë„ˆâ€ ì œê³µ.
+- ë¬¸ì œ: ì¶”ê¶â€“íšŒí”¼, ë§ˆìŒì½ê¸°, ìƒí™œ ìš´ì˜ ë¶ˆê³µì • ë“± íŒ¨í„´í™”ëœ ê°ˆë“±ì´ ë°˜ë³µ.
+- íƒ€ê¹ƒ: 20â€“40ëŒ€ ì»¤í”Œ(ì—°ì• Â·ì‹ í˜¼Â·ìœ¡ì•„ê¸°). ì…€í”„ ê°€ì´ë“œ+ìƒë‹´ ì—°ê³„ ëª¨ë‘ ê³ ë ¤.
+
+---
+
+### 2) ë²”ìœ„ (Scope)
+
+- **In:** 3ë‹¨ê³„ ìž…ë ¥ í”Œë¡œìš°, ì±„ì /Î”/í”Œëž˜ê·¸, Topâ€‘3 ì´ìŠˆ+ì½”ì¹­ ì¹´ë“œ, ê²°ê³¼ ì‹œê°í™”(ë ˆì´ë”, Î” ížˆíŠ¸ë§µ, ì‹œë‚˜ë¦¬ì˜¤), ì•ˆì „ ê²½ë¡œ(ìƒë‹´/ê¸°ê´€ ì•ˆë‚´), PDF/ë§í¬ ë³´ê´€(ë¹„ê³µê°œ).
+- **Out (1ì°¨):** ê²°ì œ, ì „ë¬¸ ìƒë‹´ ë§¤ì¹­, ë©€í‹° ì»¤í”Œ ë¹„êµ, ë‹¤êµ­ì–´, ëª¨ë°”ì¼ ì•±.
+
+---
+
+### 3) ì‚¬ìš©ìž ì‹œë‚˜ë¦¬ì˜¤
+
+1. **A(ì•„ë‚´)**ê°€ 1ë‹¨ê³„ â€œë‚¨íŽ¸ì— ëŒ€í•œ íƒ€ì¸ì˜ ì‹œì„ â€ ìš”ì•½ ì—´ëžŒ(kâ‰¥3).
+2. **A/B**ê°€ ë™ì¼ ì„¤ë¬¸ì„ ê°ìž ìž‘ì„±(SELF/GUESS).
+3. ì‹œìŠ¤í…œì€ í•˜ìœ„ì²™ë„ ì ìˆ˜ + Î” ê³„ì‚° â†’ Topâ€‘3 ì´ìŠˆ ì¹´ë“œ ìƒì„±.
+4. ì‹œë‚˜ë¦¬ì˜¤ ì‹¤ìŠµ(íƒ€ìž„ì•„ì›ƒ í•©ì˜Â·ì‚¬ì‹¤í™•ì¸ ì§ˆë¬¸ ë“±)ê³¼ ì´ë²ˆ ì£¼ í–‰ë™ 1ê°€ì§€ ë„ì¶œ.
+5. ê²°ê³¼ë¥¼ ê³µìœ  ê¸ˆì§€ ê¸°ë³¸ê°’ìœ¼ë¡œ ë³´ê´€(ë§í¬/PDF). ìœ„ê¸° ì‹ í˜¸ëŠ” ì•ˆì „ ì•ˆë‚´.
+
+---
+
+### 4) ê¸°ëŠ¥ ìš”êµ¬ (Functional Requirements)
+
+| ID      | ìš”ì•½                 | ì„¤ëª…                                             | ì˜ì¡´ì„±  | ìœ„í—˜   | ìˆ˜ë½ ê¸°ì¤€ (ìš”ì•½)                               |
+|---------|----------------------|--------------------------------------------------|--------|--------|-----------------------------------------------|
+| R-101   | 3ë‹¨ê³„ í”Œë¡œìš°         | 1)íƒ€ì¸ì§€í‘œ ìš”ì•½ â†’ 2)SELF/GUESS ìž…ë ¥ â†’ 3)ë¶€ë¶€ ì„¤ë¬¸ | Auth, DB | ì´íƒˆ   | ë‹¨ê³„ë³„ ì €ìž¥/ë³µêµ¬, íŽ˜ì´ì§€ ë¦¬ë¡œë“œì—ë„ ì§„í–‰ë¥  ë³µì› |
+| R-102   | SELF/GUESS ì´ì¤‘ ìž…ë ¥ | ê° í•­ëª© 2ì¹¸(ë‚˜/ë°°ìš°ìž ì¶”ì •) ìˆ˜ì§‘                 | R-101 | í˜¼ë™   | 0â€“4 ë¼ë””ì˜¤, í‚¤ë³´ë“œ ê°€ëŠ¥, ì ‘ê·¼ì„± ë ˆì´ë¸”         |
+| R-103   | ì±„ì /ì •ê·œí™”          | ì—­ì±„ì  í¬í•¨ í•˜ìœ„ì²™ë„ í‰ê· (0â€“4), SF1ì€ ë³„ë„(0â€“10) | R-102 | ê³„ì‚°ì˜¤ë¥˜ | ìƒ˜í”Œ ëŒ€ë¹„ íŽ¸ì°¨ â‰¤1e-6, ê²½ê³„ê°’ í…ŒìŠ¤íŠ¸ í†µê³¼        |
+| R-104   | Î” ê³„ì‚°               | Î”Aáµ¢ = A.GUESS - B.SELF, Î”Báµ¢ = B.GUESS - A.SELF   | R-103 | í•´ì„ì˜¤ë¥˜ | í•˜ìœ„ì²™ë„ í‰ê·  Î” ì¶œë ¥, ë¬¸í•­ ìƒìœ„ Î” Top-5        |
+| R-105   | í”Œëž˜ê·¸ íŒì •          | ì•ˆì „/íŒ¨í„´/ì •ì„œ/ì¸ì§€/ìš´ì˜/ì¹œë°€/í¬ë§ ë£° ì ìš©       | R-103 | ê³¼ìž‰ê²½ë³´ | ìƒ˜í”Œ ê·œì¹™í‘œì™€ ì¼ì¹˜, ë¯¼ê° ìž„ê³„ íŠœë‹ ê°€ëŠ¥         |
+| R-106   | ì¸ì‚¬ì´íŠ¸ ì¹´ë“œ        | Topâ€‘3 ì´ìŠˆ ìš”ì•½ + ì‹¤ìŠµ/ê³¼ì œ ë²„íŠ¼                 | R-105 | ê³¼ìž¥   | ìš©ì–´ ê°€ì´ë“œ ì¤€ìˆ˜, ë‹¨ì • í‘œí˜„ ê¸ˆì§€               |
+| R-107   | ì‹œê°í™”               | ë ˆì´ë”(8ì¶•)/Î” ížˆíŠ¸ë§µ/ì‹œë‚˜ë¦¬ì˜¤ ì •ë‹µ ì˜ˆì‹œ          | R-103 | ê³¼ë°€   | 360/768/1024 ë°˜ì‘í˜•, 30fps ì´ìƒ                |
+| R-108   | ì•ˆì „ ê²½ë¡œ            | í­ë ¥Â·ê°•ì•• ë“± ìœ„í—˜ ë¬¸í•­ í”Œëž˜ê·¸ ì‹œ ì•ˆë‚´            | R-105 | ëˆ„ë½   | ì•ˆì „ ì•ˆë‚´ ìƒì‹œ ë…¸ì¶œ, ì™¸ë¶€ ì—°ê³„ ë§í¬            |
+| R-109   | k-ìµëª… ê³µê°œ          | 1ë‹¨ê³„ ì§‘ê³„ k<3 ë¹„ê³µê°œ                            | R-101 | ìž¬ì‹ë³„ | k ìƒíƒœ ë±ƒì§€Â·ë„ë‹¬ ê°€ì´ë“œ, ë¹„ê³µê°œ ìž ê¸ˆ          |
+| R-110   | ê²°ê³¼ ë³´ê´€            | ë§í¬/PDF ì €ìž¥(noindex)                           | R-107 | ìœ ì¶œ   | ë§í¬ ë§Œë£Œ/ì·¨ì†Œ, í† í°í™”                         |
+| R-111   | í‘œì¤€ ì˜¤ë¥˜            | RFC 9457 Problem Details                          | ê³µí†µ   | ëˆ„ë½   | ëª¨ë“  4xx/5xx ìŠ¤í‚¤ë§ˆ ì¤€ìˆ˜                       |
+| R-112   | ìš”ì²­ ID/ê´€ì¸¡         | X-Request-ID, OTel íŠ¸ë ˆì´ìŠ¤ ì „íŒŒ                 | ê³µí†µ   | ëˆ„ë½   | ë¡œê·¸-íŠ¸ë ˆì´ìŠ¤ ì¡°ì¸ ì„±ê³µë¥  â‰¥99%                |
+| R-113   | ê²°ì • íŒ¨í‚·            | ìž…ë ¥Â·ë²„ì „Â·ì¶œë ¥ í•´ì‹œë¡œ ê²°ê³¼ ë´‰ì¸                  | R-103/104 | ìœ„ë³€ì¡° | packet í•´ì‹œ ì €ìž¥ + ë‹¤ìš´ë¡œë“œ ê°€ëŠ¥             |
+| R-114   | ì•Œë¦¼/ë¦¬ë§ˆì¸ë“œ        | ì¤‘ë‹¨ ì„¸ì…˜Â·ê²°ê³¼ ë¦¬ë§ˆì¸ë“œ(ì˜µíŠ¸ì¸)                  | ê³µí†µ   | ìŠ¤íŒ¸   | ì˜µíŠ¸ì•„ì›ƒ, 1ì¼ 1íšŒ ìƒí•œ                         |
+
+---
+
+### 5) ë¹„ê¸°ëŠ¥ ìš”êµ¬ (NFR: ìˆ˜ì¹˜ + ê²€ì¦)
+
+- ê°€ìš©ì„±: ì›” 99.9%
+- ë°±ì—”ë“œ: í•µì‹¬ API í‰ê·  <500ms, P95 <1s, ì˜¤ë¥˜ìœ¨ <1% (k6 + APM)
+- í”„ëŸ°íŠ¸(Web Vitals): LCP â‰¤2.5s, INP â‰¤200ms, CLS â‰¤0.1 (Lab + Field)
+- ë³´ì•ˆ/í”„ë¼ì´ë²„ì‹œ: TLS, TDE, ê²°ê³¼ noindex, í† í° ë§í¬ ë§Œë£Œ, PII ìµœì†Œí™”
+- ì ‘ê·¼ì„±: WCAG 2.2 AA (í‚¤ë³´ë“œÂ·ëŒ€ë¹„Â·í¬ì»¤ìŠ¤Â·ëª¨ì…˜ ê°ì†Œ)
+- ê´€ì¸¡ì„±: ìš”ì²­ ID 100%, ì˜¤ë¥˜ íŠ¸ë ˆì´ìŠ¤ 100% ìƒ˜í”Œë§, ì •ìƒ â‰¥20%
+
+---
+
+### 6) ì±„ì Â·í•´ì„ ê·œì¹™ (ìš”ì•½)
+
+- í•˜ìœ„ì²™ë„(8ì¶•): CS/EA/CB/PD/RP/LF/IN/SF â€” í‰ê·  0â€“4(ê¸ì • ì§ì ìˆ˜, CB1â€“CB4Â·PD1â€“PD2 ì—­ì±„ì )
+- Î” ë“±ê¸‰: Î” <0.8(ì–‘í˜¸) / 0.8â€“1.6(ë¶€ë¶„ ë¶ˆì¼ì¹˜) / â‰¥1.6(ê³ ìœ„í—˜ ì˜¤í•´)
+- í”Œëž˜ê·¸ ì˜ˆì‹œ: CS2 â‰¤2 ë˜ëŠ” IN4 â‰¤2 â†’ ì•ˆì „/ì¡´ì¤‘ ì¦‰ì‹œ ê°œìž…, PD1 â‰¥3 & PD3 â‰¥3 â†’ ì¶”ê¶â€“íšŒí”¼ êµìœ¡ ë“±
+- ì‹œë‚˜ë¦¬ì˜¤: S2ëŠ” íƒ€ìž„ì•„ì›ƒ(B) ì„ íƒë¥ ê³¼ ì„¤ëª… ë¬¸êµ¬ë¥¼ í•™ìŠµ ì¹´ë“œë¡œ ì—°ê²°
+
+---
+
+### 7) ê²°ê³¼ ì‚°ì¶œë¬¼
+
+- ëŒ€ì‹œë³´ë“œ: í•˜ìœ„ì²™ë„ ë ˆì´ë”(ìžê¸°/ë°°ìš°ìž í‰ê· ), Î” ížˆíŠ¸ë§µ, Topâ€‘3 ì´ìŠˆ
+- ì½”ì¹­ ì¹´ë“œ: â€œ3ì´ˆ ê·œì¹™â€, â€œë‚˜-ì „ë‹¬â€, â€œ20ë¶„ íƒ€ìž„ì•„ì›ƒ í•©ì˜â€, â€œê±°ì ˆ í›„ ëŒ€ì²´ ì œì•ˆâ€ ë“±
+- ì£¼ê°„ ê³¼ì œ: â€œì‚¬ì‹¤í™•ì¸ ì§ˆë¬¸ 1íšŒâ€, â€œí•˜ë£¨ 1ê°ì‚¬â€, â€œíƒ€ìž„ì•„ì›ƒ 1íšŒ ì‹¤ìŠµâ€
+
+---
+
+### 8) ë¦´ë¦¬ì¦ˆ ìˆ˜ë½ ê¸°ì¤€
+
+1. E2E(5 ì‹œë‚˜ë¦¬ì˜¤) í†µê³¼: ìž…ë ¥ â†’ ì±„ì  â†’ Î” â†’ í”Œëž˜ê·¸ â†’ ê²°ê³¼/ê³¼ì œ
+2. Î”Â·í•˜ìœ„ì²™ë„ ê³„ì‚° ìŠ¤ëƒ…ìƒ· í…ŒìŠ¤íŠ¸ ì˜¬ê·¸ë¦°(ì—­ì±„ì  í¬í•¨)
+3. RFC 9457 ì˜¤ë¥˜/ìš”ì²­ ID/OTel ì¡°ì¸ ê²€ì¦
+4. k<3 ìž ê¸ˆ/ì•ˆì „ ì•ˆë‚´ ë™ìž‘ í™•ì¸
+5. LCP/INP/CLS ëª©í‘œ ì¶©ì¡± (ëž© + í•„ë“œ)
+
+---
+
+### 9) ë¦¬ìŠ¤í¬Â·ì™„í™” / ê°€ì •Â·ë¯¸ê²°
+
+- ë¦¬ìŠ¤í¬: ë¯¼ê° ì£¼ì œ ë…¸ì¶œ â†’ ì•ˆì „ ì•ˆë‚´ ìƒì‹œÂ·ì‰¼í‘œ ê²½ë¡œ ì œê³µ
+- ë¦¬ìŠ¤í¬: Î” ì˜¤í•´ ê³¼ìž¥ â†’ ë‹¨ì • í‘œí˜„ ê¸ˆì§€Â·ìˆ˜ì¹˜/í‘œë³¸/ì‹œì  ë³‘ê¸°
+- ê°€ì •: ì´ˆê¸° DAU <1k, ìƒë‹´ ì—°ê³„ëŠ” ë§í¬ ì•ˆë‚´ ìˆ˜ì¤€
+- ë¯¸ê²°: ì „ë¬¸ê°€ ë„¤íŠ¸ì›Œí¬ ì—°ë™, ë‹¤êµ­ì–´ ì§€ì›
+
+---
+
+### 10) ë§ˆì¼ìŠ¤í†¤Â·KPI
+
+- M1 (4ì£¼): 3ë‹¨ê³„ ìž…ë ¥Â·ì±„ì Â·Î”Â·ë ˆì´ë”/ížˆíŠ¸ë§µ â€” KPI: ì™„ì£¼ìœ¨ â‰¥70%
+- M2 (4ì£¼): í”Œëž˜ê·¸/ì½”ì¹­ ì¹´ë“œÂ·PDF â€” KPI: Topâ€‘3 í´ë¦­ë¥  â‰¥60%
+- M3 (4ì£¼): ì•ˆì „/ì•Œë¦¼Â·ë¦¬ë§ˆì¸ë“œ â€” KPI: ìž¬ë°©ë¬¸(4ì£¼) â‰¥35%
+- M4 (4ì£¼): ìƒë‹´ ì—°ê³„ Î± â€” KPI: ê³¼ì œ ì´í–‰ ë³´ê³ ìœ¨ â‰¥50%
+
+---
+
+### 11) ì§€í‘œ (Metrics) Â· í…ŒìŠ¤íŠ¸ (Tests) Â· ì¶”ì  (Traceability)
+
+**Metrics**
+M-001 API P95, M-002 API Error, M-003 LCP/INP/CLS, M-004 ì™„ë£Œìœ¨, M-005 1ë‹¨ê³„ kâ‰¥3 ë‹¬ì„±ë¥ ,
+M-006 í‰ê·  Î”, M-007 ê³ ìœ„í—˜ Î” ê±´ìˆ˜, M-008 ì•ˆì „ ì•ˆë‚´ ë…¸ì¶œë¥ , M-009 ì½”ì¹­ í´ë¦­ë¥ ,
+M-010 DecisionPacket ì»¤ë²„ë¦¬ì§€, M-011 RFC9457 ì»¤ë²„ë¦¬ì§€, M-012 OTel TraceJoin.
+
+**Tests**
+T-001 ì±„ì /ì—­ì±„ì  ê²½ê³„, T-002 Î”/í•˜ìœ„ì²™ë„ ì •í™•ì„±, T-003 í”Œëž˜ê·¸ ë£°,
+T-004 k<3 ìž ê¸ˆ, T-005 ì•ˆì „ ì•ˆë‚´, T-006 ë ˆì´ë”/ížˆíŠ¸ë§µ ë Œë”,
+T-007 RFC9457 ì˜¤ë¥˜ ìŠ¤ëƒ…ìƒ·, T-008 ìš”ì²­ ID ì „íŒŒ/OTel ì¡°ì¸, T-009 PDF/noindex,
+T-010 ì‹œë‚˜ë¦¬ì˜¤ ì¹´ë“œ/ì‹¤ìŠµ ë²„íŠ¼, T-011 ì„±ëŠ¥(k6), T-012 E2E 5 í”Œë¡œìš°.
+
+**Traceability (ë°œì·Œ)**
+R-101 â†’ T-012/M-004, R-103 â†’ T-001/T-002/M-006, R-105 â†’ T-003/M-007,
+R-109 â†’ T-004/M-005, R-108 â†’ T-005/M-008, R-111 â†’ T-007/M-011,
+R-112 â†’ T-008/M-012, R-113 â†’ T-009/M-010.
+
+---
+
+### 12) ì°¸ì¡° ë¬¸í—Œ
+
+- RFC 9457: Problem Details for HTTP APIs â€” https://www.rfc-editor.org/rfc/rfc9457.html
+- OpenTelemetry FastAPI Instrumentation â€” https://opentelemetry-python-contrib.readthedocs.io
+- Web Vitals â€” https://web.dev/articles/vitals
+- Ad placement policies â€” https://support.google.com/adsense/answer/1346295
+- Web Content Accessibility Guidelines (WCAG) 2.2 â€” https://www.w3.org/TR/WCAG22/
 

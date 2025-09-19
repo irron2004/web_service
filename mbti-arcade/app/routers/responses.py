@@ -10,6 +10,7 @@ from app.data.questions import questions_for_mode
 from app.database import get_db
 from app.models import OtherResponse, Session as SessionModel, SelfResponse
 from app.schemas import (
+    AnswerItem,
     OtherSubmitRequest,
     OtherSubmitResponse,
     SelfSubmitRequest,
@@ -32,14 +33,45 @@ def ensure_session_active(session: SessionModel) -> None:
         )
 
 
-def validate_answers_length(mode: str, answers_count: int) -> None:
-    expected = len(questions_for_mode(mode))
-    if answers_count != expected:
+def validate_answers(mode: str, answers: list[AnswerItem]) -> None:
+    question_payloads = questions_for_mode(mode)
+    expected_ids = {item["id"] for item in question_payloads}
+    provided_ids = [answer.question_id for answer in answers]
+
+    messages: list[str] = []
+
+    if len(provided_ids) != len(expected_ids):
+        messages.append(
+            f"문항 수가 일치하지 않습니다. 기대값={len(expected_ids)}, 입력값={len(provided_ids)}"
+        )
+
+    duplicates: list[int] = []
+    seen: set[int] = set()
+    for question_id in provided_ids:
+        if question_id in seen:
+            duplicates.append(question_id)
+        else:
+            seen.add(question_id)
+
+    if duplicates:
+        unique_dups = sorted(set(duplicates))
+        messages.append(f"중복 문항 ID: {', '.join(map(str, unique_dups))}")
+
+    unexpected = sorted(set(provided_ids) - expected_ids)
+    if unexpected:
+        messages.append(f"알 수 없는 문항 ID: {', '.join(map(str, unexpected))}")
+
+    missing = sorted(expected_ids - set(provided_ids))
+    if missing:
+        messages.append(f"누락된 문항 ID: {', '.join(map(str, missing))}")
+
+    if messages:
         raise ProblemDetailsException(
             status_code=400,
-            title="Invalid Answer Count",
-            detail=f"문항 수가 일치하지 않습니다. 기대값={expected}",
-            type_suffix="validation-error",
+            title="Invalid Answers",
+            detail="응답 문항 구성이 유효하지 않습니다.",
+            type_suffix="answers-invalid",
+            errors={"answers": messages},
         )
 
 
@@ -56,33 +88,41 @@ async def submit_self(payload: SelfSubmitRequest, db: Session = Depends(get_db))
 
     ensure_session_active(session)
 
-    validate_answers_length(session.mode, len(payload.answers))
+    validate_answers(session.mode, payload.answers)
 
     seed_questions(db)
-    db.query(SelfResponse).filter(SelfResponse.session_id == session.id).delete()
-
-    for answer in payload.answers:
-        db.add(
-            SelfResponse(
-                session_id=session.id,
-                question_id=answer.question_id,
-                value=answer.value,
-            )
-        )
-
-    db.flush()
 
     try:
-        result = recalculate_aggregate(db, session)
-    except ScoringError as exc:
-        raise ProblemDetailsException(
-            status_code=400,
-            title="Scoring Failed",
-            detail=str(exc),
-            type_suffix="scoring-error",
-        ) from exc
+        db.query(SelfResponse).filter(SelfResponse.session_id == session.id).delete()
 
-    db.commit()
+        for answer in payload.answers:
+            db.add(
+                SelfResponse(
+                    session_id=session.id,
+                    question_id=answer.question_id,
+                    value=answer.value,
+                )
+            )
+
+        db.flush()
+
+        try:
+            result = recalculate_aggregate(db, session)
+        except ScoringError as exc:
+            raise ProblemDetailsException(
+                status_code=400,
+                title="Scoring Failed",
+                detail=str(exc),
+                type_suffix="scoring-error",
+            ) from exc
+
+        db.commit()
+    except ProblemDetailsException:
+        db.rollback()
+        raise
+    except Exception:
+        db.rollback()
+        raise
 
     return SelfSubmitResponse(
         session_id=session.id,
@@ -116,7 +156,7 @@ async def submit_other(payload: OtherSubmitRequest, db: Session = Depends(get_db
 
     ensure_session_active(session)
 
-    validate_answers_length(session.mode, len(payload.answers))
+    validate_answers(session.mode, payload.answers)
 
     seed_questions(db)
 
@@ -143,35 +183,42 @@ async def submit_other(payload: OtherSubmitRequest, db: Session = Depends(get_db
             type_suffix="rate-limit",
         )
 
-    db.query(OtherResponse).filter(
-        OtherResponse.session_id == session.id,
-        OtherResponse.rater_hash == rater_hash,
-    ).delete()
-
-    for answer in payload.answers:
-        db.add(
-            OtherResponse(
-                session_id=session.id,
-                rater_hash=rater_hash,
-                question_id=answer.question_id,
-                value=answer.value,
-                relation_tag=payload.relation_tag,
-            )
-        )
-
-    db.flush()
-
     try:
-        result = recalculate_aggregate(db, session)
-    except ScoringError as exc:
-        raise ProblemDetailsException(
-            status_code=400,
-            title="Scoring Failed",
-            detail=str(exc),
-            type_suffix="scoring-error",
-        ) from exc
+        db.query(OtherResponse).filter(
+            OtherResponse.session_id == session.id,
+            OtherResponse.rater_hash == rater_hash,
+        ).delete()
 
-    db.commit()
+        for answer in payload.answers:
+            db.add(
+                OtherResponse(
+                    session_id=session.id,
+                    rater_hash=rater_hash,
+                    question_id=answer.question_id,
+                    value=answer.value,
+                    relation_tag=payload.relation_tag,
+                )
+            )
+
+        db.flush()
+
+        try:
+            result = recalculate_aggregate(db, session)
+        except ScoringError as exc:
+            raise ProblemDetailsException(
+                status_code=400,
+                title="Scoring Failed",
+                detail=str(exc),
+                type_suffix="scoring-error",
+            ) from exc
+
+        db.commit()
+    except ProblemDetailsException:
+        db.rollback()
+        raise
+    except Exception:
+        db.rollback()
+        raise
 
     return OtherSubmitResponse(
         session_id=session.id,

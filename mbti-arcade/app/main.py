@@ -5,6 +5,7 @@ from typing import Dict, Iterable, Tuple
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -20,7 +21,13 @@ from app.routers import sessions as sessions_router
 from app.routers import share as share_router
 from app.routers import quiz as quiz_router
 from app.routers import report as report_router
-from app.utils.problem_details import ProblemDetailsException, from_exception
+from app.utils.problem_details import (
+    ProblemDetailsException,
+    from_exception,
+    from_http_exception,
+    from_validation_error,
+    internal_server_error,
+)
 from app.schemas import DIMENSIONS
 from app.services.scoring import compute_norms, norm_to_radar
 
@@ -141,6 +148,34 @@ async def request_id_middleware(request: Request, call_next):
 @app.exception_handler(ProblemDetailsException)
 async def problem_details_handler(request: Request, exc: ProblemDetailsException):
     return from_exception(request, exc)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    log.warning(
+        "Validation error",
+        extra={
+            "request_id": getattr(request.state, "request_id", None),
+            "errors": exc.errors(),
+        },
+    )
+    return from_validation_error(request, exc)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    if isinstance(exc, ProblemDetailsException):
+        return from_exception(request, exc)
+    return from_http_exception(request, exc)
+
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    log.exception(
+        "Unhandled application error",
+        extra={"request_id": getattr(request.state, "request_id", None)},
+    )
+    return internal_server_error(request)
 
 
 @app.on_event("startup")
@@ -289,6 +324,83 @@ async def mbti_result(request: Request):
             "scores": scores,
             "result": result,
             "pair_token": None,
+        },
+    )
+
+
+@app.post("/mbti/result/{token}", response_class=HTMLResponse)
+async def mbti_friend_result(request: Request, token: str):
+    """친구 테스트 결과 제출 (토큰 기반)"""
+    try:
+        from app.core.token import verify_token
+        pair_id, my_mbti = verify_token(token)
+    except ValueError:
+        raise HTTPException(status_code=403, detail="Invalid or expired token")
+    
+    # 데이터베이스에서 친구 정보 가져오기
+    from app.core.db import get_session
+    from app.core.models_db import Pair
+    session = next(get_session())
+    pair = session.get(Pair, pair_id)
+    if not pair:
+        raise HTTPException(status_code=404, detail="Pair not found")
+    
+    form = await request.form()
+    answer_pairs = []
+    for key, value in form.items():
+        if not key.startswith("q"):
+            continue
+        try:
+            question_id = int(key[1:])
+            answer_value = int(value)
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(status_code=400, detail="Invalid answer payload") from exc
+        answer_pairs.append((question_id, answer_value))
+
+    try:
+        mbti_type, scores, _ = _score_answers(answer_pairs)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    result = MBTI_SUMMARIES.get(mbti_type, _DEFAULT_SUMMARY)
+
+    # 친구 정보 구성
+    friend_info = {
+        "name": pair.my_name,
+        "email": pair.my_email,
+        "my_mbti": my_mbti
+    }
+
+    # 통계 정보 구성 (기본값)
+    statistics = {
+        "total_evaluations": 1,
+        "average_score": 50.0,
+        "mbti_distribution": {
+            mbti_type: 1
+        },
+        "average_scores": {
+            "E": scores.get("E", 50),
+            "I": scores.get("I", 50),
+            "S": scores.get("S", 50),
+            "N": scores.get("N", 50),
+            "T": scores.get("T", 50),
+            "F": scores.get("F", 50),
+            "J": scores.get("J", 50),
+            "P": scores.get("P", 50)
+        }
+    }
+
+    return templates.TemplateResponse(
+        "mbti/friend_results.html",
+        {
+            "request": request,
+            "mbti_type": mbti_type,
+            "scores": scores,
+            "result": result,
+            "pair_token": token,
+            "my_mbti": my_mbti,
+            "friend_info": friend_info,
+            "statistics": statistics,
         },
     )
 
