@@ -1,72 +1,504 @@
 {% extends "base.html" %}
 
-{% block title %}MBTI 테스트 - MBTI & Arcade Web Service{% endblock %}
+{% block title %}MBTI 인사이트 허브 - MBTI & Arcade{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .focus-outline:focus-visible {
+        outline: 3px solid rgba(59, 130, 246, 0.9);
+        outline-offset: 4px;
+    }
+
+    .chart-card {
+        position: relative;
+        min-height: 18rem;
+    }
+
+    .chart-card[aria-busy="true"]::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 1rem;
+        background: linear-gradient(120deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        animation: shimmer 1.6s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+{% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <h1 class="text-4xl font-bold text-gray-800 mb-6">
-        🧠 MBTI 성격 유형 테스트
-    </h1>
-    <p class="text-xl text-gray-600 mb-8">
-        당신의 성격 유형을 알아보세요!
-    </p>
+<div class="space-y-16">
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-sky-600 to-emerald-500 text-white">
+        <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')]"></div>
+        <div class="relative z-10 px-6 py-12 md:py-16 md:px-12 lg:px-16">
+            <div class="max-w-4xl mx-auto text-center">
+                <span class="inline-flex items-center rounded-full bg-white/10 px-4 py-1 text-sm font-medium tracking-wide uppercase">
+                    Self → Invite → Aggregate · WCAG 2.2 AA Ready
+                </span>
+                <h1 class="mt-6 text-4xl md:text-5xl font-bold leading-tight">
+                    🧠 360Me MBTI 인사이트로 나와 주변의 관점 차이를 한눈에 살펴보세요
+                </h1>
+                <p class="mt-6 text-lg md:text-xl text-white/90">
+                    DesignOptions, PRD 가이드라인을 기반으로 차트 중심 시각화를 준비했습니다.
+                    5분이면 자기 인식과 친구·동료의 시선을 비교하고, k≥3 익명성 기준을 통과한
+                    인사이트만 공유할 수 있습니다.
+                </p>
+                <div class="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
+                    <a href="/mbti/self-test" class="focus-outline inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-indigo-900/30 transition-transform hover:-translate-y-0.5">
+                        🚀 내 MBTI 테스트 시작하기
+                    </a>
+                    <a href="/mbti/friend" class="focus-outline inline-flex items-center justify-center rounded-xl border border-white/60 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                        👥 친구/동료 평가 초대하기
+                    </a>
+                </div>
+                <div class="mt-10 grid gap-4 sm:grid-cols-2">
+                    <div class="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm p-5 text-left">
+                        <h3 class="text-lg font-semibold">📊 Chart.js 레이더 & 스캐터</h3>
+                        <p class="mt-2 text-sm text-white/80">
+                            DesignOptions.md 권장 스택을 따라 레이더/스캐터 시각화와 OG 미리보기 템플릿을 적용합니다.
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm p-5 text-left">
+                        <h3 class="text-lg font-semibold">🛡️ RFC 9457 · k-익명 보호</h3>
+                        <p class="mt-2 text-sm text-white/80">
+                            PRD의 안전 가이드를 준수해 Problem Details, X-Request-ID, noindex 정책을 기본으로 제공합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
+    <section aria-labelledby="section-flow" class="grid gap-10 lg:grid-cols-[1.1fr_minmax(0,0.9fr)]">
+        <div class="space-y-6">
+            <div>
+                <h2 id="section-flow" class="text-3xl font-bold text-slate-900">
+                    Self → Invite → Aggregate 여정
+                </h2>
+                <p class="mt-3 text-base text-slate-600">
+                    테스트는 혼자 시작해도, 링크 공유로 친구/동료 평가를 받으면 관점 차(Δ)와 공통점을
+                    빠르게 비교할 수 있습니다. docs/frontend_style.md에서 권장하는 WCAG 2.2 AA 대비와
+                    Skeleton UX 패턴을 반영해, 각 단계에서 기다림 없이 진행할 수 있도록 준비했습니다.
+                </p>
+            </div>
+            <ol class="grid gap-4 md:grid-cols-3" aria-label="테스트 단계">
+                <li class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold">1</span>
+                    <h3 class="mt-4 text-lg font-semibold text-slate-900">Self · 자기인식</h3>
+                    <p class="mt-2 text-sm text-slate-600">24문항, 5점 척도. 제3자 관점 질문으로 오차를 줄입니다.</p>
+                </li>
+                <li class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 text-white font-semibold">2</span>
+                    <h3 class="mt-4 text-lg font-semibold text-slate-900">Invite · 관점 수집</h3>
+                    <p class="mt-2 text-sm text-slate-600">토큰 링크로 친구/동료 평가 초대, k≥3 달성 시 집계가 열립니다.</p>
+                </li>
+                <li class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white font-semibold">3</span>
+                    <h3 class="mt-4 text-lg font-semibold text-slate-900">Aggregate · 인사이트</h3>
+                    <p class="mt-2 text-sm text-slate-600">Δ 히트맵과 레이더 차트로 차이를 시각화하고, Top-3 액션 카드로 연결합니다.</p>
+                </li>
+            </ol>
+        </div>
+        <aside class="relative overflow-hidden rounded-3xl bg-slate-900 text-white">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
+            <img src="https://images.unsplash.com/photo-1529336953121-497f6c1ed0b9?auto=format&fit=crop&w=900&q=80" alt="데이터를 논의하는 사람들" class="h-full w-full object-cover" loading="lazy">
+            <div class="relative z-10 p-8 space-y-4">
+                <h3 class="text-2xl font-semibold">관계 맥락까지 함께 보는 인사이트</h3>
+                <p class="text-sm text-white/80">
+                    PRD.md의 "안전한 대화 컨테이너" 비전을 반영해, Δ ≥1.6인 고위험 신호에는 즉시 안전 안내와
+                    오해 완화 행동 가이드를 제공합니다.
+                </p>
+                <a href="/mbti/friend-system" class="focus-outline inline-flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25">
+                    시스템 상세 보기 →
+                </a>
+            </div>
+        </aside>
+    </section>
 
-        <div class="text-6xl mb-6">🎯</div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">MBTI 성격 유형 테스트</h2>
-        <p class="text-gray-600 mb-6 text-left">
-            MBTI(Myers-Briggs Type Indicator)는 개인의 성격 유형을 16가지로 분류하는 성격 유형 지표입니다. 
-            외향성(E)-내향성(I), 감각(S)-직관(N), 사고(T)-감정(F), 판단(J)-인식(P)의 4가지 선호 경향을 조합하여 
-            당신만의 고유한 성격 유형을 알아볼 수 있습니다.
-        </p>
-        
-        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p class="text-blue-800 text-center">
-                <strong>💡 새로운 기능:</strong> 친구와 서로의 MBTI를 평가해보고 차이점을 확인해보세요!
+    <section id="mbti-preview" aria-labelledby="section-preview" class="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-sm backdrop-blur" data-preview>
+        <div class="max-w-3xl">
+            <h2 id="section-preview" class="text-3xl font-bold text-slate-900">실시간 인사이트 미리보기</h2>
+            <p class="mt-3 text-base text-slate-600">
+                /api/result/preview 엔드포인트에서 반환하는 레이더·Δ 데이터를 Chart.js로 즉시 그려 시각화 흐름을 확인합니다.
+                실제 세션에서는 초대 토큰에 따라 동일한 구조의 JSON이 내려옵니다.
             </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <h3 class="font-semibold text-blue-800 mb-2">테스트 특징</h3>
-                <ul class="text-sm text-blue-700 text-left">
-                    <li>• 24문항으로 정확한 분석</li>
-                    <li>• 5점 척도로 세밀한 측정</li>
-                    <li>• 제3자 관점의 객관적 질문</li>
-                    <li>• 상세한 성향 분석 차트</li>
-                </ul>
-            </div>
-            <div class="bg-green-50 p-4 rounded-lg">
-                <h3 class="font-semibold text-green-800 mb-2">결과 포함</h3>
-                <ul class="text-sm text-green-700 text-left">
-                    <li>• 16가지 MBTI 유형</li>
-                    <li>• 각 유형별 상세 설명</li>
-                    <li>• 성격 특성 분석</li>
-                </ul>
-            </div>
+        <p data-preview-error class="mt-4 hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+            데모 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
+        </p>
+
+        <div class="mt-8 grid gap-6 lg:grid-cols-2">
+            <article class="chart-card rounded-2xl border border-slate-200 bg-slate-900 p-6 text-white" data-preview-panel="radar" aria-busy="true">
+                <header class="mb-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold">레이더 차트 · Self vs Others</h3>
+                        <p class="mt-1 text-sm text-white/70">EI · SN · TF · JP 축을 0~100 스케일로 변환한 결과입니다.</p>
+                    </div>
+                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide">Chart.js</span>
+                </header>
+                <canvas id="preview-radar" class="h-72 w-full" role="img" aria-label="MBTI 관점 차이 레이더 미리보기" aria-describedby="preview-radar-summary"></canvas>
+                <p data-preview-radar-empty class="mt-3 hidden rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-xs text-white/70">
+                    데모 데이터를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.
+                </p>
+                <p id="preview-radar-summary" class="mt-3 text-xs text-white/70">
+                    파란 영역은 Self 응답, 청록 영역은 초대 응답이 3명 이상 모였을 때 집계된 값입니다.
+                </p>
+            </article>
+
+            <article class="chart-card rounded-2xl border border-slate-200 bg-white p-6" data-preview-panel="gap" aria-busy="true">
+                <header class="mb-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-slate-900">Δ 막대 차트 · Others - Self</h3>
+                        <p class="mt-1 text-sm text-slate-500">양수는 다른 사람들이 더 높게 본 성향, 음수는 내가 더 높게 본 성향입니다.</p>
+                    </div>
+                    <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700 tracking-wide">Δ preview</span>
+                </header>
+                <canvas id="preview-gap" class="h-72 w-full" role="img" aria-label="관점 차이 Δ 막대 그래프" aria-describedby="preview-gap-summary"></canvas>
+                <p data-preview-gap-empty class="mt-3 hidden rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                    아직 k≥3 응답이 모이지 않아 Δ를 표시할 수 없습니다.
+                </p>
+                <p id="preview-gap-summary" class="mt-3 text-xs text-slate-500">
+                    회색 기준선(0)을 기준으로 ±1 스케일을 표시합니다. 정책상 k≥3 응답이 모이면 Δ를 공개합니다.
+                </p>
+            </article>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <a href="/mbti/self-test" 
-               class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
-                🚀 MBTI 테스트 시작하기
-            </a>
-            <a href="/mbti/friend" 
-               class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-colors">
-                👥 친구 평가하기
-            </a>
+        <div data-preview-loader role="status" class="mt-6 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            <span class="inline-flex h-3 w-3 animate-pulse rounded-full bg-slate-400"></span>
+            데모 데이터를 불러오는 중입니다…
         </div>
 
-        <div class="mt-6 space-x-4">
-            <a href="/mbti/types" class="text-blue-600 hover:text-blue-800 underline">
-                모든 MBTI 유형 보기 →
-            </a>
-            <span class="text-gray-400">|</span>
-            <a href="/mbti/friend-system" class="text-purple-600 hover:text-purple-800 underline">
-                친구 평가 시스템 →
-            </a>
+        <dl class="mt-6 grid gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-600 sm:grid-cols-3">
+            <div class="rounded-xl bg-white px-4 py-3">
+                <dt class="font-semibold text-slate-500">응답 샘플 수</dt>
+                <dd data-preview-n class="mt-1 text-2xl font-bold text-slate-900">—</dd>
+            </div>
+            <div class="rounded-xl bg-white px-4 py-3">
+                <dt class="font-semibold text-slate-500">평균 관점 차 지수</dt>
+                <dd data-preview-gap-score class="mt-1 text-2xl font-bold text-slate-900">—</dd>
+            </div>
+            <div class="rounded-xl bg-white px-4 py-3">
+                <dt class="font-semibold text-slate-500">공개 기준</dt>
+                <dd class="mt-1 text-sm text-slate-700">k≥3 충족 시 Δ·sigma 노출</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section aria-labelledby="section-features" class="space-y-8">
+        <header class="max-w-3xl">
+            <h2 id="section-features" class="text-3xl font-bold text-slate-900">왜 360Me MBTI인가요?</h2>
+            <p class="mt-3 text-base text-slate-600">
+                DesignOptions.md와 docs/frontend_style.md의 가이드라인을 따르는 데이터 시각화, 접근성,
+                성능 버짓을 중심으로 화면을 재구성했습니다.
+            </p>
+        </header>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">⚡ 빠른 경험 · LCP ≤2.5s</h3>
+                <p class="mt-2 text-sm text-slate-600">
+                    Hero 영역과 CTA는 이미지 지연 로딩, 컴포넌트 스켈레톤으로 초기 로딩을 최적화합니다.
+                </p>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">♿ WCAG 2.2 AA 대비</h3>
+                <p class="mt-2 text-sm text-slate-600">
+                    포커스 링, 충분한 색 대비, 키보드 네비게이션을 기본으로 구성했습니다.
+                </p>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">📈 레이더/Δ 히트맵</h3>
+                <p class="mt-2 text-sm text-slate-600">
+                    Chart.js 4.x 기반 레이더와 Δ 히트맵을 통해 자기·타인 인식을 동시에 비교합니다.
+                </p>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">🔒 k-익명 & Decision Packet</h3>
+                <p class="mt-2 text-sm text-slate-600">
+                    k<3이면 결과 비공개, 생성된 인사이트는 결정 패킷으로 봉인해 추적성을 확보합니다.
+                </p>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">🛰️ OpenTelemetry 기본</h3>
+                <p class="mt-2 text-sm text-slate-600">
+                    모든 요청은 X-Request-ID와 OTel 스팬으로 로깅되어 운영 관측성을 유지합니다.
+                </p>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">🧭 OG · 공유 최적화</h3>
+                <p class="mt-2 text-sm text-slate-600">
+                    Satori 기반 OG 이미지 템플릿을 대비해 공유 링크 품질과 광고 정책을 동시에 만족시킵니다.
+                </p>
+            </article>
         </div>
-    </div>
+    </section>
+
+    <section aria-labelledby="section-next" class="rounded-3xl bg-slate-900 px-6 py-12 text-white md:px-12">
+        <div class="mx-auto max-w-4xl text-center space-y-6">
+            <h2 id="section-next" class="text-3xl font-bold">다음 단계 준비되셨나요?</h2>
+            <p class="text-base text-white/80">
+                지금 바로 Self 테스트를 완료하고, 친구/동료 초대 링크를 공유해보세요. 최소 3명의 응답이
+                모이면 Δ 히트맵과 Top-3 코칭 카드를 자동으로 받게 됩니다.
+            </p>
+            <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
+                <a href="/mbti/self-test" class="focus-outline inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-black/30 transition hover:-translate-y-0.5">
+                    🧠 Self 테스트 진행
+                </a>
+                <a href="/mbti/share" class="focus-outline inline-flex items-center justify-center rounded-xl border border-white/60 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                    🔗 초대 링크 생성
+                </a>
+            </div>
+        </div>
+    </section>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const previewSection = document.querySelector('[data-preview]');
+        if (!previewSection) {
+            return;
+        }
+
+        const loader = previewSection.querySelector('[data-preview-loader]');
+        const errorBanner = previewSection.querySelector('[data-preview-error]');
+        const radarPanel = previewSection.querySelector('[data-preview-panel="radar"]');
+        const gapPanel = previewSection.querySelector('[data-preview-panel="gap"]');
+        const sampleCountEl = previewSection.querySelector('[data-preview-n]');
+        const gapScoreEl = previewSection.querySelector('[data-preview-gap-score]');
+        const radarCanvas = document.getElementById('preview-radar');
+        const gapCanvas = document.getElementById('preview-gap');
+        const radarEmptyEl = previewSection.querySelector('[data-preview-radar-empty]');
+        const gapEmptyEl = previewSection.querySelector('[data-preview-gap-empty]');
+
+        const markReady = (panel) => {
+            if (panel) {
+                panel.setAttribute('aria-busy', 'false');
+            }
+        };
+
+        const handleError = () => {
+            if (loader && typeof loader.remove === 'function') {
+                loader.remove();
+            }
+            markReady(radarPanel);
+            markReady(gapPanel);
+            if (errorBanner) {
+                errorBanner.classList.remove('hidden');
+            }
+            if (radarEmptyEl) {
+                radarEmptyEl.classList.remove('hidden');
+            }
+            if (gapEmptyEl) {
+                gapEmptyEl.classList.remove('hidden');
+            }
+        };
+
+        if (typeof window.Chart === 'undefined') {
+            handleError();
+            return;
+        }
+
+        fetch('/api/result/preview', { headers: { Accept: 'application/json' } })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Preview fetch failed');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (loader && typeof loader.remove === 'function') {
+                    loader.remove();
+                }
+                renderRadar(data);
+                renderGap(data);
+                if (sampleCountEl) {
+                    sampleCountEl.textContent = typeof data.n === 'number' ? data.n.toString() : '0';
+                }
+                if (gapScoreEl) {
+                    if (typeof data.gap_score === 'number') {
+                        gapScoreEl.textContent = data.gap_score.toFixed(1);
+                    } else {
+                        gapScoreEl.textContent = '—';
+                    }
+                }
+            })
+            .catch(() => {
+                handleError();
+            });
+
+        function renderRadar(data) {
+            if (!radarCanvas || !data || !data.radar_self) {
+                if (radarEmptyEl) {
+                    radarEmptyEl.classList.remove('hidden');
+                }
+                markReady(radarPanel);
+                return;
+            }
+
+            const labels = Object.keys(data.radar_self);
+            if (labels.length === 0) {
+                if (radarEmptyEl) {
+                    radarEmptyEl.classList.remove('hidden');
+                }
+                markReady(radarPanel);
+                return;
+            }
+
+            if (radarEmptyEl) {
+                radarEmptyEl.classList.add('hidden');
+            }
+
+            const datasets = [
+                {
+                    label: '내 관점 (Self)',
+                    data: labels.map((label) => Number(data.radar_self[label] ?? 0)),
+                    backgroundColor: 'rgba(99, 102, 241, 0.25)',
+                    borderColor: 'rgba(99, 102, 241, 0.95)',
+                    pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                    pointRadius: 4,
+                    fill: true,
+                },
+            ];
+
+            if (data.radar_other) {
+                datasets.push({
+                    label: '응답자 평균 (k≥3)',
+                    data: labels.map((label) => Number(data.radar_other[label] ?? 0)),
+                    backgroundColor: 'rgba(45, 212, 191, 0.2)',
+                    borderColor: 'rgba(45, 212, 191, 0.9)',
+                    pointBackgroundColor: 'rgba(45, 212, 191, 1)',
+                    pointRadius: 4,
+                    fill: true,
+                });
+            }
+
+            new Chart(radarCanvas.getContext('2d'), {
+                type: 'radar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: 'rgba(226, 232, 240, 0.8)',
+                            },
+                            angleLines: { color: 'rgba(148, 163, 184, 0.4)' },
+                            grid: { color: 'rgba(148, 163, 184, 0.25)' },
+                            pointLabels: { color: 'rgba(226, 232, 240, 0.8)' },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: 'rgba(226, 232, 240, 0.9)' },
+                        },
+                    },
+                },
+            });
+
+            markReady(radarPanel);
+        }
+
+        function renderGap(data) {
+            if (!gapCanvas) {
+                markReady(gapPanel);
+                return;
+            }
+
+            if (!data || !data.gap) {
+                if (gapEmptyEl) {
+                    gapEmptyEl.classList.remove('hidden');
+                }
+                markReady(gapPanel);
+                return;
+            }
+
+            if (gapEmptyEl) {
+                gapEmptyEl.classList.add('hidden');
+            }
+
+            const labels = Object.keys(data.gap);
+            if (labels.length === 0) {
+                markReady(gapPanel);
+                return;
+            }
+
+            const values = labels.map((label) => Number(data.gap[label] ?? 0));
+            const backgroundColors = values.map((value) =>
+                value >= 0 ? 'rgba(56, 189, 248, 0.65)' : 'rgba(248, 113, 113, 0.65)'
+            );
+            const borderColors = values.map((value) =>
+                value >= 0 ? 'rgba(14, 165, 233, 1)' : 'rgba(239, 68, 68, 1)'
+            );
+
+            new Chart(gapCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Δ (Others - Self)',
+                            data: values,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1.5,
+                            borderRadius: 6,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            suggestedMin: -1,
+                            suggestedMax: 1,
+                            grid: { color: 'rgba(148, 163, 184, 0.25)' },
+                            ticks: {
+                                callback: (value) => {
+                                    const numeric = typeof value === 'number' ? value : Number(value);
+                                    if (Number.isNaN(numeric)) {
+                                        return value;
+                                    }
+                                    return numeric.toFixed(1);
+                                },
+                            },
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                color: 'rgba(71, 85, 105, 0.9)',
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const rawValue = typeof ctx.raw === 'number' ? ctx.raw : Number(ctx.raw);
+                                    if (Number.isNaN(rawValue)) {
+                                        return ctx.dataset.label || 'Δ';
+                                    }
+                                    return `${ctx.dataset.label || 'Δ'}: ${rawValue.toFixed(2)}`;
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            markReady(gapPanel);
+        }
+    });
+    </script>
 </div>
 {% endblock %} 

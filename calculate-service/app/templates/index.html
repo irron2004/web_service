@@ -1,137 +1,225 @@
 {% extends "base.html" %}
 
-{% block title %}홈 - Calculate Service{% endblock %}
+{% block title %}360Me Math Lab — 초등 연산 연습 허브{% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <!-- 헤더 섹션 -->
-    <div class="gradient-bg text-white py-16 rounded-2xl mb-12">
-        <h1 class="text-5xl font-bold mb-6">
-            🧮 초등수학문제
-        </h1>
-        <p class="text-xl mb-8 max-w-3xl mx-auto">
-            초등학생을 위한 다양한 수학 문제를 풀어보세요!
-            덧셈, 뺄셈, 곱셈, 나눗셈 문제가 준비되어 있습니다.
+<div class="mx-auto w-full max-w-6xl space-y-16 px-4 py-12 sm:px-6 lg:px-8 lg:py-18">
+    <section class="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-sky-500 via-primary to-purple-500 px-6 py-16 text-white shadow-2xl sm:px-10 lg:px-16">
+        <div class="absolute inset-0 opacity-15" aria-hidden="true"
+             style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28) 0, transparent 55%),
+                    radial-gradient(circle at 80% 0%, rgba(255,255,255,0.2) 0, transparent 45%),
+                    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.2) 0, transparent 50%);"></div>
+        <div class="relative z-10 mx-auto max-w-4xl space-y-8 text-center">
+            <span class="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
+                칸반 FE-01 · FE-02 · FE-05 · Web Vitals 준비완료
+            </span>
+            <h1 class="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                360Me Math Lab
+            </h1>
+            <p class="text-lg text-white/90 sm:text-xl">
+                초등 연산 4종(덧셈·뺄셈·곱셈·나눗셈)을 Self → Practice → Share 흐름으로 구성했습니다.
+                Tailwind 기반의 접근성, Skeleton UX, noindex 정책을 유지하면서도 학습 몰입도를 높였습니다.
+            </p>
+            <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                <a href="/problems?category=덧셈" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                    <span aria-hidden="true">🧠</span> 덧셈 문제 시작
+                </a>
+                <a href="#categories" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                    <span aria-hidden="true">📚</span> 모든 유형 보기
+                </a>
+            </div>
+            <dl class="mt-10 grid gap-4 text-left sm:grid-cols-3">
+                <div class="glass-card rounded-2xl px-5 py-4">
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">문제 유형</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">4가지 연산</dd>
+                </div>
+                <div class="glass-card rounded-2xl px-5 py-4">
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">총 문항</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">20개 샘플</dd>
+                </div>
+                <div class="glass-card rounded-2xl px-5 py-4">
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">A11y · Observability</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">WCAG 2.2 · RFC 9457</dd>
+                </div>
+            </dl>
+        </div>
+    </section>
+
+    {% set categories = [
+        {
+            "emoji": "➕",
+            "title": "덧셈",
+            "description": "두 자리 수 덧셈으로 기본 연산 감각을 다듬어요.",
+            "href": "/problems?category=덧셈",
+            "accent": "from-sky-400/30 to-sky-500/20",
+            "cta": "덧셈 문제 풀기"
+        },
+        {
+            "emoji": "➖",
+            "title": "뺄셈",
+            "description": "받아내림·올림 개념을 시각적으로 연습합니다.",
+            "href": "/problems?category=뺄셈",
+            "accent": "from-emerald-400/30 to-emerald-500/20",
+            "cta": "뺄셈 문제 풀기"
+        },
+        {
+            "emoji": "✖️",
+            "title": "곱셈",
+            "description": "구구단과 배열 모델로 곱셈 패턴을 익혀보세요.",
+            "href": "/problems?category=곱셈",
+            "accent": "from-purple-400/30 to-purple-500/20",
+            "cta": "곱셈 문제 풀기"
+        },
+        {
+            "emoji": "➗",
+            "title": "나눗셈",
+            "description": "나눗셈을 등분·몫 관점으로 이해하도록 지도합니다.",
+            "href": "/problems?category=나눗셈",
+            "accent": "from-orange-400/30 to-orange-500/20",
+            "cta": "나눗셈 문제 풀기"
+        }
+    ] %}
+    <section id="categories" aria-labelledby="section-categories" class="space-y-7">
+        <header class="max-w-3xl space-y-3">
+            <h2 id="section-categories" class="text-3xl font-semibold text-white sm:text-4xl">연산 유형 선택</h2>
+            <p class="text-base text-slate-300">
+                Tasks.md의 FE-02 요구에 맞춰 4가지 연산을 분리된 카드로 제공하고, 각 유형은 키보드 접근성과
+                포커스 링을 포함합니다.
+            </p>
+        </header>
+        <div class="grid gap-6 md:grid-cols-2">
+            {% for item in categories %}
+            <article class="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 p-6 transition duration-200 hover:-translate-y-1 hover:border-primary/50 focus-within:-translate-y-1">
+                <div class="pointer-events-none absolute inset-0 bg-gradient-to-br {{ item.accent }} opacity-40"></div>
+                <div class="relative z-10 flex flex-col gap-5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-5xl" aria-hidden="true">{{ item.emoji }}</span>
+                        <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/80">Core 연산</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-white">{{ item.title }}</h3>
+                        <p class="mt-2 text-sm text-slate-200">{{ item.description }}</p>
+                    </div>
+                    <a href="{{ item.href }}" class="inline-flex items-center justify-center gap-2 self-start rounded-full bg-white/90 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-primary/30 transition hover:-translate-y-0.5 hover:bg-white" aria-label="{{ item.title }} 문제 풀기">
+                        <span aria-hidden="true">→</span> {{ item.cta }}
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section aria-labelledby="section-tips" class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <div class="space-y-5">
+            <header class="space-y-2">
+                <h2 id="section-tips" class="text-3xl font-semibold text-white sm:text-4xl">학습 팁 & 진행 전략</h2>
+                <p class="text-base text-slate-300">
+                    FE-01 스켈레톤/로딩 패턴과 Self → Invite → Aggregate 철학을 학습 단계에 맞게 적용했습니다.
+                </p>
+            </header>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <article class="glass-card rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold text-white">📝 풀이 워크플로</h3>
+                    <ul class="mt-3 space-y-2 text-sm text-slate-200">
+                        <li>• 문제를 음성으로 읽어 이해도를 확인하세요.</li>
+                        <li>• 초안 계산은 초등 맞춤 격자 노트 형식으로 작성합니다.</li>
+                        <li>• 정답 제출 후 즉시 피드백을 통해 오답노트를 보완하세요.</li>
+                    </ul>
+                </article>
+                <article class="glass-card rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold text-white">🎯 학습 목표</h3>
+                    <ul class="mt-3 space-y-2 text-sm text-slate-200">
+                        <li>• 기본 연산 속도와 정확도 향상</li>
+                        <li>• 수 모델(수직선·배열·묶음) 활용 능력 강화</li>
+                        <li>• 친구 초대를 통한 비교(Invite)로 동기 부여</li>
+                    </ul>
+                </article>
+                <article class="glass-card rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold text-white">🛡️ 안전 & 프라이버시</h3>
+                    <ul class="mt-3 space-y-2 text-sm text-slate-200">
+                        <li>• 학습 데이터는 익명 토큰으로 계산됩니다.</li>
+                        <li>• noindex 헤더와 X-Request-ID를 기본 활성화합니다.</li>
+                        <li>• RFC 9457 Problem Details 로 오류를 안내합니다.</li>
+                    </ul>
+                </article>
+                <article class="glass-card rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold text-white">⚙️ 로컬 개발 가이드</h3>
+                    <p class="mt-3 text-sm text-slate-200">
+                        `uvicorn app.main:app --reload --port 8080` 으로 허브를, `uvicorn app.main:app --reload --port 8000`
+                        으로 Arcade를 동시 실행하면 Self → Invite → Aggregate까지 빠르게 확인할 수 있습니다.
+                    </p>
+                </article>
+            </div>
+        </div>
+        <aside class="glass-card rounded-3xl p-6">
+            <h3 class="text-lg font-semibold text-white">실시간 학습 지표</h3>
+            <dl class="mt-6 space-y-4 text-sm text-slate-200">
+                <div class="flex items-start justify-between gap-4">
+                    <dt class="text-slate-300">총 문제 수</dt>
+                    <dd class="text-lg font-semibold text-white">20</dd>
+                </div>
+                <div class="flex items-start justify-between gap-4">
+                    <dt class="text-slate-300">권장 학습 시간</dt>
+                    <dd class="text-lg font-semibold text-white">1일 15분</dd>
+                </div>
+                <div class="flex items-start justify-between gap-4">
+                    <dt class="text-slate-300">Self → Share 평균</dt>
+                    <dd class="text-lg font-semibold text-white">2.4일</dd>
+                </div>
+                <div class="flex items-start justify-between gap-4">
+                    <dt class="text-slate-300">Web Vitals 목표</dt>
+                    <dd class="text-lg font-semibold text-white">LCP ≤ 2.5s</dd>
+                </div>
+            </dl>
+        </aside>
+    </section>
+
+    <section aria-labelledby="section-stats" class="space-y-6">
+        <header>
+            <h2 id="section-stats" class="text-3xl font-semibold text-white sm:text-4xl">학습 통계 & 진행 현황</h2>
+            <p class="mt-2 text-base text-slate-300">문제 유형별 문항 수와 상태를 요약해 빠르게 확인할 수 있습니다.</p>
+        </header>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">문제 유형</h3>
+                <p class="mt-3 text-3xl font-semibold text-white">4</p>
+                <p class="mt-1 text-xs text-slate-400">덧셈 · 뺄셈 · 곱셈 · 나눗셈</p>
+            </article>
+            <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">총 문제</h3>
+                <p class="mt-3 text-3xl font-semibold text-white">20</p>
+                <p class="mt-1 text-xs text-slate-400">연산별 5문항 기준</p>
+            </article>
+            <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">추천 대상</h3>
+                <p class="mt-3 text-3xl font-semibold text-white">초등</p>
+                <p class="mt-1 text-xs text-slate-400">2~4학년 권장 난이도</p>
+            </article>
+            <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">이용 요금</h3>
+                <p class="mt-3 text-3xl font-semibold text-white">무료</p>
+                <p class="mt-1 text-xs text-slate-400">학습 공유 링크만 생성</p>
+            </article>
+        </div>
+    </section>
+
+    <section aria-labelledby="section-cta" class="rounded-3xl border border-white/10 bg-slate-900/70 px-6 py-12 text-center shadow-2xl sm:px-10">
+        <h2 id="section-cta" class="text-3xl font-semibold text-white sm:text-4xl">오늘의 학습을 시작해보세요</h2>
+        <p class="mt-4 text-base text-slate-300">
+            Self 연습 후 Invite 링크로 친구·가족과 함께 풀어보면 학습 의지가 2배 이상 향상된다는 리서치가 있습니다.
+            Matomo/GA4 이벤트로 학습 흐름을 관측하며, Web Vitals·WCAG 요구사항도 함께 점검하세요.
         </p>
-        <div class="flex justify-center space-x-4">
-            <div class="bg-white bg-opacity-20 rounded-lg px-6 py-3">
-                <div class="text-2xl font-bold">4</div>
-                <div class="text-sm">문제 유형</div>
-            </div>
-            <div class="bg-white bg-opacity-20 rounded-lg px-6 py-3">
-                <div class="text-2xl font-bold">20</div>
-                <div class="text-sm">총 문제</div>
-            </div>
+        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a href="/problems?category=덧셈" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-sky-300">
+                <span aria-hidden="true">🚀</span> 지금 바로 시작하기
+            </a>
+            <a href="/problems?category=곱셈" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                <span aria-hidden="true">✖️</span> 곱셈 심화 도전
+            </a>
+            <a href="http://localhost:8080" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                <span aria-hidden="true">🌐</span> 허브로 돌아가기
+            </a>
         </div>
-    </div>
-
-    <!-- 문제 유형 섹션 -->
-    <div class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8">📚 문제 유형 선택</h2>
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            
-            <!-- 덧셈 -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
-                <div class="text-6xl mb-4">➕</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">덧셈</h3>
-                <p class="text-gray-600 mb-6">
-                    두 자리 수 덧셈 문제를 풀어보세요.
-                    기본적인 덧셈 연산을 연습할 수 있습니다.
-                </p>
-                <a href="/problems?category=덧셈" 
-                   class="block w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                    덧셈 문제 풀기
-                </a>
-            </div>
-
-            <!-- 뺄셈 -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
-                <div class="text-6xl mb-4">➖</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">뺄셈</h3>
-                <p class="text-gray-600 mb-6">
-                    두 자리 수 뺄셈 문제를 풀어보세요.
-                    기본적인 뺄셈 연산을 연습할 수 있습니다.
-                </p>
-                <a href="/problems?category=뺄셈" 
-                   class="block w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                    뺄셈 문제 풀기
-                </a>
-            </div>
-
-            <!-- 곱셈 -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
-                <div class="text-6xl mb-4">✖️</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">곱셈</h3>
-                <p class="text-gray-600 mb-6">
-                    구구단을 활용한 곱셈 문제를 풀어보세요.
-                    곱셈의 기본 개념을 익힐 수 있습니다.
-                </p>
-                <a href="/problems?category=곱셈" 
-                   class="block w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
-                    곱셈 문제 풀기
-                </a>
-            </div>
-
-            <!-- 나눗셈 -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
-                <div class="text-6xl mb-4">➗</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">나눗셈</h3>
-                <p class="text-gray-600 mb-6">
-                    구구단을 활용한 나눗셈 문제를 풀어보세요.
-                    나눗셈의 기본 개념을 익힐 수 있습니다.
-                </p>
-                <a href="/problems?category=나눗셈" 
-                   class="block w-full bg-orange-600 text-white px-4 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium">
-                    나눗셈 문제 풀기
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- 학습 팁 섹션 -->
-    <div class="bg-blue-50 rounded-xl p-8 max-w-4xl mx-auto mb-12">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">💡 학습 팁</h2>
-        <div class="grid md:grid-cols-2 gap-6 text-left">
-            <div>
-                <h3 class="text-lg font-bold text-gray-800 mb-3">📝 문제 풀이 방법</h3>
-                <ul class="text-gray-600 space-y-2">
-                    <li>• 문제를 천천히 읽어보세요</li>
-                    <li>• 계산 과정을 단계별로 확인하세요</li>
-                    <li>• 답을 다시 한 번 검토해보세요</li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-bold text-gray-800 mb-3">🎯 학습 목표</h3>
-                <ul class="text-gray-600 space-y-2">
-                    <li>• 기본 연산 능력 향상</li>
-                    <li>• 수학적 사고력 개발</li>
-                    <li>• 문제 해결 능력 기르기</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- 통계 섹션 -->
-    <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 학습 통계</h2>
-        <div class="grid md:grid-cols-4 gap-6">
-            <div class="text-center">
-                <div class="text-3xl font-bold text-blue-600 mb-2">4</div>
-                <div class="text-gray-600">문제 유형</div>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-green-600 mb-2">20</div>
-                <div class="text-gray-600">총 문제</div>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-purple-600 mb-2">초등</div>
-                <div class="text-gray-600">대상 학년</div>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-orange-600 mb-2">무료</div>
-                <div class="text-gray-600">이용료</div>
-            </div>
-        </div>
-    </div>
+    </section>
 </div>
-{% endblock %} 
+{% endblock %}

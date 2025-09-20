@@ -2,6 +2,13 @@
 
 {% block title %}공유 링크 생성 완료 - MBTI & Arcade Web Service{% endblock %}
 
+{% block head %}
+    {{ super() }}
+    {% if robots_meta %}
+    <meta name="robots" content="{{ robots_meta }}">
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="max-w-2xl mx-auto">
     <div class="text-center mb-8">

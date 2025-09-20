@@ -2,6 +2,13 @@
 
 {% block title %}MBTI 결과 - {{ mbti_type }} - MBTI & Arcade Web Service{% endblock %}
 
+{% block head %}
+    {{ super() }}
+    {% if robots_meta %}
+    <meta name="robots" content="{{ robots_meta }}">
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="max-w-4xl mx-auto">
     <div class="text-center mb-8">

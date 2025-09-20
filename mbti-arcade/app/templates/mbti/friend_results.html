@@ -2,6 +2,13 @@
 
 {% block title %}{{ friend_info.name }}님의 MBTI 평가 결과{% endblock %}
 
+{% block head %}
+    {{ super() }}
+    {% if robots_meta %}
+    <meta name="robots" content="{{ robots_meta }}">
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">

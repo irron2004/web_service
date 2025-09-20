@@ -1,114 +1,192 @@
 {% extends "base.html" %}
 
-{% block title %}{{ category }} 문제 - Calculate Service{% endblock %}
+{% block title %}{{ category }} 문제 — 360Me Math Lab{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <!-- 헤더 -->
-    <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">
-            🧮 {{ category }} 문제
-        </h1>
-        <p class="text-xl text-gray-600">
-            {{ category }} 연산 문제를 풀어보세요!
-        </p>
-    </div>
+<div class="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
+    <section class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-sky-500 via-primary to-purple-500 px-6 py-14 text-white shadow-2xl sm:px-10">
+        <div class="absolute inset-0 opacity-15" aria-hidden="true"
+             style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28) 0, transparent 55%),
+                    radial-gradient(circle at 80% 10%, rgba(255,255,255,0.2) 0, transparent 45%);"></div>
+        <div class="relative z-10 space-y-5 text-center">
+            <span class="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
+                Practice Stage · {{ category }} · WCAG 2.2 AA
+            </span>
+            <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{{ category }} 문제 연습</h1>
+            <p class="text-base text-white/85 sm:text-lg">
+                문제를 읽고 답을 입력하면 즉시 피드백이 제공됩니다. Self → Invite → Aggregate 여정의 Practice 단계에 해당합니다.
+                정답률 요약과 학습 노트 링크로 다음 단계에 대비하세요.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="/" class="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-white">
+                    <span aria-hidden="true">🏠</span> 허브 홈
+                </a>
+                <a href="http://localhost:8080" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
+                    <span aria-hidden="true">🌐</span> 360Me Hub로 이동
+                </a>
+            </div>
+        </div>
+    </section>
 
-    <!-- 문제 목록 -->
-    <div class="space-y-6">
-        {% for problem in problems %}
-        <div class="bg-white rounded-xl shadow-lg p-6">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">
+    <nav aria-label="연산 유형" class="flex flex-wrap items-center justify-center gap-3">
+        {% set nav_links = [
+            ("덧셈", "➕"),
+            ("뺄셈", "➖"),
+            ("곱셈", "✖️"),
+            ("나눗셈", "➗")
+        ] %}
+        {% for label, icon in nav_links %}
+        <a href="/problems?category={{ label }}" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition {% if label == category %}bg-primary text-slate-900 shadow-lg shadow-sky-900/30{% else %}border border-white/20 text-slate-200 hover:bg-white/10{% endif %}">
+            <span aria-hidden="true">{{ icon }}</span> {{ label }}
+        </a>
+        {% endfor %}
+    </nav>
+
+    <section aria-labelledby="section-problems" class="space-y-6">
+        <header>
+            <h2 id="section-problems" class="text-2xl font-semibold text-white sm:text-3xl">총 {{ problems|length }}개의 {{ category }} 문제</h2>
+            <p class="mt-2 text-sm text-slate-300">포커스 이동과 키보드 입력을 지원하며, 즉시 피드백이 제공됩니다.</p>
+        </header>
+        <div class="space-y-5" data-problem-list>
+            {% for problem in problems %}
+            <article class="rounded-2xl border border-white/10 bg-slate-900/70 p-6 shadow-lg shadow-sky-900/5" data-problem-card data-problem-index="{{ loop.index0 }}">
+                <header class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="text-xl font-semibold text-white">
+                        <span class="mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-base font-semibold text-primary">{{ loop.index }}</span>
                         문제 {{ loop.index }}: {{ problem.question }}
                     </h3>
-                    <div class="flex items-center space-x-4">
-                        <input type="number" 
-                               id="answer-{{ loop.index }}" 
-                               class="border-2 border-gray-300 rounded-lg px-4 py-2 text-lg focus:border-blue-500 focus:outline-none"
-                               placeholder="답을 입력하세요">
-                        <button onclick="checkAnswer({{ loop.index }}, {{ problem.answer }})"
-                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                            확인
-                        </button>
-                        <span id="result-{{ loop.index }}" class="text-lg font-bold"></span>
-                    </div>
-                </div>
-            </div>
+                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">즉시 채점</span>
+                </header>
+                <form class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center" data-problem-form>
+                    <label for="answer-{{ loop.index }}" class="flex-1">
+                        <span class="sr-only">{{ problem.question }} 정답 입력</span>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="answer-{{ loop.index }}" class="w-full rounded-xl border border-white/15 bg-slate-950/60 px-4 py-3 text-lg text-white placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="정답을 입력하세요" data-input>
+                    </label>
+                    <button type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-sky-300" data-check>
+                        <span aria-hidden="true">✅</span> 답 확인
+                    </button>
+                </form>
+                <p class="mt-3 text-sm text-slate-300" data-feedback role="status"></p>
+            </article>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    </section>
 
-    <!-- 결과 요약 -->
-    <div class="mt-8 bg-blue-50 rounded-xl p-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">📊 결과 요약</h2>
-        <div class="grid md:grid-cols-3 gap-4">
-            <div class="text-center">
-                <div class="text-3xl font-bold text-blue-600" id="total-problems">{{ problems|length }}</div>
-                <div class="text-gray-600">총 문제</div>
+    <section aria-labelledby="section-summary" class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10">
+        <header class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 id="section-summary" class="text-2xl font-semibold text-white">학습 결과 요약</h2>
+                <p class="mt-1 text-sm text-slate-300">정답 수와 정확도를 확인하고, Invite 단계로 넘어갈 준비를 마칩니다.</p>
             </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-green-600" id="correct-answers">0</div>
-                <div class="text-gray-600">정답</div>
+            <button type="button" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10" data-reset>
+                <span aria-hidden="true">🔄</span> 결과 초기화
+            </button>
+        </header>
+        <dl class="mt-6 grid gap-4 sm:grid-cols-3 text-center">
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">총 문제</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-total">{{ problems|length }}</dd>
             </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-purple-600" id="accuracy">0%</div>
-                <div class="text-gray-600">정답률</div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답 수</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-correct">0</dd>
             </div>
-        </div>
-    </div>
-
-    <!-- 네비게이션 -->
-    <div class="mt-8 flex justify-center space-x-4">
-        <a href="/" 
-           class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
-            🏠 홈으로
-        </a>
-        <a href="/problems?category=덧셈" 
-           class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-            ➕ 덧셈
-        </a>
-        <a href="/problems?category=뺄셈" 
-           class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
-            ➖ 뺄셈
-        </a>
-        <a href="/problems?category=곱셈" 
-           class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
-            ✖️ 곱셈
-        </a>
-        <a href="/problems?category=나눗셈" 
-           class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors">
-            ➗ 나눗셈
-        </a>
-    </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답률</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-accuracy">0%</dd>
+            </div>
+        </dl>
+        <p class="mt-4 text-xs text-slate-400">Tip: 정답률 80% 이상이면 Invite 링크를 생성해 친구나 가족과 함께 풀어보세요.</p>
+    </section>
 </div>
 
 <script>
-let correctCount = 0;
-const totalProblems = {{ problems|length }};
+const problemCards = Array.from(document.querySelectorAll('[data-problem-card]'));
+const summaryCorrect = document.getElementById('summary-correct');
+const summaryAccuracy = document.getElementById('summary-accuracy');
+const summaryTotal = document.getElementById('summary-total');
+const answered = new Map();
 
-function checkAnswer(problemIndex, correctAnswer) {
-    const input = document.getElementById(`answer-${problemIndex}`);
-    const result = document.getElementById(`result-${problemIndex}`);
-    const userAnswer = parseInt(input.value);
-    
-    if (userAnswer === correctAnswer) {
-        result.textContent = "✅ 정답!";
-        result.className = "text-lg font-bold text-green-600";
-        correctCount++;
-    } else {
-        result.textContent = `❌ 오답! 정답: ${correctAnswer}`;
-        result.className = "text-lg font-bold text-red-600";
+function renderSummary() {
+    const correctCount = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
+    const total = Number(summaryTotal?.textContent ?? problemCards.length) || problemCards.length;
+    const accuracy = total === 0 ? 0 : Math.round((correctCount / total) * 100);
+    if (summaryCorrect) {
+        summaryCorrect.textContent = String(correctCount);
     }
-    
-    updateSummary();
+    if (summaryAccuracy) {
+        summaryAccuracy.textContent = `${accuracy}%`;
+    }
 }
 
-function updateSummary() {
-    const accuracy = Math.round((correctCount / totalProblems) * 100);
-    document.getElementById('correct-answers').textContent = correctCount;
-    document.getElementById('accuracy').textContent = `${accuracy}%`;
+function handleCheck(card, index, correctAnswer) {
+    const input = card.querySelector('[data-input]');
+    const feedback = card.querySelector('[data-feedback]');
+    const rawValue = input?.value ?? '';
+    const userAnswer = Number(rawValue);
+    if (!Number.isFinite(userAnswer) || rawValue.trim() === '') {
+        if (feedback) {
+            feedback.textContent = '답을 숫자로 입력해주세요.';
+            feedback.className = 'mt-3 text-sm font-semibold text-amber-300';
+        }
+        answered.delete(index);
+        renderSummary();
+        return;
+    }
+
+    const isCorrect = userAnswer === Number(correctAnswer);
+    if (feedback) {
+        if (isCorrect) {
+            feedback.textContent = '정답입니다! 잘했어요 🎉';
+            feedback.className = 'mt-3 text-sm font-semibold text-emerald-300';
+        } else {
+            feedback.textContent = `오답입니다. 정답은 ${correctAnswer} 입니다.`;
+            feedback.className = 'mt-3 text-sm font-semibold text-rose-300';
+        }
+    }
+    answered.set(index, isCorrect);
+    renderSummary();
+}
+
+function bindCard(card) {
+    const index = Number(card.dataset.problemIndex ?? '0');
+    const button = card.querySelector('[data-check]');
+    const input = card.querySelector('[data-input]');
+    const correctAnswer = {{ problems|tojson }}[index]?.answer;
+    if (!button || typeof correctAnswer === 'undefined') {
+        return;
+    }
+    button.addEventListener('click', () => handleCheck(card, index, correctAnswer));
+    if (input) {
+        input.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleCheck(card, index, correctAnswer);
+            }
+        });
+    }
+}
+
+problemCards.forEach(bindCard);
+renderSummary();
+
+const resetButton = document.querySelector('[data-reset]');
+if (resetButton) {
+    resetButton.addEventListener('click', () => {
+        answered.clear();
+        problemCards.forEach((card) => {
+            const input = card.querySelector('[data-input]');
+            const feedback = card.querySelector('[data-feedback]');
+            if (input) {
+                input.value = '';
+            }
+            if (feedback) {
+                feedback.textContent = '';
+                feedback.className = 'mt-3 text-sm text-slate-300';
+            }
+        });
+        renderSummary();
+    });
 }
 </script>
-{% endblock %} 
+{% endblock %}

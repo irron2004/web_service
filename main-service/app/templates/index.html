@@ -1,49 +1,205 @@
 {% extends "base.html" %}
 
-{% block title %}Web Service Hub{% endblock %}
+{% block title %}360Me Web Service Hub{% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <div class="gradient-bg text-white py-16 rounded-2xl mb-12">
-        <h1 class="text-5xl font-bold mb-6">
-            🚀 Web Service Hub
-        </h1>
-        <p class="text-xl mb-8 max-w-3xl mx-auto">
-            다양한 웹 서비스를 한 곳에서 관리하고 접근할 수 있는 중앙 허브입니다.
-        </p>
-    </div>
-
-    <!-- 사용 가능한 서비스 -->
-    <div class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8">🎯 사용 가능한 서비스</h2>
-        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <!-- 심리검사 -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
-                <div class="text-6xl mb-4">🧠</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">심리검사</h3>
-                <a href="/mbti" class="block w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium mb-2">
-                    MBTI
+<div class="mx-auto w-full max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
+    <section class="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-indigo-600 via-sky-500 to-emerald-500 px-6 py-16 text-white shadow-2xl sm:px-10 lg:px-16">
+        <div class="absolute inset-0 opacity-15" aria-hidden="true"
+             style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25) 0, transparent 55%),
+                    radial-gradient(circle at 80% 0%, rgba(255,255,255,0.18) 0, transparent 45%),
+                    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.18) 0, transparent 50%);"></div>
+        <div class="relative z-10 mx-auto max-w-4xl space-y-8 text-center">
+            <span class="inline-flex items-center justify-center rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
+                Self → Invite → Aggregate · DesignOptions 권고 스택
+            </span>
+            <h1 class="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                360Me Web Service Hub
+            </h1>
+            <p class="text-lg text-white/90 sm:text-xl">
+                MBTI 퍼셉션 갭 실험과 Math Playground 등 여러 서비스를 한 곳에서 연결해 주는 허브입니다.
+                Tasks.md · DesignOptions.md 의 요구를 토대로 WCAG 2.2 AA와 Web Vitals 버짓까지 고려한
+                레이아웃을 마련했습니다.
+            </p>
+            <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                <a href="http://localhost:8000/mbti/self-test" class="focus-visible:outline-none inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-indigo-900/40 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                    <span aria-hidden="true">🧠</span> MBTI 테스트 시작
+                </a>
+                <a href="#services" class="focus-visible:outline-none inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                    <span aria-hidden="true">📚</span> 서비스 살펴보기
                 </a>
             </div>
-
-            <!-- 수학 게임 -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
-                <div class="text-6xl mb-4">🧮</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">수학 게임</h3>
-                <a href="/math" class="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium mb-2">
-                    Math App 접속
-                </a>
-            </div>
-
-            <!-- Arcade -->
-            <div class="bg-white rounded-xl shadow-lg p-8 card-hover flex flex-col items-center">
-                <div class="text-6xl mb-4">🎮</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Arcade</h3>
-                <a href="/arcade" class="block w-full bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium">
-                    게임
-                </a>
-            </div>
+            <dl class="mt-10 grid gap-4 text-left sm:grid-cols-3">
+                <div class="glass-card rounded-2xl px-5 py-4">
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-teal-200/80">k-익명 Safeguard</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">응답 3명 이상일 때만 Δ 공개</dd>
+                </div>
+                <div class="glass-card rounded-2xl px-5 py-4">
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-teal-200/80">RFC 9457 Errors</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">Problem Details 스키마 기본</dd>
+                </div>
+                <div class="glass-card rounded-2xl px-5 py-4">
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-teal-200/80">Observability</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">X-Request-ID · OTel Trace Join</dd>
+                </div>
+            </dl>
         </div>
-    </div>
+    </section>
+
+    <section id="services" aria-labelledby="section-services" class="space-y-8">
+        <header class="max-w-3xl space-y-3">
+            <h2 id="section-services" class="text-3xl font-semibold text-white sm:text-4xl">허브에 포함된 서비스</h2>
+            <p class="text-base text-slate-300">
+                FE-01 ~ FE-07, BE-01 ~ BE-07 항목에 맞춰 설계된 서비스 카드입니다. 각 서비스는 공유 링크에
+                noindex 헤더를 적용하고, Chart.js · TanStack Query 기반 프런트 실험을 지원합니다.
+            </p>
+        </header>
+        <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <article class="glass-card group relative overflow-hidden rounded-2xl p-6 transition duration-200 hover:-translate-y-1 hover:border-secondary/60">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-white">MBTI & Arcade</h3>
+                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">P0 플로우</span>
+                </div>
+                <p class="mt-4 text-sm text-slate-200">
+                    Self → Invite → Aggregate 단계에 맞춘 24문항 자기 평가와 초대 공유, Δ 시각화를 제공합니다.
+                </p>
+                <ul class="mt-5 space-y-2 text-sm text-slate-300">
+                    <li>• Chart.js 4.x 레이더 & Δ 막대 프리뷰</li>
+                    <li>• k≥3 충족 전까지 안전 잠금</li>
+                    <li>• RFC 9457 오류 미들웨어 · OTel 계측</li>
+                </ul>
+                <a href="http://localhost:8000/mbti" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-200 transition hover:text-white">
+                    <span aria-hidden="true">→</span> MBTI 인사이트 열기
+                </a>
+            </article>
+
+            <article class="glass-card group relative overflow-hidden rounded-2xl p-6 transition duration-200 hover:-translate-y-1 hover:border-secondary/60">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-white">Observability & Ops</h3>
+                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">M-107 · M-108</span>
+                </div>
+                <p class="mt-4 text-sm text-slate-200">
+                    요청 ID, OTel 스팬, Decision Packet 봉인을 통해 서비스 상태를 한 번에 추적할 수 있습니다.
+                </p>
+                <ul class="mt-5 space-y-2 text-sm text-slate-300">
+                    <li>• X-Request-ID 헤더 자동 전파</li>
+                    <li>• Web Vitals, Lighthouse 파이프라인 연동</li>
+                    <li>• docker-compose 로컬 멀티 서비스 검증</li>
+                </ul>
+                <a href="/health" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-200 transition hover:text-white">
+                    <span aria-hidden="true">→</span> 상태 확인하기
+                </a>
+            </article>
+
+            <article class="glass-card group relative overflow-hidden rounded-2xl p-6 transition duration-200 hover:-translate-y-1 hover:border-secondary/60">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-white">Math Playground</h3>
+                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">실험 스테이션</span>
+                </div>
+                <p class="mt-4 text-sm text-slate-200">
+                    React + Vite 기반의 수학 게임 실험으로, TanStack Query와 Zustand 상태 관리를 검증합니다.
+                </p>
+                <ul class="mt-5 space-y-2 text-sm text-slate-300">
+                    <li>• WebSocket 기반 실시간 점수판</li>
+                    <li>• A/B 실험용 라우팅 구조</li>
+                    <li>• WCAG 2.2 AA 대비 색상 팔레트</li>
+                </ul>
+                <a href="http://localhost:3000" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-200 transition hover:text-white">
+                    <span aria-hidden="true">→</span> Math App 접속
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <section aria-labelledby="section-flow" class="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+        <div class="space-y-6">
+            <div class="space-y-3">
+                <h2 id="section-flow" class="text-3xl font-semibold text-white sm:text-4xl">Self → Invite → Aggregate 여정</h2>
+                <p class="text-base text-slate-300">
+                    docs/frontend_style.md 에 정의된 스켈레톤 로딩, 에러바운더리, TanStack Query 패턴을
+                    반영해 설계했습니다. 각 단계는 5분 내 완주를 목표로 하며, Δ와 Top-3 인사이트를 자동으로
+                    생성합니다.
+                </p>
+            </div>
+            <ol class="space-y-4">
+                <li class="glass-card flex items-start gap-4 rounded-2xl p-5">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-base font-semibold">1</span>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Self 테스트 · 24문항</h3>
+                        <p class="mt-2 text-sm text-slate-300">Likert 5점 척도, 포커스 링과 키보드 네비 지원.</p>
+                    </div>
+                </li>
+                <li class="glass-card flex items-start gap-4 rounded-2xl p-5">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-base font-semibold">2</span>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Invite 링크 · k≥3 도달 가이드</h3>
+                        <p class="mt-2 text-sm text-slate-300">초대 링크는 noindex, X-Request-ID가 유지됩니다.</p>
+                    </div>
+                </li>
+                <li class="glass-card flex items-start gap-4 rounded-2xl p-5">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-base font-semibold">3</span>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Aggregate · Δ 히트맵/레이더</h3>
+                        <p class="mt-2 text-sm text-slate-300">k≥3 충족 시 Δ, sigma, Top-3 코칭 카드가 노출됩니다.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+        <div class="space-y-6">
+            <article class="glass-card rounded-3xl p-6">
+                <h3 class="text-lg font-semibold text-white">지표 & 체크리스트</h3>
+                <ul class="mt-4 space-y-3 text-sm text-slate-300">
+                    <li>• LCP ≤ 2.5s / INP ≤ 200ms / CLS ≤ 0.1 @75p</li>
+                    <li>• Lighthouse CI + RUM/CrUX 파이프라인 (M-107)</li>
+                    <li>• RFC 9457 오류 스냅샷 & 계약 테스트 (M-108)</li>
+                    <li>• Confirmed-Click 대비 광고 슬롯 정책 (M-109)</li>
+                </ul>
+            </article>
+            <article class="glass-card rounded-3xl p-6">
+                <h3 class="text-lg font-semibold text-white">보안 & 안전 가드</h3>
+                <ul class="mt-4 space-y-3 text-sm text-slate-300">
+                    <li>• 요청/응답에 X-Request-ID · Traceparent 동시 전파</li>
+                    <li>• 초대/결과 페이지 noindex 헤더 기본값</li>
+                    <li>• Decision Packet 해시로 결과 위변조 방지</li>
+                    <li>• 안전 플래그 시 즉시 상담 안내로 우회</li>
+                </ul>
+            </article>
+        </div>
+    </section>
+
+    <section aria-labelledby="section-dev" class="space-y-4">
+        <div class="glass-card rounded-3xl p-6">
+            <header class="space-y-2">
+                <h2 id="section-dev" class="text-2xl font-semibold text-white">개발자 빠른 시작</h2>
+                <p class="text-sm text-slate-300">
+                    루트에서 venv 를 활성화한 뒤, 사용자 안내처럼 pytest 를 실행하면 핵심 테스트를 바로 검증할 수 있습니다.
+                </p>
+            </header>
+            <div class="mt-4 rounded-2xl border border-white/10 bg-slate-900/80 p-4 font-mono text-sm text-teal-200">
+                <code>.venv/bin/python -m pytest mbti-arcade/ test.py</code>
+            </div>
+            <p class="mt-4 text-sm text-slate-300">
+                추가로 <code>make run</code>, <code>make check</code>, <code>docker-compose up</code> 으로 로컬 멀티 서비스와 품질 게이트를 검증하세요.
+            </p>
+        </div>
+    </section>
+
+    <section aria-labelledby="section-cta" class="rounded-3xl border border-white/10 bg-slate-900/70 px-6 py-12 text-center shadow-2xl sm:px-10">
+        <h2 id="section-cta" class="text-3xl font-semibold text-white sm:text-4xl">지금 바로 Self 테스트와 초대를 시작해보세요</h2>
+        <p class="mt-4 text-base text-slate-300">
+            Docs, PRD, Tasks 를 참고해 팀별 우선순위를 조정하고, Web Vitals · RFC 9457 · OTel 기반 지표를 꾸준히 확인하세요.
+        </p>
+        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a href="http://localhost:8000/mbti/self-test" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-900/40 transition hover:-translate-y-0.5 hover:bg-indigo-500">
+                <span aria-hidden="true">🚀</span> Self 테스트 실행
+            </a>
+            <a href="http://localhost:8000/mbti/share" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                <span aria-hidden="true">🔗</span> 초대 링크 만들기
+            </a>
+            <a href="/health" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                <span aria-hidden="true">❤️</span> 헬스 체크
+            </a>
+        </div>
+    </section>
 </div>
-{% endblock %} 
+{% endblock %}
