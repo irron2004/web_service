@@ -15,6 +15,9 @@ if str(REPO_ROOT) not in sys.path:
 from testing_utils.sync_client import create_client  # noqa: E402
 
 
+# NOTE: Telemetry exporters are validated in integration smoke tests. These
+# tests focus on ensuring middleware behaviour remains backwards compatible.
+
 def _load_module(module_name: str, relative_path: str):
     module_path = SERVICE_ROOT / relative_path
     spec = importlib.util.spec_from_file_location(module_name, module_path)
@@ -96,6 +99,8 @@ def test_invalid_category_returns_problem_detail(client) -> None:
 
 
 def test_request_id_is_preserved(client) -> None:
+    """RequestContextMiddleware should echo back caller provided IDs."""
+
     request_id = "test-request-id"
     response = client.get("/api/problems", headers={"X-Request-ID": request_id})
     assert response.status_code == 200
