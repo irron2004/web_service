@@ -28,11 +28,16 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
     templates = Jinja2Templates(directory=template_dir)
 
+    # Store shared resources on the application state so routers can resolve them
+    # without needing to be constructed dynamically during startup.
+    app.state.settings = settings
+    app.state.templates = templates
+
     app.add_middleware(RequestContextMiddleware)
 
     app.include_router(health.router)
-    app.include_router(pages.get_router(templates))
-    app.include_router(invites.get_router(templates))
+    app.include_router(pages.router)
+    app.include_router(invites.router)
     app.include_router(problems.router)
 
     return app

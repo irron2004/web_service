@@ -14,6 +14,16 @@ from ..category_service import (
 from ..invite_service import InviteSession, InviteSummary, invite_store
 
 
+router = APIRouter(tags=["invites"])
+
+
+def _get_templates(request: Request) -> Jinja2Templates:
+    templates = getattr(request.app.state, "templates", None)
+    if not isinstance(templates, Jinja2Templates):
+        raise RuntimeError("Templates are not configured on the application state.")
+    return templates
+
+
 def _allowed_categories() -> set[str]:
     return set(resolve_allowed_categories())
 
@@ -56,64 +66,63 @@ def _serialize(session: InviteSession, request: Request) -> InviteResponse:
     )
 
 
-def get_router(templates: Jinja2Templates) -> APIRouter:
-    router = APIRouter(tags=["invites"])
+@router.post(
+    "/api/invites",
+    response_model=InviteResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_invite(payload: InviteCreatePayload, request: Request) -> InviteResponse:
+    if payload.category not in _allowed_categories():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="unknown category")
 
-    @router.post(
-        "/api/invites",
-        response_model=InviteResponse,
-        status_code=status.HTTP_201_CREATED,
-    )
-    async def create_invite(payload: InviteCreatePayload, request: Request) -> InviteResponse:
-        if payload.category not in _allowed_categories():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="unknown category")
+    summary_model = None
+    if payload.summary is not None:
+        summary_model = InviteSummary(
+            total=payload.summary.total,
+            correct=payload.summary.correct,
+        )
 
-        summary_model = None
-        if payload.summary is not None:
-            summary_model = InviteSummary(
-                total=payload.summary.total,
-                correct=payload.summary.correct,
-            )
-
-        session = invite_store.create(category=payload.category, summary=summary_model)
-        return _serialize(session, request)
-
-    @router.get("/api/invites/{token}", response_model=InviteResponse)
-    async def get_invite(token: str, request: Request) -> InviteResponse:
-        session = invite_store.get(token)
-        if session is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invite not found or expired")
-        return _serialize(session, request)
-
-    @router.delete("/api/invites/{token}", status_code=status.HTTP_204_NO_CONTENT)
-    async def expire_invite(token: str) -> Response:
-        removed = invite_store.expire(token)
-        if removed is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invite not found")
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    @router.get(
-        "/share/{token}",
-        response_class=HTMLResponse,
-        name="share_invite",
-    )
-    async def share_page(token: str, request: Request) -> HTMLResponse:
-        session = invite_store.get(token)
-        categories = resolve_allowed_categories()
-        context = {
-            "request": request,
-            "invite": session.to_dict() if session else None,
-            "expired": session is None,
-            "categories": categories,
-            "primary_category": resolve_primary_category(categories),
-        }
-        status_code = status.HTTP_200_OK if session else status.HTTP_410_GONE
-        response = templates.TemplateResponse("share.html", context, status_code=status_code)
-        response.headers["X-Robots-Tag"] = "noindex"
-        response.headers["Cache-Control"] = "no-store"
-        return response
-
-    return router
+    session = invite_store.create(category=payload.category, summary=summary_model)
+    return _serialize(session, request)
 
 
-__all__ = ["get_router"]
+@router.get("/api/invites/{token}", response_model=InviteResponse)
+async def get_invite(token: str, request: Request) -> InviteResponse:
+    session = invite_store.get(token)
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invite not found or expired")
+    return _serialize(session, request)
+
+
+@router.delete("/api/invites/{token}", status_code=status.HTTP_204_NO_CONTENT)
+async def expire_invite(token: str) -> Response:
+    removed = invite_store.expire(token)
+    if removed is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invite not found")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get(
+    "/share/{token}",
+    response_class=HTMLResponse,
+    name="share_invite",
+)
+async def share_page(token: str, request: Request) -> HTMLResponse:
+    session = invite_store.get(token)
+    categories = resolve_allowed_categories()
+    context = {
+        "request": request,
+        "invite": session.to_dict() if session else None,
+        "expired": session is None,
+        "categories": categories,
+        "primary_category": resolve_primary_category(categories),
+    }
+    status_code = status.HTTP_200_OK if session else status.HTTP_410_GONE
+    templates = _get_templates(request)
+    response = templates.TemplateResponse("share.html", context, status_code=status_code)
+    response.headers["X-Robots-Tag"] = "noindex"
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+__all__ = ["router"]
