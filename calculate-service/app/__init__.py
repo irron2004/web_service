@@ -1,10 +1,11 @@
 from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import get_settings
-from .instrumentation import RequestContextMiddleware
+from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .routers import health, pages, problems
 
 
@@ -19,6 +20,8 @@ def create_app() -> FastAPI:
         docs_url="/docs" if settings.enable_openapi else None,
         redoc_url=None,
     )
+
+    configure_telemetry(app)
 
     # Ensure templates/tests can resolve relative paths when run from any CWD.
     base_dir = Path(__file__).resolve().parent
