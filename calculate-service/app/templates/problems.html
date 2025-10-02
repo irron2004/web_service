@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ category }} 문제 — 360Me Math Lab{% endblock %}
+{% block title %}{{ category_display }} 문제 — 360Me Math Lab{% endblock %}
 
 {% block content %}
 <div class="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
@@ -10,9 +10,9 @@
                     radial-gradient(circle at 80% 10%, rgba(255,255,255,0.2) 0, transparent 45%);"></div>
         <div class="relative z-10 space-y-5 text-center">
             <span class="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
-                Practice Stage · {{ category }} · WCAG 2.2 AA
+                Practice Stage · {{ category_display }} · WCAG 2.2 AA
             </span>
-            <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{{ category }} 문제 연습</h1>
+            <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{{ category_display }} 문제 연습</h1>
             <p class="text-base text-white/85 sm:text-lg">
                 문제를 읽고 답을 입력하면 즉시 피드백이 제공됩니다. Self → Invite → Aggregate 여정의 Practice 단계에 해당합니다.
                 정답률 요약과 학습 노트 링크로 다음 단계에 대비하세요.
@@ -45,7 +45,7 @@
 
     <section aria-labelledby="section-problems" class="space-y-6">
         <header>
-            <h2 id="section-problems" class="text-2xl font-semibold text-white sm:text-3xl">총 {{ problems|length }}개의 {{ category }} 문제</h2>
+            <h2 id="section-problems" class="text-2xl font-semibold text-white sm:text-3xl">총 {{ problems|length }}개의 {{ category_display }} 문제</h2>
             <p class="mt-2 text-sm text-slate-300">포커스 이동과 키보드 입력을 지원하며, 즉시 피드백이 제공됩니다.</p>
         </header>
         <div class="space-y-5" data-problem-list>
@@ -104,7 +104,7 @@
         <header class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-2xl font-semibold text-white">Invite 링크 공유</h2>
-                <p class="mt-1 text-sm text-slate-300">현재 스테이지 진행 상황을 공유하고, 가족이나 친구에게 문제를 초대하세요.</p>
+                <p class="mt-1 text-sm text-slate-300">현재 스테이지 진행 상황을 공유하고, 가족이나 친구에게 {{ category_display }} 문제를 초대하세요.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 <button type="button" class="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60" data-invite-generate data-label-default="초대 링크 생성" data-label-refresh="초대 링크 다시 생성">
@@ -241,7 +241,7 @@ if (resetButton) {
     });
 }
 
-const categoryName = {{ category|tojson }};
+const categoryName = {{ (category or category_display)|tojson }};
 const inviteSection = document.querySelector('[data-invite-section]');
 if (inviteSection) {
     const inviteGenerateButton = inviteSection.querySelector('[data-invite-generate]');

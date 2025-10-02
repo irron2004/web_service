@@ -7,16 +7,15 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, model_validator
 
-from ..config import get_settings
+from ..category_service import (
+    resolve_allowed_categories,
+    resolve_primary_category,
+)
 from ..invite_service import InviteSession, InviteSummary, invite_store
-from ..problem_bank import list_categories
 
 
 def _allowed_categories() -> set[str]:
-    settings = get_settings()
-    configured = settings.allowed_problem_categories or list_categories()
-    candidates = configured if configured else list_categories()
-    return set(candidates)
+    return set(resolve_allowed_categories())
 
 
 class InviteSummaryPayload(BaseModel):
@@ -100,10 +99,13 @@ def get_router(templates: Jinja2Templates) -> APIRouter:
     )
     async def share_page(token: str, request: Request) -> HTMLResponse:
         session = invite_store.get(token)
+        categories = resolve_allowed_categories()
         context = {
             "request": request,
             "invite": session.to_dict() if session else None,
             "expired": session is None,
+            "categories": categories,
+            "primary_category": resolve_primary_category(categories),
         }
         status_code = status.HTTP_200_OK if session else status.HTTP_410_GONE
         response = templates.TemplateResponse("share.html", context, status_code=status_code)

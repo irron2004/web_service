@@ -4,14 +4,12 @@ from dataclasses import asdict
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from ..config import get_settings
-from ..problem_bank import get_problems, list_categories
-
-
-def _resolve_allowed_categories() -> list[str]:
-    settings = get_settings()
-    candidates = settings.allowed_problem_categories or list_categories()
-    return candidates if candidates else list_categories()
+from ..category_service import (
+    build_category_cards,
+    resolve_allowed_categories,
+    resolve_primary_category,
+)
+from ..problem_bank import get_problems
 
 
 def get_router(templates: Jinja2Templates) -> APIRouter:
@@ -19,12 +17,17 @@ def get_router(templates: Jinja2Templates) -> APIRouter:
 
     @router.get("/", response_class=HTMLResponse)
     async def home(request: Request) -> HTMLResponse:
-        categories = _resolve_allowed_categories()
+        categories = resolve_allowed_categories()
+        cards = build_category_cards(categories)
+        primary_category = resolve_primary_category(categories)
         return templates.TemplateResponse(
             "index.html",
             {
                 "request": request,
                 "categories": categories,
+                "category_cards": cards,
+                "primary_category": primary_category,
+                "category_count": len(cards),
             },
         )
 
@@ -33,15 +36,21 @@ def get_router(templates: Jinja2Templates) -> APIRouter:
         request: Request,
         category: str = Query(default=None, description="문제 유형"),
     ) -> HTMLResponse:
-        categories = _resolve_allowed_categories()
-        selected_category = category if category in categories else categories[0]
+        categories = resolve_allowed_categories()
+        selected_category = category if category in categories else resolve_primary_category(categories)
+        if not selected_category:
+            problems_payload: list[dict[str, object]] = []
+        else:
+            problems_payload = [asdict(problem) for problem in get_problems(selected_category)]
         return templates.TemplateResponse(
             "problems.html",
             {
                 "request": request,
                 "category": selected_category,
-                "problems": [asdict(problem) for problem in get_problems(selected_category)],
+                "category_display": (selected_category or "문제"),
+                "problems": problems_payload,
                 "categories": categories,
+                "primary_category": resolve_primary_category(categories),
             },
         )
 

@@ -2,22 +2,16 @@ from fastapi import APIRouter, Query, status
 
 from dataclasses import asdict
 
-from ..config import get_settings
-from ..problem_bank import Problem, get_problems, list_categories
+from ..category_service import resolve_allowed_categories
+from ..problem_bank import Problem, get_problems
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/api", tags=["problems"])
 
 
-def _resolve_allowed_categories() -> list[str]:
-    settings = get_settings()
-    categories = settings.allowed_problem_categories or list_categories()
-    return categories or list_categories()
-
-
 @router.get("/categories", summary="사용 가능한 문제 카테고리 나열")
 async def categories() -> dict[str, list[str]]:
-    available = _resolve_allowed_categories()
+    available = resolve_allowed_categories()
     return {"categories": available, "count": len(available)}
 
 
@@ -28,7 +22,7 @@ async def problems(
         description="요청할 문제 유형 (기본값: 첫 번째 카테고리)",
     ),
 ) -> dict[str, object]:
-    categories = _resolve_allowed_categories()
+    categories = resolve_allowed_categories()
     selected_category = category or (categories[0] if categories else None)
 
     if not selected_category:
