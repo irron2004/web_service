@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import logging
+import time
+from pathlib import Path
+from email.utils import formatdate
 from typing import Dict, Iterable, Tuple
 from uuid import uuid4
 
@@ -49,7 +52,8 @@ app = FastAPI(
     version="0.9.0",
 )
 
-templates = Jinja2Templates(directory="app/templates")
+BASE_DIR = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 # Set up OpenTelemetry instrumentation if available.
 configure_observability(app)
@@ -173,7 +177,7 @@ async def request_id_middleware(request: Request, call_next):
         span = trace.get_current_span()
         if span and span.is_recording():
             span.set_attribute("http.request_id", request_id)
-    if response.status_code == 404:
+    if response.status_code == 404 and request.scope.get("endpoint") is None:
         override = problem_response(
             request,
             status=404,
@@ -198,10 +202,27 @@ if RateLimitExceeded:  # pragma: no cover - optional dependency
             detail=detail,
             type_suffix="rate-limit",
         )
-        headers = getattr(exc, "headers", None)
-        if headers:
-            for key, value in headers.items():
-                response.headers[key] = value
+        headers = dict(getattr(exc, "headers", {}) or {})
+        if "Retry-After" not in headers:
+            limiter = getattr(request.app.state, "limiter", None)
+            limit_info = getattr(request.state, "view_rate_limit", None)
+            if limiter and limit_info:
+                limit_item, limit_args = limit_info
+                try:
+                    window_stats = limiter.limiter.get_window_stats(
+                        limit_item, *limit_args
+                    )
+                    reset_in = 1 + window_stats[0]
+                    if getattr(limiter, "_retry_after", None) == "http-date":
+                        headers["Retry-After"] = formatdate(reset_in)
+                    else:
+                        headers["Retry-After"] = str(
+                            max(0, int(reset_in - time.time()))
+                        )
+                except Exception:
+                    pass
+        for key, value in headers.items():
+            response.headers[key] = value
         return response
 
 

@@ -1,13 +1,17 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
-from app.core.token import verify_token
-from app.core.db import get_session
-from app.core.services.mbti_service import MBTIService
-from fastapi.templating import Jinja2Templates
-from app.core.models_db import Pair
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+from app.core.db import get_session
+from app.core.models_db import Pair
+from app.core.services.mbti_service import MBTIService
+from app.core.token import verify_token
 
 router = APIRouter(prefix="/quiz", tags=["Quiz"])
-templates = Jinja2Templates(directory="app/templates")
+TEMPLATE_DIR = Path(__file__).resolve().parents[1] / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 # 실제 데이터베이스 질문 ID를 사용 (각 차원당 6개씩 24개)
 MBTI_QUESTIONS = [
@@ -51,7 +55,15 @@ def quiz_prefill(request: Request, token: str, session=Depends(get_session)):
     if not pair:
         raise HTTPException(status_code=404)
     
-    return templates.TemplateResponse("mbti/friend_test.html",
-          {"request": request, "pair_id": pair_id, "token": token,
-           "friend_name": pair.my_name, "my_mbti": my_mbti,
-           "questions": MBTI_QUESTIONS, "relations": RELATIONS_ENUM}) 
+    return templates.TemplateResponse(
+        "mbti/friend_test.html",
+        {
+            "request": request,
+            "pair_id": pair_id,
+            "token": token,
+            "friend_name": pair.my_name,
+            "my_mbti": my_mbti,
+            "questions": MBTI_QUESTIONS,
+            "relations": RELATIONS_ENUM,
+        },
+    )

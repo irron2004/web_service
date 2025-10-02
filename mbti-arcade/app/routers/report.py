@@ -1,13 +1,17 @@
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
-from app.core.db import get_session
-from app.core.token import verify_token
-from app.core.services.mbti_service import MBTIService
+
 from app.core.advice import MBTIAdvice
+from app.core.db import get_session
+from app.core.services.mbti_service import MBTIService
+from app.core.token import verify_token
 
 router = APIRouter(prefix="/api", tags=["Report"])
-templates = Jinja2Templates(directory="app/templates")
+TEMPLATE_DIR = Path(__file__).resolve().parents[1] / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 @router.get("/report/{token}")
 def report(token: str, session=Depends(get_session)):
