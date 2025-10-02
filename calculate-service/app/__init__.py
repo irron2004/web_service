@@ -5,6 +5,8 @@ from fastapi.templating import Jinja2Templates
 
 from .config import get_settings
 from .instrumentation import RequestContextMiddleware
+from .problem_bank import refresh_cache
+from .repositories import AttemptRepository
 from .routers import health, pages, problems
 
 
@@ -27,6 +29,16 @@ def create_app() -> FastAPI:
 
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
     templates = Jinja2Templates(directory=template_dir)
+
+    problem_repository = refresh_cache(force=True)
+    app.state.problem_repository = problem_repository
+    app.state.problem_cache_strategy = {
+        "strategy": "file-mtime",
+        "source": str(problem_repository.source_path),
+    }
+
+    attempt_repository = AttemptRepository(settings.attempts_database_path)
+    app.state.attempt_repository = attempt_repository
 
     app.add_middleware(RequestContextMiddleware)
 

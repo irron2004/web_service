@@ -49,7 +49,7 @@
         </header>
         <div class="space-y-5" data-problem-list>
             {% for problem in problems %}
-            <article class="rounded-2xl border border-white/10 bg-slate-900/70 p-6 shadow-lg shadow-sky-900/5" data-problem-card data-problem-index="{{ loop.index0 }}">
+            <article class="rounded-2xl border border-white/10 bg-slate-900/70 p-6 shadow-lg shadow-sky-900/5" data-problem-card data-problem-index="{{ loop.index0 }}" data-problem-id="{{ problem.id }}">
                 <header class="flex flex-wrap items-center justify-between gap-3">
                     <h3 class="text-xl font-semibold text-white">
                         <span class="mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-base font-semibold text-primary">{{ loop.index }}</span>
@@ -119,49 +119,123 @@ function renderSummary() {
     }
 }
 
-function handleCheck(card, index, correctAnswer) {
+function setFeedback(feedbackEl, message, toneClass) {
+    if (!feedbackEl) {
+        return;
+    }
+    feedbackEl.textContent = message;
+    feedbackEl.className = `mt-3 text-sm font-semibold ${toneClass}`;
+}
+
+function extractErrorMessage(payload) {
+    if (!payload) {
+        return '답안을 채점하는 중 오류가 발생했습니다. 다시 시도해주세요.';
+    }
+    if (typeof payload.detail === 'string') {
+        return payload.detail;
+    }
+    if (Array.isArray(payload.detail) && payload.detail[0]?.msg) {
+        return payload.detail[0].msg;
+    }
+    if (payload.detail && typeof payload.detail.detail === 'string') {
+        return payload.detail.detail;
+    }
+    if (typeof payload.message === 'string') {
+        return payload.message;
+    }
+    return '답안을 채점하는 중 오류가 발생했습니다. 다시 시도해주세요.';
+}
+
+async function submitAttempt(problemId, answer) {
+    const response = await fetch(`/api/problems/${encodeURIComponent(problemId)}/attempts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ answer }),
+    });
+
+    let payload = null;
+    const contentType = response.headers.get('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+        payload = await response.json();
+    }
+
+    if (!response.ok) {
+        const error = new Error(extractErrorMessage(payload));
+        error.payload = payload;
+        error.status = response.status;
+        throw error;
+    }
+
+    return payload;
+}
+
+async function handleCheck(card) {
+    const button = card.querySelector('[data-check]');
     const input = card.querySelector('[data-input]');
     const feedback = card.querySelector('[data-feedback]');
+    const problemId = card.dataset.problemId ?? '';
     const rawValue = input?.value ?? '';
-    const userAnswer = Number(rawValue);
-    if (!Number.isFinite(userAnswer) || rawValue.trim() === '') {
-        if (feedback) {
-            feedback.textContent = '답을 숫자로 입력해주세요.';
-            feedback.className = 'mt-3 text-sm font-semibold text-amber-300';
-        }
-        answered.delete(index);
+    const trimmed = rawValue.trim();
+    const userAnswer = Number(trimmed);
+
+    if (!problemId) {
+        setFeedback(feedback, '문제 정보를 찾을 수 없습니다.', 'text-amber-300');
+        return;
+    }
+
+    if (trimmed === '' || !Number.isFinite(userAnswer)) {
+        setFeedback(feedback, '답을 숫자로 입력해주세요.', 'text-amber-300');
+        answered.delete(problemId);
         renderSummary();
         return;
     }
 
-    const isCorrect = userAnswer === Number(correctAnswer);
-    if (feedback) {
-        if (isCorrect) {
-            feedback.textContent = '정답입니다! 잘했어요 🎉';
-            feedback.className = 'mt-3 text-sm font-semibold text-emerald-300';
-        } else {
-            feedback.textContent = `오답입니다. 정답은 ${correctAnswer} 입니다.`;
-            feedback.className = 'mt-3 text-sm font-semibold text-rose-300';
-        }
+    if (button) {
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
     }
-    answered.set(index, isCorrect);
-    renderSummary();
+
+    try {
+        const payload = await submitAttempt(problemId, userAnswer);
+        const isCorrect = Boolean(payload?.is_correct);
+        if (isCorrect) {
+            setFeedback(feedback, '정답입니다! 잘했어요 🎉', 'text-emerald-300');
+        } else {
+            const correctAnswer = payload?.correct_answer;
+            const hint = correctAnswer !== undefined ? `정답은 ${correctAnswer} 입니다.` : '다시 한번 도전해보세요!';
+            setFeedback(feedback, `오답입니다. ${hint}`, 'text-rose-300');
+        }
+        answered.set(problemId, isCorrect);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : '답안을 채점할 수 없습니다.';
+        setFeedback(feedback, message, 'text-amber-300');
+        answered.delete(problemId);
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.removeAttribute('aria-busy');
+        }
+        renderSummary();
+    }
 }
 
 function bindCard(card) {
-    const index = Number(card.dataset.problemIndex ?? '0');
     const button = card.querySelector('[data-check]');
     const input = card.querySelector('[data-input]');
-    const correctAnswer = {{ problems|tojson }}[index]?.answer;
-    if (!button || typeof correctAnswer === 'undefined') {
+    if (!button) {
         return;
     }
-    button.addEventListener('click', () => handleCheck(card, index, correctAnswer));
+    button.addEventListener('click', () => {
+        void handleCheck(card);
+    });
     if (input) {
         input.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                handleCheck(card, index, correctAnswer);
+                void handleCheck(card);
             }
         });
     }

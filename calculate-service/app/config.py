@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -10,6 +11,8 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     enable_openapi: bool = True
     allowed_problem_categories: List[str] | None = None
+    problem_data_path: Path = Path(__file__).resolve().parent / "data" / "problems.json"
+    attempts_database_path: Path = Path(__file__).resolve().parent / "data" / "attempts.db"
 
     model_config = SettingsConfigDict(
         env_file=".env",

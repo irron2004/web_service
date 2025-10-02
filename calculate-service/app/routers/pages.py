@@ -1,11 +1,16 @@
 from fastapi import APIRouter, Query, Request
-from dataclasses import asdict
-
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from ..config import get_settings
-from ..problem_bank import get_problems, list_categories
+from ..problem_bank import ProblemRepository, list_categories, refresh_cache
+
+def _get_repository(request: Request) -> ProblemRepository:
+    repository = getattr(request.app.state, "problem_repository", None)
+    if repository is None:
+        repository = refresh_cache(force=True)
+        request.app.state.problem_repository = repository
+    return repository
 
 
 def _resolve_allowed_categories() -> list[str]:
@@ -35,12 +40,21 @@ def get_router(templates: Jinja2Templates) -> APIRouter:
     ) -> HTMLResponse:
         categories = _resolve_allowed_categories()
         selected_category = category if category in categories else categories[0]
+        repository = _get_repository(request)
         return templates.TemplateResponse(
             "problems.html",
             {
                 "request": request,
                 "category": selected_category,
-                "problems": [asdict(problem) for problem in get_problems(selected_category)],
+                "problems": [
+                    {
+                        "id": problem.id,
+                        "question": problem.question,
+                        "hint": problem.hint,
+                        "category": problem.category,
+                    }
+                    for problem in repository.get_problems(selected_category)
+                ],
                 "categories": categories,
             },
         )
