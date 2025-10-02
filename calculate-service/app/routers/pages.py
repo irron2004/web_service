@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Query, Request
+from dataclasses import asdict
+
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -38,7 +40,7 @@ def get_router(templates: Jinja2Templates) -> APIRouter:
             {
                 "request": request,
                 "category": selected_category,
-                "problems": get_problems(selected_category),
+                "problems": [asdict(problem) for problem in get_problems(selected_category)],
                 "categories": categories,
             },
         )

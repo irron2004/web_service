@@ -1,16 +1,20 @@
-from fastapi import APIRouter, Form, Depends, Request
-from fastapi.responses import RedirectResponse, HTMLResponse
-from fastapi.templating import Jinja2Templates
-from app.core.db import get_session
-from app.core.services.mbti_service import MBTIService
-from app.core.token import issue_token
+from pathlib import Path
 from urllib.parse import urlencode
+
+from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from app.core.db import get_session
+from app.core.services.mbti_service import MBTIService
+from app.core.token import issue_token
+
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(tags=["Share"])
-templates = Jinja2Templates(directory="app/templates")
+TEMPLATE_DIR = Path(__file__).resolve().parents[1] / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 @router.post("/share", response_class=HTMLResponse)
 @limiter.limit("1/minute")

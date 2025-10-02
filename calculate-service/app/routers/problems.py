@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Query, status
+
+from dataclasses import asdict
 
 from ..config import get_settings
 from ..problem_bank import Problem, get_problems, list_categories
+from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/api", tags=["problems"])
 
@@ -29,9 +32,9 @@ async def problems(
     selected_category = category or (categories[0] if categories else None)
 
     if not selected_category:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={
+            content={
                 "type": "https://360me.app/problems/not-found",
                 "title": "문제 데이터를 찾을 수 없습니다",
                 "status": 404,
@@ -40,9 +43,9 @@ async def problems(
         )
 
     if selected_category not in categories:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={
+            content={
                 "type": "https://360me.app/problems/invalid-category",
                 "title": "지원하지 않는 카테고리",
                 "status": 404,
@@ -52,7 +55,7 @@ async def problems(
             },
         )
 
-    items = [problem.__dict__ for problem in get_problems(selected_category)]
+    items = [asdict(problem) for problem in get_problems(selected_category)]
     return {
         "category": selected_category,
         "items": items,
