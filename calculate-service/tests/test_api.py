@@ -67,11 +67,15 @@ def dataset(tmp_path, monkeypatch):
     get_settings.cache_clear()  # type: ignore[attr-defined]
     reset_problem_cache()
 
-    return {
-        "problems_path": problems_path,
-        "attempts_path": attempts_path,
-        "problems": sample_problems,
-    }
+    try:
+        yield {
+            "problems_path": problems_path,
+            "attempts_path": attempts_path,
+            "problems": sample_problems,
+        }
+    finally:
+        reset_problem_cache()
+        get_settings.cache_clear()  # type: ignore[attr-defined]
 
 
 @pytest.fixture
