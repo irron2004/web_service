@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -39,6 +39,12 @@ def get_router(templates: Jinja2Templates) -> APIRouter:
         category: str = Query(default=None, description="문제 유형"),
     ) -> HTMLResponse:
         categories = _resolve_allowed_categories()
+        if not categories:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="등록된 문제 카테고리가 없습니다.",
+            )
+
         selected_category = category if category in categories else categories[0]
         repository = _get_repository(request)
         return templates.TemplateResponse(
