@@ -28,14 +28,15 @@
         </div>
     </section>
 
+    {% set icon_map = {
+        "덧셈": "➕",
+        "뺄셈": "➖",
+        "곱셈": "✖️",
+        "나눗셈": "➗"
+    } %}
     <nav aria-label="연산 유형" class="flex flex-wrap items-center justify-center gap-3">
-        {% set nav_links = [
-            ("덧셈", "➕"),
-            ("뺄셈", "➖"),
-            ("곱셈", "✖️"),
-            ("나눗셈", "➗")
-        ] %}
-        {% for label, icon in nav_links %}
+        {% for label in categories %}
+        {% set icon = icon_map.get(label, "📘") %}
         <a href="/problems?category={{ label }}" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition {% if label == category %}bg-primary text-slate-900 shadow-lg shadow-sky-900/30{% else %}border border-white/20 text-slate-200 hover:bg-white/10{% endif %}">
             <span aria-hidden="true">{{ icon }}</span> {{ label }}
         </a>
@@ -149,6 +150,7 @@
 
 <script>
 const problemCards = Array.from(document.querySelectorAll('[data-problem-card]'));
+const problemData = {{ problems|tojson }};
 const summaryCorrect = document.getElementById('summary-correct');
 const summaryAccuracy = document.getElementById('summary-accuracy');
 const summaryTotal = document.getElementById('summary-total');
@@ -156,13 +158,16 @@ const answered = new Map();
 
 function renderSummary() {
     const correctCount = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
-    const total = Number(summaryTotal?.textContent ?? problemCards.length) || problemCards.length;
+    const total = problemData.length || problemCards.length;
     const accuracy = total === 0 ? 0 : Math.round((correctCount / total) * 100);
     if (summaryCorrect) {
         summaryCorrect.textContent = String(correctCount);
     }
     if (summaryAccuracy) {
         summaryAccuracy.textContent = `${accuracy}%`;
+    }
+    if (summaryTotal) {
+        summaryTotal.textContent = String(total);
     }
 }
 
@@ -199,7 +204,7 @@ function bindCard(card) {
     const index = Number(card.dataset.problemIndex ?? '0');
     const button = card.querySelector('[data-check]');
     const input = card.querySelector('[data-input]');
-    const correctAnswer = {{ problems|tojson }}[index]?.answer;
+    const correctAnswer = problemData[index]?.answer;
     if (!button || typeof correctAnswer === 'undefined') {
         return;
     }
@@ -324,7 +329,7 @@ if (inviteSection) {
     }
 
     function computeInviteSummary() {
-        const total = Number(summaryTotal?.textContent ?? problemCards.length) || problemCards.length;
+        const total = problemData.length || problemCards.length;
         const correct = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
         return { total, correct };
     }
