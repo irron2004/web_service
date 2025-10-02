@@ -55,6 +55,28 @@ def test_health_endpoint_returns_status(client) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "healthy"
+    assert "version" in payload
+    assert "details" in payload
+    assert "dependencies" in payload["details"]
+
+
+def test_healthz_endpoint_reports_dependencies(client) -> None:
+    response = client.get("/healthz")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "healthy"
+    dependencies = payload["details"]["dependencies"]
+    assert dependencies["jinja2"]["status"] == "ok"
+
+
+def test_readyz_endpoint_reports_readiness(client) -> None:
+    response = client.get("/readyz")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "ready"
+    readiness = payload["details"]["readiness"]
+    assert readiness["templates"]["status"] == "ok"
+    assert readiness["problem_bank"]["status"] == "ok"
 
 
 def test_default_problem_category_is_returned(client) -> None:

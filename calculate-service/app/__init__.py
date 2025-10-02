@@ -30,6 +30,12 @@ def create_app() -> FastAPI:
 
     app.add_middleware(RequestContextMiddleware)
 
+    # Store frequently used resources on the application state so ancillary
+    # components (health checks, background tasks, etc.) can reuse them without
+    # rebuilding instances.
+    app.state.settings = settings
+    app.state.templates = templates
+
     app.include_router(health.router)
     app.include_router(pages.get_router(templates))
     app.include_router(problems.router)
