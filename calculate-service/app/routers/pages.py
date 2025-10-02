@@ -3,7 +3,12 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from ..config import get_settings
-from ..problem_bank import ProblemRepository, list_categories, refresh_cache
+from ..problem_bank import (
+    ProblemDataError,
+    ProblemRepository,
+    list_categories,
+    refresh_cache,
+)
 
 def _get_repository(request: Request) -> ProblemRepository:
     repository = getattr(request.app.state, "problem_repository", None)
@@ -15,8 +20,19 @@ def _get_repository(request: Request) -> ProblemRepository:
 
 def _resolve_allowed_categories() -> list[str]:
     settings = get_settings()
-    candidates = settings.allowed_problem_categories or list_categories()
-    return candidates if candidates else list_categories()
+    allowed = settings.allowed_problem_categories or []
+    try:
+        available = list_categories()
+    except ProblemDataError:
+        available = []
+
+    if allowed:
+        if not available:
+            return []
+        filtered = [category for category in allowed if category in available]
+        return filtered
+
+    return available
 
 
 def get_router(templates: Jinja2Templates) -> APIRouter:
