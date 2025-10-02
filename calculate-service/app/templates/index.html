@@ -17,16 +17,27 @@
                 360Me Math Lab
             </h1>
               {% set featured_count = category_count | default(categories|length) %}
-              {% set featured_label = primary_category | default('덧셈') %}
-              {% set secondary_label = (category_cards[1].title if category_cards|length > 1 else featured_label) %}
+              {% set featured_label = cta_primary_category %}
+              {% set secondary_label = secondary_category %}
+              {% if secondary_label is none %}
+              {% set secondary_label = featured_label %}
+              {% endif %}
+              {% set show_featured_link = featured_label is not none %}
+              {% set show_secondary_link = secondary_label is not none and secondary_label != featured_label %}
             <p class="text-lg text-white/90 sm:text-xl">
                 초등 연산 {{ featured_count if featured_count else 4 }}종을 Self → Practice → Share 흐름으로 구성했습니다.
                 Tailwind 기반의 접근성, Skeleton UX, noindex 정책을 유지하면서도 학습 몰입도를 높였습니다.
             </p>
             <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                {% if show_featured_link %}
                 <a href="/problems?category={{ featured_label }}" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-slate-100">
                     <span aria-hidden="true">🧠</span> {{ featured_label }} 문제 시작
                 </a>
+                {% else %}
+                <a href="/problems" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                    <span aria-hidden="true">🧠</span> 문제 바로 시작
+                </a>
+                {% endif %}
                 <a href="#categories" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
                     <span aria-hidden="true">📚</span> 모든 유형 보기
                 </a>
@@ -183,12 +194,20 @@
             Matomo/GA4 이벤트로 학습 흐름을 관측하며, Web Vitals·WCAG 요구사항도 함께 점검하세요.
         </p>
           <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              {% if show_featured_link %}
               <a href="/problems?category={{ featured_label }}" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-sky-300">
                   <span aria-hidden="true">🚀</span> {{ featured_label }}부터 시작하기
               </a>
+              {% else %}
+              <a href="/problems" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-sky-300">
+                  <span aria-hidden="true">🚀</span> 문제부터 시작하기
+              </a>
+              {% endif %}
+              {% if show_secondary_link %}
               <a href="/problems?category={{ secondary_label }}" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
                   <span aria-hidden="true">✨</span> {{ secondary_label }} 심화 도전
               </a>
+              {% endif %}
             <a href="http://localhost:8080" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
                 <span aria-hidden="true">🌐</span> 허브로 돌아가기
             </a>

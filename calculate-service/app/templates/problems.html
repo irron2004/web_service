@@ -35,12 +35,16 @@
         "나눗셈": "➗"
     } %}
     <nav aria-label="연산 유형" class="flex flex-wrap items-center justify-center gap-3">
+        {% if categories %}
         {% for label in categories %}
         {% set icon = icon_map.get(label, "📘") %}
         <a href="/problems?category={{ label }}" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition {% if label == category %}bg-primary text-slate-900 shadow-lg shadow-sky-900/30{% else %}border border-white/20 text-slate-200 hover:bg-white/10{% endif %}">
             <span aria-hidden="true">{{ icon }}</span> {{ label }}
         </a>
         {% endfor %}
+        {% else %}
+        <span class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-slate-300">활성화된 문제 유형이 없습니다</span>
+        {% endif %}
     </nav>
 
     <section aria-labelledby="section-problems" class="space-y-6">
@@ -100,7 +104,7 @@
         <p class="mt-4 text-xs text-slate-400">Tip: 정답률 80% 이상이면 Invite 링크를 생성해 친구나 가족과 함께 풀어보세요.</p>
     </section>
 
-    <section id="invite" data-invite-section tabindex="-1" class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10 focus:outline-none">
+    <section id="invite" data-invite-section data-category="{{ category or '' }}" data-category-available="{{ 'true' if category_available else 'false' }}" tabindex="-1" class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10 focus:outline-none">
         <header class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-2xl font-semibold text-white">Invite 링크 공유</h2>
@@ -119,7 +123,13 @@
                 </button>
             </div>
         </header>
-        <p class="mt-4 text-sm text-slate-300" data-invite-status role="status">정답률을 확인한 뒤 초대 링크를 생성해보세요.</p>
+        <p class="mt-4 text-sm text-slate-300" data-invite-status role="status">
+            {% if category_available %}
+            정답률을 확인한 뒤 초대 링크를 생성해보세요.
+            {% else %}
+            문제 유형을 선택해야 초대 링크를 생성할 수 있습니다. 상단에서 카테고리를 먼저 선택해주세요.
+            {% endif %}
+        </p>
         <div class="mt-6 hidden gap-6 lg:grid lg:grid-cols-[1.3fr_1fr]" data-invite-result>
             <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
                 <h3 class="text-lg font-semibold text-white">공유 링크</h3>
@@ -241,9 +251,11 @@ if (resetButton) {
     });
 }
 
-const categoryName = {{ (category or category_display)|tojson }};
 const inviteSection = document.querySelector('[data-invite-section]');
 if (inviteSection) {
+    const rawCategoryName = (inviteSection.dataset.category ?? '').trim();
+    const hasValidCategory = (inviteSection.dataset.categoryAvailable ?? 'false') === 'true' && rawCategoryName !== '';
+    const categoryName = hasValidCategory ? rawCategoryName : null;
     const inviteGenerateButton = inviteSection.querySelector('[data-invite-generate]');
     const inviteCopyButton = inviteSection.querySelector('[data-invite-copy]');
     const inviteExpireButton = inviteSection.querySelector('[data-invite-expire]');
@@ -289,7 +301,12 @@ if (inviteSection) {
             inviteResult.classList.add('hidden');
         }
         if (inviteGenerateButton && inviteGenerateLabel) {
-            inviteGenerateButton.disabled = false;
+            inviteGenerateButton.disabled = !hasValidCategory;
+            if (inviteGenerateButton.disabled) {
+                inviteGenerateButton.setAttribute('aria-disabled', 'true');
+            } else {
+                inviteGenerateButton.removeAttribute('aria-disabled');
+            }
             inviteGenerateLabel.textContent = defaultLabel;
         }
         if (inviteUrlElement) {
@@ -318,7 +335,13 @@ if (inviteSection) {
         if (!inviteGenerateButton || !inviteGenerateLabel) {
             return;
         }
-        inviteGenerateButton.disabled = isLoading;
+        const shouldDisable = isLoading || !hasValidCategory;
+        inviteGenerateButton.disabled = shouldDisable;
+        if (shouldDisable) {
+            inviteGenerateButton.setAttribute('aria-disabled', 'true');
+        } else {
+            inviteGenerateButton.removeAttribute('aria-disabled');
+        }
         if (isLoading) {
             inviteGenerateLabel.textContent = '생성 중…';
         } else if (inviteState) {
@@ -380,6 +403,11 @@ if (inviteSection) {
 
     async function handleInviteGenerate() {
         if (!inviteGenerateButton) {
+            return;
+        }
+        if (!hasValidCategory || !categoryName) {
+            setInviteStatus('현재 활성화된 문제 유형이 없어 초대 링크를 생성할 수 없습니다.', 'warning');
+            toggleGenerateLoading(false);
             return;
         }
         toggleGenerateLoading(true);
@@ -466,6 +494,11 @@ if (inviteSection) {
     }
 
     resetInviteState();
+    if (!hasValidCategory) {
+        setInviteStatus('현재 선택된 문제 유형이 없어 초대 링크를 생성할 수 없습니다. 카테고리를 선택한 뒤 다시 시도해주세요.', 'warning');
+        return;
+    }
+    setInviteStatus('정답률을 확인한 뒤 초대 링크를 생성해보세요.', 'info');
 }
 </script>
 {% endblock %}
