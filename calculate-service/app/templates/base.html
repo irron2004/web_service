@@ -111,6 +111,9 @@
                     <a href="/health" class="nav-link">헬스체크</a>
                 </nav>
                 <div class="hidden sm:flex items-center gap-2">
+                    <button type="button" id="global-invite-trigger" class="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                        <span aria-hidden="true">🤝</span> Invite
+                    </button>
                     <a href="/problems?category=덧셈" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition hover:-translate-y-0.5 hover:bg-slate-100">
                         <span aria-hidden="true">🚀</span> 덧셈부터 시작하기
                     </a>
@@ -133,5 +136,25 @@
             </div>
         </footer>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inviteTrigger = document.getElementById('global-invite-trigger');
+            if (!inviteTrigger) {
+                return;
+            }
+
+            inviteTrigger.addEventListener('click', () => {
+                const inviteSection = document.querySelector('[data-invite-section]');
+                if (!inviteSection) {
+                    window.location.href = '/problems';
+                    return;
+                }
+
+                inviteSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                inviteSection.classList.add('ring-2', 'ring-primary/70');
+                window.setTimeout(() => inviteSection.classList.remove('ring-2', 'ring-primary/70'), 2000);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from .config import get_settings
 from .instrumentation import RequestContextMiddleware
-from .routers import health, pages, problems
+from .routers import health, invites, pages, problems
 
 
 def create_app() -> FastAPI:
@@ -32,6 +32,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     app.include_router(pages.get_router(templates))
+    app.include_router(invites.get_router(templates))
     app.include_router(problems.router)
 
     return app
