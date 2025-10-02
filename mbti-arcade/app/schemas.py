@@ -38,7 +38,7 @@ class QuestionSchema(BaseModel):
 class SessionCreate(BaseModel):
     owner_email: Optional[EmailStr] = None
     owner_nickname: Optional[str] = Field(default=None, max_length=120)
-    mode: str = Field(pattern="^(basic|couple|friend)$")
+    mode: str = Field(pattern="^(basic|couple|friend|work|partner|family)$")
     max_raters: int = Field(default=50, ge=1, le=500)
     expires_in_hours: int = Field(default=72, ge=1, le=720)
     anonymous: bool = True

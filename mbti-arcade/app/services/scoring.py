@@ -12,6 +12,7 @@ RELATION_WEIGHTS = {
     "partner": 1.5,
     "couple": 1.5,
     "family": 1.1,
+    "coworker": 1.1,
 }
 
 

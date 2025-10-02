@@ -12,10 +12,30 @@ from typing import Dict, Iterable, List, Sequence
 from pydantic import BaseModel, Field, field_validator
 
 DIMENSIONS = {"EI", "SN", "TF", "JP"}
-MODE_CONTEXT_MAP = {"romance": "couple", "friend": "friend"}
-PREFIX_BASE = {"C": 0, "R": 400, "F": 800}
+MODE_CONTEXT_MAP = {
+    "romance": "couple",
+    "friend": "friend",
+    "work": "work",
+    "partner": "partner",
+    "family": "family",
+}
+PREFIX_BASE = {
+    "C": 0,
+    "R": 400,
+    "F": 800,  # friend
+    "W": 1200, # work
+    "P": 1600, # partner
+    "G": 2000, # family (G for "family")
+}
 DIMENSION_OFFSETS = {"EI": 0, "SN": 100, "TF": 200, "JP": 300}
-CONTEXT_SORT_ORDER = {"common": 0, "couple": 1, "friend": 2}
+CONTEXT_SORT_ORDER = {
+    "common": 0,
+    "couple": 1,
+    "friend": 2,
+    "work": 3,
+    "partner": 4,
+    "family": 5,
+}
 QUESTIONNAIRE_ENV_VAR = "QUESTIONNAIRE_FILE"
 
 

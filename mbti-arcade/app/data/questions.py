@@ -9,12 +9,15 @@ from app.data.questionnaire_loader import QuestionSeed, get_question_seeds
 QUESTION_SEEDS: tuple[QuestionSeed, ...] = tuple(get_question_seeds())
 CONTEXT_TO_SEEDS: Dict[str, List[QuestionSeed]] = {
     context: [seed for seed in QUESTION_SEEDS if seed.context == context]
-    for context in {"common", "couple", "friend"}
+    for context in {"common", "couple", "friend", "work", "partner", "family"}
 }
 MODE_TO_CONTEXTS: Dict[str, set[str]] = {
     "basic": {"common"},
     "friend": {"common", "friend"},
     "couple": {"common", "couple"},
+    "work": {"work"},
+    "partner": {"partner"},
+    "family": {"family"},
 }
 
 

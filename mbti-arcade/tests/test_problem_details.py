@@ -1,12 +1,5 @@
-from fastapi.testclient import TestClient
-
-from app.main import app
-
-
-client = TestClient(app)
-
-
-def test_not_found_returns_problem_details_payload():
+# 파일: mbti-arcade/tests/test_problem_details.py
+def test_not_found_returns_problem_details_payload(client):
     response = client.get("/non-existent-route")
     assert response.status_code == 404
     body = response.json()
@@ -16,8 +9,7 @@ def test_not_found_returns_problem_details_payload():
     assert body["instance"] == "/non-existent-route"
     assert body["type"].endswith("/http-404")
 
-
-def test_validation_error_returns_problem_details_payload():
+def test_validation_error_returns_problem_details_payload(client):
     response = client.post("/api/sessions", json={})
     assert response.status_code == 422
     body = response.json()

@@ -1,0 +1,73 @@
+meta:
+  version: 1.0
+  language: ko
+  relation_label: 가족
+  tone: respectful-warm
+variables:
+  user_name: ""
+  self_type: ""
+  n_family: 0
+  top1_type: ""
+  top1_pct: 0
+  top2_type: ""
+  top2_pct: 0
+  conf_score: 0.0
+  conf_label: ""
+  pgi_score: 0
+  diff_axes: []
+  axis_shift:
+    EI: ""
+    SN: ""
+    TF: ""
+    JP: ""
+templates:
+  tldr: |
+    {{user_name}} 님의 Self는 {{self_type}}입니다.
+    가족은 {{top1_type}}(약 {{top1_pct}}%)로 보는 경향이며, 의견 일치도는 {{conf_label}}입니다.
+    Perception Gap 지수는 {{pgi_score}}/100이며, {{diff_axes | length}}개 축에서 차이가 보입니다.
+
+  summary: |
+    총 {{n_family}}명의 가족 응답이 반영되었습니다. 최빈 유형은 {{top1_type}}, 다음은 {{top2_type}}({{top2_pct}}%)입니다.
+    합의도({{conf_label}})는 가족 내 공통 인식을 의미합니다.
+
+  gap_analysis: |
+    Self({{self_type}})와 가족 인식 간 차이가 큰 축: {{diff_axes | join(", ")}}.
+    {% if axis_shift.EI %}- **EI**: 가족은 {{ "외향(E)" if axis_shift.EI == "E" else "내향(I)" }} 쪽 신호를 더 관찰했습니다.{% endif %}
+    {% if axis_shift.SN %}- **SN**: 가족은 {{ "감각(S)" if axis_shift.SN == "S" else "직관(N)" }} 기반 접근을 더 두드러지게 보았습니다.{% endif %}
+    {% if axis_shift.TF %}- **TF**: 가족은 {{ "사고(T)" if axis_shift.TF == "T" else "감정(F)" }} 기준을 더 강하게 인식했습니다.{% endif %}
+    {% if axis_shift.JP %}- **JP**: 가족은 {{ "판단(J)" if axis_shift.JP == "J" else "인식(P)" }} 성향을 더 자주 보았습니다.{% endif %}
+
+  suggestions_header: "가족과의 소통/협력을 위한 제안:"
+  suggestions_body:
+    - "{{tips.dynamic_intro}}"
+    - "{% for line in tips.axis_based %}{{ line }}{% endfor %}"
+    - "{{tips.end_note}}"
+
+phrasebook:
+  confidence_labels:
+    - { if: "conf_score >= 0.67", label: "높음" }
+    - { if: "0.34 <= conf_score < 0.67", label: "중간" }
+    - { if: "conf_score < 0.34", label: "낮음" }
+
+  tips_by_axis:
+    EI:
+      E: "모임 주도/사교는 강점입니다. 조용한 구성원에게도 발언 기회를 열어 균형을 맞춰보세요."
+      I: "조용함이 무관심으로 오해되지 않도록, 참여 방식(메모/준비)을 미리 공유하세요."
+    SN:
+      S: "행사 일정·준비물을 간단히 리스트로 공유하면 모두가 안심합니다."
+      N: "새로운 아이디어 제안 시, 예산/역할/시간 틀을 함께 제시하면 합의가 쉬워집니다."
+    TF:
+      T: "원칙을 말하기 전 감정을 1문장으로 인정해 주세요(예: '수고 많았어')."
+      F: "공감 후에는 결정 프레임(대안/장단)을 짧게 정리해 갈등을 마무리하세요."
+    JP:
+      J: "체계화는 강점입니다. 변동성에 대비해 체인지로그/여유 버퍼를 두세요."
+      P: "유연성은 강점입니다. 대신 핵심 시간표/역할은 사전에 합의해 혼선을 줄이세요."
+
+defaults:
+  tips:
+    dynamic_intro: "가족이 보는 강점을 살리되, 차이가 큰 축에서는 작은 습관으로 기대치를 맞춰보세요."
+    axis_based: []
+    end_note: "가족의 상황·세대 차를 고려해 대화를 천천히 이어가면 좋아요."
+
+disclaimer: |
+  본 리포트는 오락 및 자기이해 목적이며, 인사/의료적 판단을 대신하지 않습니다.

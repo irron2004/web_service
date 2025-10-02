@@ -1,19 +1,36 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Core perception-gap logic lives in `mbti-arcade/app/` (FastAPI, SQLAlchemy, Jinja). Shared templates and assets sit in `main-service/app/templates/`, while auxiliary examples reside in `calculate-service/` and `math-app/`. Operational docs and style guides are under `docs/`, and deployment artifacts live alongside `docker-compose.yml` and `nginx/` sample configs. Treat `Tasks.md` and `DeploymentPlan.md` as the authoritative roadmap for scope and releases.
+- Core MBTI arcade service lives in `mbti-arcade/app/` (FastAPI, SQLAlchemy, Jinja templates). Supporting data and migrations sit under `mbti-arcade/app/data/` and `mbti-arcade/alembic/`.
+- The repo temporarily co-hosts the 360Me perception-gap stack (`mbti-arcade/`) and the
+  standalone math API in `calculate-service/` so we can operate behind one domain; once
+  the `calc.360me.app` pipeline is stable, plan on splitting calculate-service into its
+  own repository and deployment track.
+- Shared templates and lightweight API examples reside in `main-service/app/templates/`; `calculate-service/app/` is now a standalone FastAPI sample kept in sync as an external-facing service. Experimental math content is isolated in `math-app/` (frontend under `math-app/frontend/`, backend in `math-app/backend/`).
+- Documentation and playbooks are under `docs/`, while deployment assets (Docker, nginx) are at the repository root.
 
 ## Build, Test, and Development Commands
-From `mbti-arcade/`, `make setup` provisions the virtualenv and dependencies, `make run` starts `uvicorn app.main:app --reload --port 8000`, and `make prod` spawns a four-worker server. `make test` (or `pytest tests/`) runs the perception-gap suite; `make check` chains formatting, lint, and tests. For lightweight services run `uvicorn app.main:app --reload --port 8080` inside `main-service/` and `calculate-service/`. Use the `docker-compose.yml` at the repo root when validating multi-service flows locally.
+- `cd mbti-arcade && make setup` — create virtualenv and install Python dependencies.
+- `make run` (inside `mbti-arcade/`) — launch `uvicorn app.main:app --reload --port 8000` for local iteration.
+- `make check` — run Black, isort, flake8, pylint, and the pytest suite in one pass.
+- `docker-compose up` — bring up the multi-service stack defined at the repo root for integration checks.
 
 ## Coding Style & Naming Conventions
-Python modules follow Black formatting (4-space indent, 88-char lines), isort ordering, and flake8/pylint lint gates—prefer `snake_case` for functions, `CamelCase` for Pydantic models, and `PascalCase` SQLAlchemy models mapped in `app/models.py`. API responses must honor RFC 9457 Problem Details with deterministic `type` URLs. Frontend experiments stay consistent with `docs/frontend_style.md`: Vite + React Router, TanStack Query for server state, and WCAG 2.2 AA-friendly components.
+- Python: Black (4 spaces, 88-char lines), isort, flake8, pylint. Use `snake_case` for functions, `CamelCase` for Pydantic models, and `PascalCase` for SQLAlchemy models.
+- Templates: keep Jinja blocks compact; align with styles in `docs/frontend_style.md`.
+- Configuration and secrets live in `.env` files ignored by git—never hardcode credentials.
 
 ## Testing Guidelines
-Tests live in `mbti-arcade/tests/` plus legacy coverage in `test_mbti.py`. New contributions ship with unit coverage for scoring helpers, integration checks for repositories, and FastAPI E2E paths mirroring the Self→Invite→Aggregate flow. Prior to PRs, run `pytest -m "not slow"` if you add markers and capture coverage for gap formulas and anonymity enforcement. Refer to `docs/testing.md` for Web Vitals, WCAG, AdSense, and OpenTelemetry checkpoints.
+- Primary tests are in `mbti-arcade/tests/` with legacy cases in `mbti-arcade/test_mbti.py`. FastAPI flows rely on pytest and httpx clients.
+- Run `pytest` (or `make test`) before each PR; use markers (`@pytest.mark.slow`) so CI can filter heavy suites.
+- Add unit coverage for scoring helpers, integration tests for repositories, and end-to-end flows for Self→Invite→Aggregate and couple sessions.
 
 ## Commit & Pull Request Guidelines
-Match the existing history: imperative subject lines, ≤72 chars, optional Conventional Commits prefixes (`feat(core):`, `fix`, `chore`). Reference task IDs from `Tasks.md` when applicable and note config migrations in the body. PRs should describe behaviour changes, link supporting docs (PRD, DeploymentPlan), list local test commands executed, and attach screenshots or JSON samples for API/UI tweaks. Expect reviewers to block on missing RFC 9457 payloads, k≥3 safeguards, or absent observability hooks.
+- Follow the existing history: imperative subjects ≤72 chars, optional Conventional prefixes like `feat(core): ...` and reference IDs from `Tasks.md` when relevant.
+- PRs should describe behavior changes, link specs (PRD, DeploymentPlan), list local test commands, and include screenshots or JSON samples for API/UI updates.
+- Expect reviewers to block on missing RFC 9457 payloads, absence of k≥3 safeguards, or missing observability hooks.
 
-## Security & Observability Checks
-Every new endpoint must propagate `X-Request-ID`, emit OpenTelemetry spans, and maintain k-anonymity before exposing aggregates. Confirm `noindex` headers on share/result pages and avoid embedding secrets in client bundles. When touching Cloud Run or Cloudflare surfaces, update the corresponding section in `DeploymentPlan.md` so rollout checklists stay accurate.
+## Security & Observability
+- Every endpoint must propagate `X-Request-ID`, emit OpenTelemetry spans, and honor k-anonymity before exposing aggregates.
+- Ensure share/result pages send `X-Robots-Tag: noindex` and scrub secrets from client bundles.
+- Update `DeploymentPlan.md` whenever Cloud Run or Cloudflare configs change to keep rollout checklists current.

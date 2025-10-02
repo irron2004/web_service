@@ -18,7 +18,7 @@ web_service/
 │   ├── backend/              # FastAPI 백엔드
 │   └── frontend/             # React 프론트엔드
 ├── mbti-arcade/              # MBTI & Arcade 서비스
-└── calculate-service/         # 계산 서비스
+└── calculate-service/         # 분리된 계산 서비스 (독립 실행)
 ```
 
 ## 🌐 서비스 라우팅
@@ -29,7 +29,7 @@ web_service/
 - **수학 게임**: `http://yourdomain.com/math` 또는 `http://localhost/math`
 - **MBTI 검사**: `http://yourdomain.com/mbti` 또는 `http://localhost/mbti`
 - **아케이드 게임**: `http://yourdomain.com/arcade` 또는 `http://localhost/arcade`
-- **계산 서비스**: `http://yourdomain.com/calculate` 또는 `http://localhost/calculate`
+> `calculate-service`는 독립 배포 대상으로 분리되어 기본 Compose 스택에는 포함되지 않습니다. 별도 서비스로 배포할 때 프록시 경로를 수동으로 추가하세요.
 
 ## 🛠️ 설치 및 실행
 

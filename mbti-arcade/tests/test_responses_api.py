@@ -1,13 +1,9 @@
-from fastapi.testclient import TestClient
+# 파일: mbti-arcade/tests/test_responses_api.py
 
-from app.main import app
 from app.data.questions import questions_for_mode
 
 
-client = TestClient(app)
-
-
-def _create_session(mode: str = "basic") -> dict:
+def _create_session(client, mode: str = "basic") -> dict:
     response = client.post(
         "/api/sessions",
         json={"mode": mode},
@@ -20,9 +16,8 @@ def _build_answers(mode: str) -> list[dict[str, int]]:
     questions = questions_for_mode(mode)
     return [{"question_id": q["id"], "value": 3} for q in questions]
 
-
-def test_submit_self_success():
-    session = _create_session()
+def test_submit_self_success(client):
+    session = _create_session(client)
     answers = _build_answers("basic")
 
     response = client.post(
@@ -35,9 +30,8 @@ def test_submit_self_success():
     assert body["session_id"] == session["session_id"]
     assert set(body["self_norm"].keys()) == {"EI", "SN", "TF", "JP"}
 
-
-def test_submit_self_missing_question_returns_problem_details():
-    session = _create_session()
+def test_submit_self_missing_question_returns_problem_details(client):
+    session = _create_session(client)
     answers = _build_answers("basic")
     answers.pop()  # remove one question to trigger validation failure
 
@@ -52,9 +46,8 @@ def test_submit_self_missing_question_returns_problem_details():
     assert "answers" in body["errors"]
     assert any("누락된 문항" in message for message in body["errors"]["answers"])
 
-
-def test_submit_other_invalid_answers_rejected():
-    session = _create_session()
+def test_submit_other_invalid_answers_rejected(client):
+    session = _create_session(client)
     base_answers = _build_answers("basic")
 
     # Self responses must exist first
@@ -82,9 +75,8 @@ def test_submit_other_invalid_answers_rejected():
     assert body["type"].endswith("/answers-invalid")
     assert any("중복 문항" in message for message in body["errors"]["answers"])
 
-
-def test_submit_other_success_updates_respondents():
-    session = _create_session()
+def test_submit_other_success_updates_respondents(client):
+    session = _create_session(client)
     answers = _build_answers("basic")
 
     # Self baseline
@@ -106,3 +98,34 @@ def test_submit_other_success_updates_respondents():
     body = response.json()
     assert body["session_id"] == session["session_id"]
     assert body["respondents"] >= 1
+
+
+def test_submit_self_unknown_session_returns_problem_details(client):
+    response = client.post(
+        "/api/self/submit",
+        json={
+            "session_id": "missing-session",
+            "answers": [],
+        },
+    )
+
+    assert response.status_code == 404
+    body = response.json()
+    assert body["type"].endswith("/session-not-found")
+    assert body["title"] == "Session Not Found"
+
+
+def test_submit_other_unknown_invite_returns_problem_details(client):
+    response = client.post(
+        "/api/other/submit",
+        json={
+            "invite_token": "missing-token",
+            "answers": [{"question_id": 1, "value": 3}],
+            "relation_tag": "friend",
+        },
+    )
+
+    assert response.status_code == 404
+    body = response.json()
+    assert body["type"].endswith("/invite-not-found")
+    assert body["title"] == "Invite Not Found"

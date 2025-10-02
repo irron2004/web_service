@@ -1,18 +1,48 @@
-﻿from fastapi import APIRouter, Depends
+from statistics import fmean
+
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Session as SessionModel
 from app.schemas import ResultDetail
 from app.services.aggregator import recalculate_aggregate
-from app.services.scoring import ScoringError
+from app.services.scoring import ScoringError, norm_to_radar
 from app.utils.problem_details import ProblemDetailsException
+from app.utils.privacy import apply_noindex_headers
 
 router = APIRouter(prefix="/api", tags=["results"])
 
+PREVIEW_SELF_NORM = {'EI': 0.35, 'SN': -0.2, 'TF': 0.15, 'JP': -0.4}
+PREVIEW_OTHER_NORM = {'EI': -0.1, 'SN': 0.4, 'TF': -0.05, 'JP': 0.2}
+PREVIEW_GAP = {'EI': -0.45, 'SN': 0.6, 'TF': -0.2, 'JP': 0.6}
+PREVIEW_SIGMA = {'EI': 0.32, 'SN': 0.27, 'TF': 0.41, 'JP': 0.38}
+PREVIEW_GAP_SCORE = 46.25
+PREVIEW_RESULT = ResultDetail(
+    session_id="demo-session",
+    mode="preview",
+    n=4,
+    self_norm=PREVIEW_SELF_NORM,
+    other_norm=PREVIEW_OTHER_NORM,
+    gap=PREVIEW_GAP,
+    sigma=PREVIEW_SIGMA,
+    gap_score=PREVIEW_GAP_SCORE,
+    radar_self=norm_to_radar(PREVIEW_SELF_NORM),
+    radar_other=norm_to_radar(PREVIEW_OTHER_NORM),
+)
+
+
+@router.get("/result/preview", response_model=ResultDetail)
+async def preview_result() -> ResultDetail:
+    return PREVIEW_RESULT
+
 
 @router.get("/result/{invite_token}", response_model=ResultDetail)
-async def fetch_result(invite_token: str, db: Session = Depends(get_db)):
+async def fetch_result(
+    invite_token: str,
+    response: Response,
+    db: Session = Depends(get_db),
+):
     session = (
         db.query(SessionModel)
         .filter(SessionModel.invite_token == invite_token)
@@ -42,7 +72,7 @@ async def fetch_result(invite_token: str, db: Session = Depends(get_db)):
     if session.mode != "couple" and (result.n or 0) < 3:
         publish_other = False
 
-    return ResultDetail(
+    result_payload = ResultDetail(
         session_id=session.id,
         mode=session.mode,
         n=result.n,
@@ -54,3 +84,7 @@ async def fetch_result(invite_token: str, db: Session = Depends(get_db)):
         radar_self=result.radar_self,
         radar_other=result.radar_other if publish_other else None,
     )
+
+    apply_noindex_headers(response)
+
+    return result_payload

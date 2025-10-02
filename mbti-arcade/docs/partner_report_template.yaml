@@ -1,0 +1,73 @@
+meta:
+  version: 1.0
+  language: ko
+  relation_label: 연인
+  tone: warm-empathetic
+variables:
+  user_name: ""
+  self_type: ""
+  n_partners: 0
+  top1_type: ""
+  top1_pct: 0
+  top2_type: ""
+  top2_pct: 0
+  conf_score: 0.0
+  conf_label: ""
+  pgi_score: 0
+  diff_axes: []
+  axis_shift:
+    EI: ""
+    SN: ""
+    TF: ""
+    JP: ""
+templates:
+  tldr: |
+    {{user_name}} 님의 Self는 {{self_type}}입니다.
+    연인은 {{top1_type}}(약 {{top1_pct}}%)로 보며, 의견 일치도는 {{conf_label}}입니다.
+    Perception Gap 지수는 {{pgi_score}}/100이며, {{diff_axes | length}}개 축에서 차이가 관찰됩니다.
+
+  summary: |
+    총 {{n_partners}}명의 연인 응답이 반영되었습니다. 최빈 유형은 {{top1_type}}, 다음은 {{top2_type}}({{top2_pct}}%)입니다.
+    합의도({{conf_label}})는 연인이 보는 인식의 집중도를 의미합니다.
+
+  gap_analysis: |
+    Self({{self_type}})와 연인 인식 간 차이가 큰 축: {{diff_axes | join(", ")}}.
+    {% if axis_shift.EI %}- **EI**: 연인은 {{ "외향(E)" if axis_shift.EI == "E" else "내향(I)" }} 신호를 더 자주 보았습니다.{% endif %}
+    {% if axis_shift.SN %}- **SN**: 연인은 {{ "감각(S)" if axis_shift.SN == "S" else "직관(N)" }} 기반 접근을 더 강하게 보았습니다.{% endif %}
+    {% if axis_shift.TF %}- **TF**: 연인은 {{ "사고(T)" if axis_shift.TF == "T" else "감정(F)" }} 기준을 더 두드러지게 인식했습니다.{% endif %}
+    {% if axis_shift.JP %}- **JP**: 연인은 {{ "판단(J)" if axis_shift.JP == "J" else "인식(P)" }} 성향을 더 자주 보았습니다.{% endif %}
+
+  suggestions_header: "더 편안한 관계를 위한 제안:"
+  suggestions_body:
+    - "{{tips.dynamic_intro}}"
+    - "{% for line in tips.axis_based %}{{ line }}{% endfor %}"
+    - "{{tips.end_note}}"
+
+phrasebook:
+  confidence_labels:
+    - { if: "conf_score >= 0.67", label: "높음" }
+    - { if: "0.34 <= conf_score < 0.67", label: "중간" }
+    - { if: "conf_score < 0.34", label: "낮음" }
+
+  tips_by_axis:
+    EI:
+      E: "공개적 애정표현은 장점입니다. 다만 조용한 시간도 주기적으로 제안해 균형을 맞춰보세요."
+      I: "조용함을 오해하지 않도록, 애정 표현의 선호 방식을 미리 알려주세요(예: 메시지/편지)."
+    SN:
+      S: "데이트 전 시간·장소·예산을 간단히 정리해주면 안정감이 커집니다."
+      N: "서프라이즈나 테마 제안 시, 간단한 예산/시간 틀도 함께 공유하면 설득력이 커집니다."
+    TF:
+      T: "해결책을 말하기 전 감정을 1문장으로 인정해 주세요(예: '서운했겠다')."
+      F: "공감 후에는 다음 단계 1가지를 함께 합의해 주세요(언제/무엇)."
+    JP:
+      J: "계획·준비는 강점입니다. 즉흥 변화에 대비해 작은 여유(버퍼)를 남겨두면 좋아요."
+      P: "유연성은 강점입니다. 대신 핵심 이벤트/예산만은 미리 합의해 혼선을 줄이세요."
+
+defaults:
+  tips:
+    dynamic_intro: "연인이 보는 강점을 살리고, 차이가 큰 축은 작은 습관으로 보완해 보세요."
+    axis_based: []
+    end_note: "이 리포트는 오락/자기이해 목적이며, 관계 대화의 출발점으로 활용해 주세요."
+
+disclaimer: |
+  본 리포트는 심리 진단이 아니며, 응답 분포/맥락에 따라 결과가 달라질 수 있습니다.

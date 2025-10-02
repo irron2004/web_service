@@ -1,6 +1,6 @@
 ﻿from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 DEFAULT_EXPIRES_HOURS = 72
@@ -16,4 +16,4 @@ def generate_invite_token() -> str:
 
 
 def compute_expiry(hours: int) -> datetime:
-    return datetime.utcnow() + timedelta(hours=hours)
+    return datetime.now(timezone.utc) + timedelta(hours=hours)

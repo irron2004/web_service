@@ -1,5 +1,5 @@
-﻿import hashlib
-from datetime import datetime
+import hashlib
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func
@@ -24,7 +24,10 @@ router = APIRouter(prefix="/api", tags=["responses"])
 
 
 def ensure_session_active(session: SessionModel) -> None:
-    if session.expires_at < datetime.utcnow():
+    expires_at = session.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
         raise ProblemDetailsException(
             status_code=410,
             title="Session Expired",

@@ -1,15 +1,19 @@
-from sqlmodel import Field, SQLModel
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 from typing import Dict, Optional
 from sqlalchemy import JSON
+from sqlmodel import Field, SQLModel
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
 
 class Friend(SQLModel, table=True):
     email: str = Field(primary_key=True, index=True)
     name: str
     description: Optional[str] = None
     actual_mbti: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=_utcnow)
     mbti_updated_at: Optional[datetime] = None
 
 class Pair(SQLModel, table=True):
@@ -20,7 +24,7 @@ class Pair(SQLModel, table=True):
     my_email: str | None = None    # 내 이메일 (공유자 정보)
     my_mbti: str | None = None     # 내 MBTI (공유자 정보)
     completed: bool = False
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=_utcnow)
 
 class Response(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -31,4 +35,4 @@ class Response(SQLModel, table=True):
     mbti_type: str
     scores: str = Field(sa_column=JSON)   # JSON string으로 저장
     raw_scores: str = Field(sa_column=JSON)  # JSON string으로 저장
-    created_at: datetime = Field(default_factory=datetime.utcnow) 
+    created_at: datetime = Field(default_factory=_utcnow)

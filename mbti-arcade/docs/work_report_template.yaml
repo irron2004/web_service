@@ -1,0 +1,74 @@
+meta:
+  version: 1.0
+  language: ko
+  relation_label: 직장
+  tone: professional-friendly
+variables:
+  user_name: ""
+  self_type: ""
+  n_coworkers: 0
+  top1_type: ""
+  top1_pct: 0
+  top2_type: ""
+  top2_pct: 0
+  conf_score: 0.0
+  conf_label: ""
+  pgi_score: 0
+  diff_axes: []
+  axis_shift:
+    EI: ""
+    SN: ""
+    TF: ""
+    JP: ""
+templates:
+  tldr: |
+    {{user_name}} 님의 Self는 {{self_type}}입니다.
+    직장 동료들은 {{top1_type}}(약 {{top1_pct}}%)로 보는 경향이며, 의견 일치도는 {{conf_label}}입니다.
+    Perception Gap 지수는 {{pgi_score}}/100으로, {{diff_axes | length}}개 축에서 차이가 관찰됩니다.
+
+  summary: |
+    총 {{n_coworkers}}명의 동료 응답이 집계되었습니다. 최빈 유형은 {{top1_type}}, 다음은 {{top2_type}}(약 {{top2_pct}}%)입니다.
+    합의도({{conf_label}})는 응답 분포의 집중도로, 높을수록 조직 내 공통 인식이 강하다는 의미입니다.
+
+  gap_analysis: |
+    Self({{self_type}})와 직장 평균 사이에 차이가 큰 축: {{diff_axes | join(", ")}}.
+    {% if axis_shift.EI %}- **EI**: 동료들은 {{ "외향(E)" if axis_shift.EI == "E" else "내향(I)" }} 신호를 더 자주 관찰했습니다.{% endif %}
+    {% if axis_shift.SN %}- **SN**: 동료들은 {{ "감각(S)" if axis_shift.SN == "S" else "직관(N)" }} 기반 접근을 더 강하게 보았습니다.{% endif %}
+    {% if axis_shift.TF %}- **TF**: 동료들은 {{ "사고(T)" if axis_shift.TF == "T" else "감정(F)" }} 기준을 더 두드러지게 인지했습니다.{% endif %}
+    {% if axis_shift.JP %}- **JP**: 동료들은 {{ "판단(J)" if axis_shift.JP == "J" else "인식(P)" }} 성향을 더 자주 관찰했습니다.{% endif %}
+
+  suggestions_header: "업무 상황에서 기대치 정렬을 위한 제안:"
+  suggestions_body:
+    - "{{tips.dynamic_intro}}"
+    - "{% for line in tips.axis_based %}{{ line }}{% endfor %}"
+    - "{{tips.ops_note}}"
+
+phrasebook:
+  confidence_labels:
+    - { if: "conf_score >= 0.67", label: "높음" }
+    - { if: "0.34 <= conf_score < 0.67", label: "중간" }
+    - { if: "conf_score < 0.34", label: "낮음" }
+
+  tips_by_axis:
+    EI:
+      E: "회의에서 발언 기회를 라운드로빈으로 배분하고, 파킹랏을 두어 다른 의견도 담아보세요."
+      I: "사전 메모/프리리드로 의견을 남기고, 핵심 포인트는 회의 초반에 1분 요약으로 신호를 주세요."
+    SN:
+      S: "PRD·체크리스트·근거 링크를 함께 공유하면 의사결정 속도가 빨라집니다."
+      N: "비전/가설을 제시한 뒤, 실험 계획(MVP/가드레일/측정 기준)을 함께 제안하세요."
+    TF:
+      T: "데이터를 말하기 전, 이해관계자의 감정을 1문장으로 먼저 인정해 주세요(예: '답답했을 수 있어요')."
+      F: "공감 후에는 결정 프레임(대안/장단/결정 기준)을 짧게 명시해 마무리하세요."
+    JP:
+      J: "계획·문서화는 강점입니다. 변경 버퍼/체인지로그를 두어 변동성도 흡수하세요."
+      P: "유연성은 강점입니다. 마일스톤·완료 정의(DoD)를 명확히 적어 혼선을 줄이세요."
+
+defaults:
+  tips:
+    dynamic_intro: "동료들이 보는 강점을 살리되, 차이가 큰 축은 작은 습관으로 기대치를 맞춰보세요."
+    axis_based: []
+    ops_note: "본 리포트는 HR 평가 용도가 아니라 협업 개선을 돕기 위한 참고 자료입니다."
+
+disclaimer: |
+  본 리포트는 오락 및 자기이해를 돕기 위한 정보이며 인사평가 용도가 아닙니다.
+  응답 분포/맥락에 따라 결과가 달라질 수 있습니다.

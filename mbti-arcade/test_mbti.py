@@ -17,8 +17,10 @@ def db_session():
 
 def test_token_roundtrip():
     pid = "test123"
-    token = issue_token(pid)
-    assert verify_token(token) == pid
+    my_mbti = "INTJ"
+    token = issue_token(pid, my_mbti)
+    verified_pid, verified_mbti = verify_token(token)
+    assert (verified_pid, verified_mbti) == (pid, my_mbti)
 
 def test_calc_ei_positive(db_session):
     svc = MBTIService(db_session)

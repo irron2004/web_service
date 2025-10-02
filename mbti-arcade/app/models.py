@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from sqlalchemy import (
@@ -18,14 +18,18 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime(timezone=True), default=_utcnow, nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        DateTime(timezone=True),
+        default=_utcnow,
+        onupdate=_utcnow,
         nullable=False,
     )
 
@@ -48,7 +52,7 @@ class Session(Base, TimestampMixin):
     mode: Mapped[str] = mapped_column(String(20), nullable=False)
     invite_token: Mapped[str] = mapped_column(String(60), unique=True, nullable=False)
     is_anonymous: Mapped[bool] = mapped_column(Boolean, default=True)
-    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     max_raters: Mapped[int] = mapped_column(Integer, default=50)
 
     owner: Mapped[User | None] = relationship(back_populates="sessions")
@@ -138,3 +142,4 @@ class Aggregate(Base, TimestampMixin):
     gap_score: Mapped[float | None] = mapped_column(Float)
 
     session: Mapped[Session] = relationship(back_populates="aggregate")
+

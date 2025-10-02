@@ -2,7 +2,7 @@
 
 360Me delivers the "If I were you" perception-gap experience. We compare how people see themselves versus how others see them, surface the gaps, and make it easy to share insights. This monorepo keeps the FastAPI backend, supporting services, and the product/operations docs together so experiments and deployments stay consistent.
 
-- **Key specs**: `PRD.md`, `DesignOptions.md`, `Tasks.md`, `DeploymentPlan.md`, and the guides under `docs/`
+- **Key specs**: `PRD.md`, `DesignOptions.md`, `Tasks.md`, `DeploymentPlan.md`, [`AGENTS.md`](AGENTS.md), and the guides under `docs/`
 - **Mandatory standards**: RFC 9457 error schema, WCAG 2.2 AA, Web Vitals (LCP≤2.5 s / INP≤200 ms / CLS≤0.1), OpenTelemetry observability, k≥3 anonymity safeguard, AdSense confirmed-click prevention
 
 ---
@@ -34,7 +34,7 @@
 
 ```
 web_service_new/
-|- calculate-service/        # Auxiliary FastAPI example service
+|- calculate-service/        # 분리된 FastAPI 계산 서비스 (독립 실행/배포)
 |- main-service/             # Hub/landing FastAPI app (Jinja templates)
 |- math-app/                 # Simple learning SPA
 |- mbti-arcade/              # Core perception-gap API (FastAPI + SQLAlchemy)
@@ -55,7 +55,7 @@ All services can run independently; `mbti-arcade` is the production backend for 
 |--------------------|----------------------|------------------|
 | `mbti-arcade`      | FastAPI, SQLAlchemy, Jinja | Questionnaire API, session/invite flow, self & other submissions, aggregation, OG images |
 | `main-service`     | FastAPI, Jinja       | Hub landing pages, links to other apps, health endpoints |
-| `calculate-service`| FastAPI              | Education-themed sample API |
+| `calculate-service`| FastAPI (standalone) | 독립 실행·배포용 교육 샘플 API |
 | `math-app`         | Static SPA (HTML/JS) | Lightweight teaching site |
 | `nginx`            | Nginx configs        | Dev reverse-proxy examples |
 
@@ -98,6 +98,8 @@ uvicorn app.main:app --reload --port 8080
 ```
 
 ### Sample calculator (`calculate-service`)
+
+> 지금은 `calculate-service/README.md`를 기준으로 독립 개발·배포를 진행합니다. 아래 명령은 빠른 로컬 확인용 예시입니다.
 ```bash
 cd ../calculate-service
 pip install -r requirements.txt
@@ -141,6 +143,7 @@ Need to proxy multiple services behind one origin? See the `nginx/` folder for e
 | `docs/testing.md` | Testing, performance, accessibility, observability strategy |
 | `docs/agent_runbook.md` | Operations, release, rollback procedures |
 | `CLOUDFLARE-SETUP.md` | Cloudflare Pages/Workers setup notes |
+| `AGENTS.md` | Contributor quick-start guidelines |
 
 ---
 

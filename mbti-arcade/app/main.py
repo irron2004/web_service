@@ -21,15 +21,25 @@ from app.routers import sessions as sessions_router
 from app.routers import share as share_router
 from app.routers import quiz as quiz_router
 from app.routers import report as report_router
+from app.routers import og as og_router
+from app.routers import couple as couple_router
+from app.observability import bind_request_id, configure_observability, reset_request_id
 from app.utils.problem_details import (
     ProblemDetailsException,
     from_exception,
     from_http_exception,
     from_validation_error,
     internal_server_error,
+    problem_response,
 )
+from app.utils.privacy import apply_noindex_headers, NOINDEX_VALUE
 from app.schemas import DIMENSIONS
 from app.services.scoring import compute_norms, norm_to_radar
+
+try:  # pragma: no cover - optional dependency
+    from slowapi.errors import RateLimitExceeded  # type: ignore[import]
+except ImportError:  # pragma: no cover - optional dependency
+    RateLimitExceeded = None  # type: ignore[assignment]
 
 log = logging.getLogger("perception_gap")
 
@@ -40,6 +50,14 @@ app = FastAPI(
 )
 
 templates = Jinja2Templates(directory="app/templates")
+
+# Set up OpenTelemetry instrumentation if available.
+configure_observability(app)
+
+try:  # pragma: no cover - optional dependency hook
+    from opentelemetry import trace  # type: ignore[import]
+except ImportError:  # pragma: no cover - optional dependency
+    trace = None  # type: ignore[assignment]
 
 
 def _build_questions(mode: str, *, perspective: str) -> list[dict[str, object]]:
@@ -134,15 +152,57 @@ app.include_router(results_router.router)
 app.include_router(share_router.router)
 app.include_router(quiz_router.router)
 app.include_router(report_router.router)
+app.include_router(og_router.router)
+app.include_router(couple_router.router)
+
+if hasattr(share_router, "limiter"):
+    app.state.limiter = share_router.limiter
 
 
 @app.middleware("http")
 async def request_id_middleware(request: Request, call_next):
     request_id = request.headers.get(REQUEST_ID_HEADER, str(uuid4()))
     request.state.request_id = request_id
-    response = await call_next(request)
+    token = bind_request_id(request_id)
+    try:
+        response = await call_next(request)
+    finally:
+        reset_request_id(token)
     response.headers[REQUEST_ID_HEADER] = request_id
+    if trace:
+        span = trace.get_current_span()
+        if span and span.is_recording():
+            span.set_attribute("http.request_id", request_id)
+    if response.status_code == 404:
+        override = problem_response(
+            request,
+            status=404,
+            title="Not Found",
+            detail="Not Found",
+            type_suffix="http-404",
+        )
+        override.headers[REQUEST_ID_HEADER] = request_id
+        return override
     return response
+
+
+if RateLimitExceeded:  # pragma: no cover - optional dependency
+
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_exception_handler(request: Request, exc: RateLimitExceeded):
+        detail = getattr(exc, "detail", "요청 한도를 초과했습니다.")
+        response = problem_response(
+            request,
+            status=429,
+            title="Rate Limit Exceeded",
+            detail=detail,
+            type_suffix="rate-limit",
+        )
+        headers = getattr(exc, "headers", None)
+        if headers:
+            for key, value in headers.items():
+                response.headers[key] = value
+        return response
 
 
 @app.exception_handler(ProblemDetailsException)
@@ -284,15 +344,18 @@ async def mbti_self_result(request: Request):
 
     result = MBTI_SUMMARIES.get(mbti_type, _DEFAULT_SUMMARY)
 
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "mbti/self_result.html",
         {
             "request": request,
             "mbti_type": mbti_type,
             "scores": scores,
             "result": result,
+            "robots_meta": NOINDEX_VALUE,
         },
     )
+    apply_noindex_headers(response)
+    return response
 
 
 @app.post("/mbti/result", response_class=HTMLResponse)
@@ -316,7 +379,7 @@ async def mbti_result(request: Request):
 
     result = MBTI_SUMMARIES.get(mbti_type, _DEFAULT_SUMMARY)
 
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "mbti/result.html",
         {
             "request": request,
@@ -324,8 +387,11 @@ async def mbti_result(request: Request):
             "scores": scores,
             "result": result,
             "pair_token": None,
+            "robots_meta": NOINDEX_VALUE,
         },
     )
+    apply_noindex_headers(response)
+    return response
 
 
 @app.post("/mbti/result/{token}", response_class=HTMLResponse)
@@ -390,7 +456,7 @@ async def mbti_friend_result(request: Request, token: str):
         }
     }
 
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "mbti/friend_results.html",
         {
             "request": request,
@@ -401,8 +467,11 @@ async def mbti_friend_result(request: Request, token: str):
             "my_mbti": my_mbti,
             "friend_info": friend_info,
             "statistics": statistics,
+            "robots_meta": NOINDEX_VALUE,
         },
     )
+    apply_noindex_headers(response)
+    return response
 
 
 @app.get("/mbti/types", response_class=HTMLResponse)
@@ -428,25 +497,31 @@ async def mbti_share(
     name: str | None = None,
     mbti: str | None = None,
 ):
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "mbti/share.html",
         {
             "request": request,
             "name": name,
             "mbti": mbti,
+            "robots_meta": NOINDEX_VALUE,
         },
     )
+    apply_noindex_headers(response)
+    return response
 
 
 @app.get("/mbti/share_success", response_class=HTMLResponse)
 async def mbti_share_success(request: Request, url: str | None = None):
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "mbti/share_success.html",
         {
             "request": request,
             "url": url,
+            "robots_meta": NOINDEX_VALUE,
         },
     )
+    apply_noindex_headers(response)
+    return response
 
 @app.get("/api", tags=["system"])
 async def api_root():
@@ -457,3 +532,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+try:  # pragma: no cover - optional dependency
+    from slowapi.errors import RateLimitExceeded  # type: ignore[import]
+except ImportError:  # pragma: no cover - optional dependency
+    RateLimitExceeded = None  # type: ignore[assignment]

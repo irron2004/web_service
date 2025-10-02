@@ -1,12 +1,8 @@
-import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+from urllib.parse import parse_qs, urlparse
 
-@pytest.mark.asyncio
-async def test_share_flow():
+
+def test_share_flow(client):
     """공유 링크 생성 → 퀴즈 → 결과 플로우 테스트"""
-    
-    client = TestClient(app)
     
     # 1. 공유 링크 생성
     share_data = {
@@ -16,9 +12,6 @@ async def test_share_flow():
     }
     
     response = client.post("/share", data=share_data, follow_redirects=False)
-    print(f"Response status: {response.status_code}")
-    print(f"Response headers: {response.headers}")
-    print(f"Response text: {response.text}")
     assert response.status_code == 303  # Redirect
     
     # 2. 퀴즈 페이지 접근 (리다이렉트 URL에서 토큰 추출)
@@ -28,7 +21,6 @@ async def test_share_flow():
     assert "/mbti/share_success?url=" in redirect_url
     
     # URL에서 토큰 추출
-    from urllib.parse import urlparse, parse_qs
     parsed_url = urlparse(redirect_url)
     query_params = parse_qs(parsed_url.query)
     share_url = query_params.get("url", [None])[0]
@@ -51,38 +43,31 @@ async def test_share_flow():
         quiz_data[f"q{qid}"] = "3"  # 보통이다
     
     response = client.post(f"/mbti/result/{test_token}", data=quiz_data)
-    print(f"Result response status: {response.status_code}")
-    print(f"Result response text: {response.text}")
     assert response.status_code == 200
 
-@pytest.mark.asyncio
-async def test_expired_token():
+def test_expired_token(client):
     """만료된 토큰 테스트"""
-    
-    client = TestClient(app)
     
     # 잘못된 토큰으로 접근
     response = client.get("/quiz/invalid_token")
     assert response.status_code == 403
 
-@pytest.mark.asyncio
-async def test_rate_limit():
+def test_rate_limit_returns_problem_details(client):
     """Rate limiting 테스트"""
-    
-    client = TestClient(app)
-    
+
     share_data = {
         "name": "테스트 사용자",
         "email": "test@example.com",
-        "my_mbti": "INTJ"
+        "my_mbti": "INTJ",
     }
-    
-    # 연속으로 여러 번 요청
-    for _ in range(3):
-        response = client.post("/share", data=share_data)
-    
-    # Rate limit에 걸려야 함
-    assert response.status_code == 429
 
-if __name__ == "__main__":
-    pytest.main([__file__]) 
+    first = client.post("/share", data=share_data, follow_redirects=False)
+    assert first.status_code == 303
+
+    limited = client.post("/share", data=share_data, follow_redirects=False)
+    assert limited.status_code == 429
+
+    body = limited.json()
+    assert body["type"].endswith("/rate-limit")
+    assert body["title"] == "Rate Limit Exceeded"
+    assert "Retry-After" in limited.headers
