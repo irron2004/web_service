@@ -13,6 +13,7 @@
     .chart-card {
         position: relative;
         min-height: 18rem;
+        overflow: hidden;
     }
 
     .chart-card[aria-busy="true"]::after {
@@ -27,6 +28,16 @@
     @keyframes shimmer {
         0% { background-position: -200% 0; }
         100% { background-position: 200% 0; }
+    }
+
+    [data-preview] {
+        overflow-x: hidden;
+    }
+
+    [data-preview] canvas {
+        display: block;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
