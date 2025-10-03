@@ -6,9 +6,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import get_settings
-from .instrumentation import RequestContextMiddleware
 from .problem_bank import refresh_cache, reset_cache
 from .repositories import AttemptRepository
+from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .routers import health, pages, problems
 
 
@@ -48,6 +48,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    configure_telemetry(app)
+
     # Ensure templates/tests can resolve relative paths when run from any CWD.
     base_dir = Path(__file__).resolve().parent
     static_dir = base_dir / "static"
@@ -57,6 +59,12 @@ def create_app() -> FastAPI:
     templates = Jinja2Templates(directory=template_dir)
 
     app.add_middleware(RequestContextMiddleware)
+
+    # Store frequently used resources on the application state so ancillary
+    # components (health checks, background tasks, etc.) can reuse them without
+    # rebuilding instances.
+    app.state.settings = settings
+    app.state.templates = templates
 
     app.include_router(health.router)
     app.include_router(pages.get_router(templates))
