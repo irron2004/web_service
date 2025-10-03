@@ -35,9 +35,21 @@ def create_app() -> FastAPI:
 
     app.add_middleware(RequestContextMiddleware)
 
+    # Older router modules exposed a factory (``get_router``) so we gracefully
+    # support both patterns to avoid merge conflicts when downstream branches
+    # still rely on the function based API.
+    page_router = (
+        pages.get_router(templates) if hasattr(pages, "get_router") else pages.router
+    )
+    invite_router = (
+        invites.get_router(templates)
+        if hasattr(invites, "get_router")
+        else invites.router
+    )
+
     app.include_router(health.router)
-    app.include_router(pages.router)
-    app.include_router(invites.router)
+    app.include_router(page_router)
+    app.include_router(invite_router)
     app.include_router(problems.router)
 
     return app
