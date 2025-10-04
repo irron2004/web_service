@@ -185,7 +185,36 @@ class HostValidationMiddleware(BaseHTTPMiddleware):
         )
 
 
-app.add_middleware(HostValidationMiddleware, allowed_hosts=_load_allowed_hosts())
+_ALLOWED_HOSTS = _load_allowed_hosts()
+
+
+class ForwardedHeadersMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app: FastAPI) -> None:
+        super().__init__(app)
+
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
+        forwarded_proto = request.headers.get("x-forwarded-proto")
+        if forwarded_proto:
+            scheme = forwarded_proto.split(",")[0].strip()
+            if scheme:
+                request.scope["scheme"] = scheme
+        forwarded_host = request.headers.get("x-forwarded-host") or request.headers.get("host")
+        if forwarded_host:
+            host_value = forwarded_host.split(",")[0].strip()
+            if host_value:
+                hostname, _, port_text = host_value.partition(":")
+                try:
+                    port = int(port_text) if port_text else None
+                except ValueError:
+                    port = None
+                if port is None:
+                    port = 443 if request.scope.get("scheme") == "https" else 80
+                request.scope["server"] = (hostname.lower(), port)
+        return await call_next(request)
+
+
+app.add_middleware(HostValidationMiddleware, allowed_hosts=_ALLOWED_HOSTS)
+app.add_middleware(ForwardedHeadersMiddleware)
 
 try:  # pragma: no cover - optional dependency hook
     from opentelemetry import trace  # type: ignore[import]
