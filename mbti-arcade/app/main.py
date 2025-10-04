@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import logging
-import os
-from urllib.parse import urlparse
 import time
 from email.utils import formatdate
 from pathlib import Path
@@ -13,10 +11,44 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from starlette.datastructures import Headers, URL as StarletteURL
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import RedirectResponse
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+try:
+    from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
+except ImportError:  # pragma: no cover - fallback for older Starlette versions
+    from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+
+    class ProxyHeadersMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
+            forwarded_proto = request.headers.get("x-forwarded-proto")
+            if forwarded_proto:
+                scheme = forwarded_proto.split(",")[0].strip()
+                if scheme:
+                    request.scope["scheme"] = scheme
+
+            forwarded_host = request.headers.get("x-forwarded-host") or request.headers.get("host")
+            if forwarded_host:
+                host_value = forwarded_host.split(",")[0].strip()
+                if host_value:
+                    hostname, _, port_text = host_value.partition(":")
+                    try:
+                        port = int(port_text) if port_text else None
+                    except ValueError:
+                        port = None
+                    if port is None:
+                        port = 443 if request.scope.get("scheme") == "https" else 80
+                    request.scope["server"] = (hostname.lower(), port)
+
+            forwarded_for = request.headers.get("x-forwarded-for")
+            if forwarded_for:
+                client_ip = forwarded_for.split(",")[0].strip()
+                if client_ip:
+                    client = request.scope.get("client") or (None, 0)
+                    request.scope["client"] = (client_ip, client[1] or 0)
+
+            return await call_next(request)
+
+from app import settings
 from app.core.config import REQUEST_ID_HEADER
 from app.core.db import get_session as get_core_session
 from app.data.loader import seed_questions
@@ -87,134 +119,12 @@ templates.env.filters.setdefault("escapejs", _escape_js)
 # Set up OpenTelemetry instrumentation if available.
 configure_observability(app)
 
+_allowed_hosts = list(settings.ALLOWED_HOSTS)
+if "testserver" not in _allowed_hosts:
+    _allowed_hosts.append("testserver")
 
-_DEFAULT_ALLOWED_HOSTS = {
-    "localhost",
-    "localhost:8000",
-    "127.0.0.1",
-    "127.0.0.1:8000",
-    "testserver",
-    "360me.app",
-    "www.360me.app",
-    "api.360me.app",
-    "*.360me.app",
-}
-
-
-def _normalize_host_pattern(value: str) -> str | None:
-    pattern = value.strip()
-    if not pattern:
-        return None
-    if pattern == "*":
-        return pattern
-
-    parsed = urlparse(pattern)
-    candidate = parsed.netloc or parsed.path or pattern
-    candidate = candidate.rstrip("/")
-    if not candidate:
-        return None
-    return candidate.lower()
-
-
-def _load_allowed_hosts() -> list[str]:
-    raw = os.getenv("ALLOWED_HOSTS", "")
-    declared: list[str] = []
-    for host in raw.split(","):
-        normalized = _normalize_host_pattern(host)
-        if not normalized:
-            continue
-        if normalized == "*":
-            return ["*"]
-        if normalized not in declared:
-            declared.append(normalized)
-    if declared:
-        for default_host in _DEFAULT_ALLOWED_HOSTS:
-            if default_host not in declared:
-                declared.append(default_host)
-        return declared
-    return sorted(_DEFAULT_ALLOWED_HOSTS)
-
-
-class HostValidationMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: FastAPI, *, allowed_hosts: list[str], www_redirect: bool = True) -> None:
-        super().__init__(app)
-        self.allow_any = "*" in allowed_hosts
-        processed: list[str] = []
-        seen: set[str] = set()
-        for pattern in allowed_hosts:
-            if pattern == "*":
-                continue
-            base_pattern = pattern.split(":", 1)[0]
-            if base_pattern not in seen:
-                processed.append(base_pattern)
-                seen.add(base_pattern)
-        self.allowed_hosts = processed
-        self.www_redirect = www_redirect
-
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        if self.allow_any or request.scope.get("type") not in {"http", "websocket"}:
-            return await call_next(request)
-
-        headers = Headers(scope=request.scope)
-        host_header = headers.get("host", "")
-        host = host_header.split(":")[0].lower()
-        is_valid = False
-        found_www_redirect = False
-
-        for pattern in self.allowed_hosts:
-            if host == pattern or (pattern.startswith("*.") and host.endswith(pattern[1:])):
-                is_valid = True
-                break
-            if f"www.{host}" == pattern:
-                found_www_redirect = True
-
-        if is_valid:
-            return await call_next(request)
-
-        if found_www_redirect and self.www_redirect:
-            url = StarletteURL(scope=request.scope)
-            redirect_url = url.replace(netloc=f"www.{url.netloc}")
-            return RedirectResponse(url=str(redirect_url))
-
-        return problem_response(
-            request,
-            status=400,
-            title="Bad Request",
-            detail="Invalid host header",
-            type_suffix="invalid-host",
-        )
-
-
-_ALLOWED_HOSTS = _load_allowed_hosts()
-
-
-class ForwardedHeadersMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: FastAPI) -> None:
-        super().__init__(app)
-
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        forwarded_proto = request.headers.get("x-forwarded-proto")
-        if forwarded_proto:
-            scheme = forwarded_proto.split(",")[0].strip()
-            if scheme:
-                request.scope["scheme"] = scheme
-        forwarded_host = request.headers.get("x-forwarded-host") or request.headers.get("host")
-        if forwarded_host:
-            host_value = forwarded_host.split(",")[0].strip()
-            if host_value:
-                hostname, _, port_text = host_value.partition(":")
-                try:
-                    port = int(port_text) if port_text else None
-                except ValueError:
-                    port = None
-                if port is None:
-                    port = 443 if request.scope.get("scheme") == "https" else 80
-                request.scope["server"] = (hostname.lower(), port)
-        return await call_next(request)
-
-
-app.add_middleware(HostValidationMiddleware, allowed_hosts=_ALLOWED_HOSTS)
-app.add_middleware(ForwardedHeadersMiddleware)
+app.add_middleware(ProxyHeadersMiddleware)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=_allowed_hosts)
 
 try:  # pragma: no cover - optional dependency hook
     from opentelemetry import trace  # type: ignore[import]
