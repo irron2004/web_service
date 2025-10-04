@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+from urllib.parse import urlparse
 import time
 from email.utils import formatdate
 from pathlib import Path
@@ -86,6 +87,7 @@ templates.env.filters.setdefault("escapejs", _escape_js)
 # Set up OpenTelemetry instrumentation if available.
 configure_observability(app)
 
+
 _DEFAULT_ALLOWED_HOSTS = {
     "localhost",
     "localhost:8000",
@@ -95,11 +97,32 @@ _DEFAULT_ALLOWED_HOSTS = {
 }
 
 
+def _normalize_host_pattern(value: str) -> str | None:
+    pattern = value.strip()
+    if not pattern:
+        return None
+    if pattern == "*":
+        return pattern
+
+    parsed = urlparse(pattern)
+    candidate = parsed.netloc or parsed.path or pattern
+    candidate = candidate.rstrip("/")
+    if not candidate:
+        return None
+    return candidate.lower()
+
+
 def _load_allowed_hosts() -> list[str]:
     raw = os.getenv("ALLOWED_HOSTS", "")
-    declared = [host.strip() for host in raw.split(",") if host.strip()]
-    if "*" in declared:
-        return ["*"]
+    declared: list[str] = []
+    for host in raw.split(","):
+        normalized = _normalize_host_pattern(host)
+        if not normalized:
+            continue
+        if normalized == "*":
+            return ["*"]
+        if normalized not in declared:
+            declared.append(normalized)
     if declared:
         for default_host in _DEFAULT_ALLOWED_HOSTS:
             if default_host not in declared:
@@ -130,7 +153,7 @@ class HostValidationMiddleware(BaseHTTPMiddleware):
 
         headers = Headers(scope=request.scope)
         host_header = headers.get("host", "")
-        host = host_header.split(":")[0]
+        host = host_header.split(":")[0].lower()
         is_valid = False
         found_www_redirect = False
 
