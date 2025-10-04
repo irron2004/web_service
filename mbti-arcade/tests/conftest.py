@@ -1,7 +1,18 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 from fastapi import FastAPI
+
+os.environ.setdefault(
+    "CANONICAL_BASE_URL",
+    "https://webservice-production-c039.up.railway.app",
+)
+os.environ.setdefault(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1,webservice-production-c039.up.railway.app",
+)
 
 from app.main import app as fastapi_app
 from .client import create_client
