@@ -94,6 +94,10 @@ _DEFAULT_ALLOWED_HOSTS = {
     "127.0.0.1",
     "127.0.0.1:8000",
     "testserver",
+    "360me.app",
+    "www.360me.app",
+    "api.360me.app",
+    "*.360me.app",
 }
 
 
