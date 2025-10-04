@@ -77,6 +77,10 @@ def configure_observability(app: FastAPI) -> bool:
     if _INSTRUMENTED:
         return True
 
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        log.debug("Skipping OpenTelemetry instrumentation during test execution")
+        return False
+
     try:
         from opentelemetry.instrumentation.fastapi import (  # type: ignore[import]
             FastAPIInstrumentor,

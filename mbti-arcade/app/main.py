@@ -1,31 +1,36 @@
 from __future__ import annotations
 
 import logging
+import os
 import time
-from pathlib import Path
 from email.utils import formatdate
+from pathlib import Path
 from typing import Dict, Iterable, Tuple
 from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from starlette.datastructures import Headers, URL as StarletteURL
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.responses import RedirectResponse
 
 from app.core.config import REQUEST_ID_HEADER
+from app.core.db import get_session as get_core_session
 from app.data.loader import seed_questions
 from app.data.questionnaire_loader import get_question_lookup
 from app.data.questions import questions_for_mode
 from app.database import Base, engine, session_scope
 from app.routers import health
+from app.routers import couple as couple_router
+from app.routers import og as og_router
+from app.routers import quiz as quiz_router
+from app.routers import report as report_router
 from app.routers import responses as responses_router
 from app.routers import results as results_router
 from app.routers import sessions as sessions_router
 from app.routers import share as share_router
-from app.routers import quiz as quiz_router
-from app.routers import report as report_router
-from app.routers import og as og_router
-from app.routers import couple as couple_router
 from app.observability import bind_request_id, configure_observability, reset_request_id
 from app.utils.problem_details import (
     ProblemDetailsException,
@@ -55,8 +60,105 @@ app = FastAPI(
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
+
+def _escape_js(value: object) -> str:
+    if value is None:
+        return ""
+    text = str(value)
+    replacements = {
+        "\\": "\\\\",
+        "\n": "\\n",
+        "\r": "\\r",
+        "\t": "\\t",
+        "\'": "\\'",
+        '"': '\\"',
+        "</": "<" + "\\/",
+        "\u2028": "\\u2028",
+        "\u2029": "\\u2029",
+    }
+    for search, replacement in replacements.items():
+        text = text.replace(search, replacement)
+    return text
+
+
+templates.env.filters.setdefault("escapejs", _escape_js)
+
 # Set up OpenTelemetry instrumentation if available.
 configure_observability(app)
+
+_DEFAULT_ALLOWED_HOSTS = {
+    "localhost",
+    "localhost:8000",
+    "127.0.0.1",
+    "127.0.0.1:8000",
+    "testserver",
+}
+
+
+def _load_allowed_hosts() -> list[str]:
+    raw = os.getenv("ALLOWED_HOSTS", "")
+    declared = [host.strip() for host in raw.split(",") if host.strip()]
+    if "*" in declared:
+        return ["*"]
+    if declared:
+        for default_host in _DEFAULT_ALLOWED_HOSTS:
+            if default_host not in declared:
+                declared.append(default_host)
+        return declared
+    return sorted(_DEFAULT_ALLOWED_HOSTS)
+
+
+class HostValidationMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app: FastAPI, *, allowed_hosts: list[str], www_redirect: bool = True) -> None:
+        super().__init__(app)
+        self.allow_any = "*" in allowed_hosts
+        processed: list[str] = []
+        seen: set[str] = set()
+        for pattern in allowed_hosts:
+            if pattern == "*":
+                continue
+            base_pattern = pattern.split(":", 1)[0]
+            if base_pattern not in seen:
+                processed.append(base_pattern)
+                seen.add(base_pattern)
+        self.allowed_hosts = processed
+        self.www_redirect = www_redirect
+
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
+        if self.allow_any or request.scope.get("type") not in {"http", "websocket"}:
+            return await call_next(request)
+
+        headers = Headers(scope=request.scope)
+        host_header = headers.get("host", "")
+        host = host_header.split(":")[0]
+        is_valid = False
+        found_www_redirect = False
+
+        for pattern in self.allowed_hosts:
+            if host == pattern or (pattern.startswith("*.") and host.endswith(pattern[1:])):
+                is_valid = True
+                break
+            if f"www.{host}" == pattern:
+                found_www_redirect = True
+
+        if is_valid:
+            return await call_next(request)
+
+        if found_www_redirect and self.www_redirect:
+            url = StarletteURL(scope=request.scope)
+            redirect_url = url.replace(netloc=f"www.{url.netloc}")
+            return RedirectResponse(url=str(redirect_url))
+
+        return problem_response(
+            request,
+            status=400,
+            title="Bad Request",
+            detail="Invalid host header",
+            type_suffix="invalid-host",
+        )
+
+
+app.add_middleware(HostValidationMiddleware, allowed_hosts=_load_allowed_hosts())
 
 try:  # pragma: no cover - optional dependency hook
     from opentelemetry import trace  # type: ignore[import]
@@ -543,6 +645,11 @@ async def mbti_share_success(request: Request, url: str | None = None):
     )
     apply_noindex_headers(response)
     return response
+
+
+@app.get("/i/{token}", response_class=HTMLResponse, name="invite_public")
+def invite_public(request: Request, token: str, session=Depends(get_core_session)):
+    return quiz_router.render_invite_page(request, token, session)
 
 @app.get("/api", tags=["system"])
 async def api_root():
