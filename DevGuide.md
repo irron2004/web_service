@@ -178,6 +178,7 @@ def flag_rules(scales: dict, raw: dict) -> list[dict]:
 - CI/CD: GitHub Actions → 테스트 → 스캔 → 스테이징 → 카나리(10 → 50 → 100)
 - 런타임: Cloud Run(리비전/롤백), Cloud SQL, Cloudflare(Pages/WAF)
 - 관측: OTel 트레이스(요청-DB-워커), 대시보드에 리비전별 P95/에러율 표기
+- 헬스체크: `/healthz`(업타임/메타데이터)와 `/readyz`(DB·Redis 핑 성공 시 200). 로컬은 `pytest mbti-arcade/tests/test_health.py -q`와 `docker compose logs mbti-arcade | grep readyz`로 확인
 - 알림: 고위험 Δ 급증·안전 안내 클릭률 급감 시 경보 룰
 
 ---
