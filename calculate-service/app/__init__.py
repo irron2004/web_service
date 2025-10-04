@@ -6,10 +6,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import get_settings
-from .problem_bank import refresh_cache, reset_cache
-from .repositories import AttemptRepository
-from .instrumentation import RequestContextMiddleware, configure_telemetry
-from .routers import health, pages, problems
+from .instrumentation import RequestContextMiddleware
+from .routers import health, invites, pages, problems
 
 
 def create_app() -> FastAPI:
@@ -58,16 +56,28 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
     templates = Jinja2Templates(directory=template_dir)
 
-    app.add_middleware(RequestContextMiddleware)
-
-    # Store frequently used resources on the application state so ancillary
-    # components (health checks, background tasks, etc.) can reuse them without
-    # rebuilding instances.
+    # Store shared resources on the application state so routers can resolve them
+    # without needing to be constructed dynamically during startup.
     app.state.settings = settings
     app.state.templates = templates
 
+    app.add_middleware(RequestContextMiddleware)
+
+    # Older router modules exposed a factory (``get_router``) so we gracefully
+    # support both patterns to avoid merge conflicts when downstream branches
+    # still rely on the function based API.
+    page_router = (
+        pages.get_router(templates) if hasattr(pages, "get_router") else pages.router
+    )
+    invite_router = (
+        invites.get_router(templates)
+        if hasattr(invites, "get_router")
+        else invites.router
+    )
+
     app.include_router(health.router)
-    app.include_router(pages.get_router(templates))
+    app.include_router(page_router)
+    app.include_router(invite_router)
     app.include_router(problems.router)
 
     return app

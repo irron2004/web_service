@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     enable_openapi: bool = True
     allowed_problem_categories: List[str] | None = None
-    problem_data_path: Path = Path(__file__).resolve().parent / "data" / "problems.json"
-    attempts_database_path: Path = Path(__file__).resolve().parent / "data" / "attempts.db"
+    invite_token_ttl_minutes: int = 180
+    invite_token_bytes: int = 16
 
     model_config = SettingsConfigDict(
         env_file=".env",

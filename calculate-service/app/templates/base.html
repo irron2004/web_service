@@ -110,10 +110,23 @@
                     <a href="http://localhost:8080" class="nav-link">메인 허브</a>
                     <a href="/health" class="nav-link">헬스체크</a>
                 </nav>
+                {% set nav_primary = primary_category %}
+                {% if nav_primary is none and categories %}
+                {% set nav_primary = categories[0] %}
+                {% endif %}
                 <div class="hidden sm:flex items-center gap-2">
-                    <a href="/problems?category=덧셈" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition hover:-translate-y-0.5 hover:bg-slate-100">
-                        <span aria-hidden="true">🚀</span> 덧셈부터 시작하기
+                    <button type="button" id="global-invite-trigger" class="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                        <span aria-hidden="true">🤝</span> Invite
+                    </button>
+                    {% if nav_primary %}
+                    <a href="/problems?category={{ nav_primary }}" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                        <span aria-hidden="true">🚀</span> {{ nav_primary }}부터 시작하기
                     </a>
+                    {% else %}
+                    <a href="/problems" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                        <span aria-hidden="true">🚀</span> 문제부터 시작하기
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </header>
@@ -133,5 +146,25 @@
             </div>
         </footer>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inviteTrigger = document.getElementById('global-invite-trigger');
+            if (!inviteTrigger) {
+                return;
+            }
+
+            inviteTrigger.addEventListener('click', () => {
+                const inviteSection = document.querySelector('[data-invite-section]');
+                if (!inviteSection) {
+                    window.location.href = '/problems';
+                    return;
+                }
+
+                inviteSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                inviteSection.classList.add('ring-2', 'ring-primary/70');
+                window.setTimeout(() => inviteSection.classList.remove('ring-2', 'ring-primary/70'), 2000);
+            });
+        });
+    </script>
 </body>
 </html>

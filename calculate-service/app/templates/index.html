@@ -16,14 +16,28 @@
             <h1 class="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
                 360Me Math Lab
             </h1>
+              {% set featured_count = category_count | default(categories|length) %}
+              {% set featured_label = cta_primary_category %}
+              {% set secondary_label = secondary_category %}
+              {% if secondary_label is none %}
+              {% set secondary_label = featured_label %}
+              {% endif %}
+              {% set show_featured_link = featured_label is not none %}
+              {% set show_secondary_link = secondary_label is not none and secondary_label != featured_label %}
             <p class="text-lg text-white/90 sm:text-xl">
-                초등 연산 4종(덧셈·뺄셈·곱셈·나눗셈)을 Self → Practice → Share 흐름으로 구성했습니다.
+                초등 연산 {{ featured_count if featured_count else 4 }}종을 Self → Practice → Share 흐름으로 구성했습니다.
                 Tailwind 기반의 접근성, Skeleton UX, noindex 정책을 유지하면서도 학습 몰입도를 높였습니다.
             </p>
             <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-                <a href="/problems?category=덧셈" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-slate-100">
-                    <span aria-hidden="true">🧠</span> 덧셈 문제 시작
+                {% if show_featured_link %}
+                <a href="/problems?category={{ featured_label }}" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                    <span aria-hidden="true">🧠</span> {{ featured_label }} 문제 시작
                 </a>
+                {% else %}
+                <a href="/problems" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                    <span aria-hidden="true">🧠</span> 문제 바로 시작
+                </a>
+                {% endif %}
                 <a href="#categories" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
                     <span aria-hidden="true">📚</span> 모든 유형 보기
                 </a>
@@ -31,7 +45,7 @@
             <dl class="mt-10 grid gap-4 text-left sm:grid-cols-3">
                 <div class="glass-card rounded-2xl px-5 py-4">
                     <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">문제 유형</dt>
-                    <dd class="mt-2 text-lg font-semibold text-white">4가지 연산</dd>
+                    <dd class="mt-2 text-lg font-semibold text-white">{{ featured_count if featured_count else 4 }}가지 연산</dd>
                 </div>
                 <div class="glass-card rounded-2xl px-5 py-4">
                     <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">총 문항</dt>
@@ -45,50 +59,17 @@
         </div>
     </section>
 
-    {% set categories = [
-        {
-            "emoji": "➕",
-            "title": "덧셈",
-            "description": "두 자리 수 덧셈으로 기본 연산 감각을 다듬어요.",
-            "href": "/problems?category=덧셈",
-            "accent": "from-sky-400/30 to-sky-500/20",
-            "cta": "덧셈 문제 풀기"
-        },
-        {
-            "emoji": "➖",
-            "title": "뺄셈",
-            "description": "받아내림·올림 개념을 시각적으로 연습합니다.",
-            "href": "/problems?category=뺄셈",
-            "accent": "from-emerald-400/30 to-emerald-500/20",
-            "cta": "뺄셈 문제 풀기"
-        },
-        {
-            "emoji": "✖️",
-            "title": "곱셈",
-            "description": "구구단과 배열 모델로 곱셈 패턴을 익혀보세요.",
-            "href": "/problems?category=곱셈",
-            "accent": "from-purple-400/30 to-purple-500/20",
-            "cta": "곱셈 문제 풀기"
-        },
-        {
-            "emoji": "➗",
-            "title": "나눗셈",
-            "description": "나눗셈을 등분·몫 관점으로 이해하도록 지도합니다.",
-            "href": "/problems?category=나눗셈",
-            "accent": "from-orange-400/30 to-orange-500/20",
-            "cta": "나눗셈 문제 풀기"
-        }
-    ] %}
     <section id="categories" aria-labelledby="section-categories" class="space-y-7">
         <header class="max-w-3xl space-y-3">
             <h2 id="section-categories" class="text-3xl font-semibold text-white sm:text-4xl">연산 유형 선택</h2>
             <p class="text-base text-slate-300">
-                Tasks.md의 FE-02 요구에 맞춰 4가지 연산을 분리된 카드로 제공하고, 각 유형은 키보드 접근성과
-                포커스 링을 포함합니다.
+                Tasks.md의 FE-02 요구에 맞춰 {{ featured_count if featured_count else 4 }}가지 연산을 분리된 카드로 제공하고,
+                각 유형은 키보드 접근성과 포커스 링을 포함합니다.
             </p>
         </header>
         <div class="grid gap-6 md:grid-cols-2">
-            {% for item in categories %}
+            {% if category_cards %}
+            {% for item in category_cards %}
             <article class="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 p-6 transition duration-200 hover:-translate-y-1 hover:border-primary/50 focus-within:-translate-y-1">
                 <div class="pointer-events-none absolute inset-0 bg-gradient-to-br {{ item.accent }} opacity-40"></div>
                 <div class="relative z-10 flex flex-col gap-5">
@@ -106,6 +87,9 @@
                 </div>
             </article>
             {% endfor %}
+            {% else %}
+            <p class="text-sm text-slate-300">등록된 문제 카테고리가 없습니다. 환경 설정을 확인해주세요.</p>
+            {% endif %}
         </div>
     </section>
 
@@ -209,13 +193,21 @@
             Self 연습 후 Invite 링크로 친구·가족과 함께 풀어보면 학습 의지가 2배 이상 향상된다는 리서치가 있습니다.
             Matomo/GA4 이벤트로 학습 흐름을 관측하며, Web Vitals·WCAG 요구사항도 함께 점검하세요.
         </p>
-        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href="/problems?category=덧셈" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-sky-300">
-                <span aria-hidden="true">🚀</span> 지금 바로 시작하기
-            </a>
-            <a href="/problems?category=곱셈" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
-                <span aria-hidden="true">✖️</span> 곱셈 심화 도전
-            </a>
+          <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              {% if show_featured_link %}
+              <a href="/problems?category={{ featured_label }}" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-sky-300">
+                  <span aria-hidden="true">🚀</span> {{ featured_label }}부터 시작하기
+              </a>
+              {% else %}
+              <a href="/problems" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-sky-300">
+                  <span aria-hidden="true">🚀</span> 문제부터 시작하기
+              </a>
+              {% endif %}
+              {% if show_secondary_link %}
+              <a href="/problems?category={{ secondary_label }}" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                  <span aria-hidden="true">✨</span> {{ secondary_label }} 심화 도전
+              </a>
+              {% endif %}
             <a href="http://localhost:8080" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
                 <span aria-hidden="true">🌐</span> 허브로 돌아가기
             </a>
