@@ -59,6 +59,7 @@ source_of_truth: "DeploymentPlan.md"
 * **트래픽 관리:** 리비전별 트래픽 스플릿(Blue/Green/Canary) 및 즉시 롤백. ([Google Cloud][9])
 * **DB 연결:** Cloud SQL 커넥터/프록시, IAM 인증. ([Google Cloud][3])
 * **비밀:** Secret Manager → Cloud Run 환경변수/파일 주입. ([Google Cloud][10])
+* **헬스 프로브:** Cloud Run은 `/healthz`(liveness)와 `/readyz`(readiness)를 사용하며, `/readyz`는 DB·Redis 핑이 성공해야 200을 반환한다. 배포 전 `pytest mbti-arcade/tests/test_health.py -q`와 `docker compose logs mbti-arcade | grep readyz`로 상태를 캡처한다.
 * **배포 예:** `gcloud run deploy api --image $IMAGE_URL --region asia-northeast3 --allow-unauthenticated` → 트래픽 점진 전환. ([Google Cloud][11])
 
 ---

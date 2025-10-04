@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Query, status
+from datetime import datetime
 
-from dataclasses import asdict
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+
+from pydantic import BaseModel, Field
 
 from ..category_service import resolve_allowed_categories
 from ..problem_bank import Problem, get_problems
@@ -49,12 +51,55 @@ async def problems(
             },
         )
 
-    items = [asdict(problem) for problem in get_problems(selected_category)]
+    items = [problem.to_dict(include_answer=True) for problem in get_problems(selected_category)]
     return {
         "category": selected_category,
         "items": items,
         "total": len(items),
     }
+
+
+@router.post(
+    "/problems/{problem_id}/attempts",
+    status_code=status.HTTP_201_CREATED,
+    summary="문제 풀이 제출",
+    response_model=ProblemAttemptResponse,
+)
+async def submit_attempt(
+    problem_id: str,
+    payload: ProblemAttemptRequest,
+    problem_repository: ProblemRepository = Depends(_get_problem_repository),
+    attempt_repository: AttemptRepository = Depends(_get_attempt_repository),
+) -> ProblemAttemptResponse:
+    try:
+        problem = problem_repository.get_problem(problem_id)
+    except ProblemDataError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "type": "https://360me.app/problems/not-found",
+                "title": "문제를 찾을 수 없습니다",
+                "status": status.HTTP_404_NOT_FOUND,
+                "detail": f"요청한 문제 '{problem_id}'가 존재하지 않습니다.",
+            },
+        ) from None
+
+    is_correct = int(payload.answer) == problem.answer
+    record = attempt_repository.record_attempt(
+        problem_id=problem.id,
+        submitted_answer=payload.answer,
+        is_correct=is_correct,
+    )
+
+    return ProblemAttemptResponse(
+        attempt_id=record.id,
+        problem_id=record.problem_id,
+        category=problem.category,
+        is_correct=record.is_correct,
+        submitted_answer=record.submitted_answer,
+        correct_answer=problem.answer,
+        attempted_at=record.attempted_at,
+    )
 
 
 __all__ = ["router"]
