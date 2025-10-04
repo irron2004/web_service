@@ -7,6 +7,7 @@ from fastapi import Request
 from starlette.datastructures import URL
 
 INVITE_ROUTE_NAME = "invite_public"
+_LOCAL_HTTP_HOSTS = {"localhost", "127.0.0.1", "testserver"}
 
 
 def _parse_canonical_base(raw: str | None) -> URL | None:
@@ -35,6 +36,8 @@ def build_invite_url(request: Request, token: str) -> str:
     target_url = URL(str(request.url_for(INVITE_ROUTE_NAME, token=token)))
     base = _canonical_base()
     if not base:
+        if target_url.scheme != "https" and target_url.hostname not in _LOCAL_HTTP_HOSTS:
+            target_url = target_url.replace(scheme="https")
         return str(target_url)
 
     base_path = base.path.rstrip("/") if base.path not in {"", "/"} else ""
@@ -48,3 +51,4 @@ def build_invite_url(request: Request, token: str) -> str:
             fragment=target_url.fragment,
         )
     )
+
