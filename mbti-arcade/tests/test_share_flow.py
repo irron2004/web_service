@@ -25,10 +25,10 @@ def test_share_flow(client):
     query_params = parse_qs(parsed_url.query)
     share_url = query_params.get("url", [None])[0]
     assert share_url is not None
-    assert "/quiz/" in share_url
-    test_token = share_url.split("/quiz/")[1]
-    
-    response = client.get(f"/quiz/{test_token}")
+    assert "/i/" in share_url
+    test_token = share_url.split("/i/")[1]
+
+    response = client.get(f"/i/{test_token}")
     assert response.status_code == 200
     
     # 3. 퀴즈 제출
@@ -49,8 +49,11 @@ def test_expired_token(client):
     """만료된 토큰 테스트"""
     
     # 잘못된 토큰으로 접근
-    response = client.get("/quiz/invalid_token")
+    response = client.get("/i/invalid_token")
     assert response.status_code == 403
+    body = response.json()
+    assert body["type"].endswith("/http-403")
+    assert body["title"] == "Forbidden"
 
 def test_rate_limit_returns_problem_details(client):
     """Rate limiting 테스트"""

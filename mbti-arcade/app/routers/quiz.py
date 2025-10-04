@@ -43,18 +43,17 @@ MBTI_QUESTIONS = [
 
 RELATIONS_ENUM = ["friend", "boyfriend", "girlfriend", "spouse", "colleague", "family"]
 
-@router.get("/{token}", response_class=HTMLResponse)
-def quiz_prefill(request: Request, token: str, session=Depends(get_session)):
+def render_invite_page(request: Request, token: str, session) -> HTMLResponse:
     try:
         pair_id, my_mbti = verify_token(token)
     except ValueError:
         raise HTTPException(status_code=403, detail="expired link")
-    
+
     svc = MBTIService(session)
     pair = svc.session.get(Pair, pair_id)
     if not pair:
         raise HTTPException(status_code=404)
-    
+
     return templates.TemplateResponse(
         "mbti/friend_test.html",
         {
@@ -67,3 +66,8 @@ def quiz_prefill(request: Request, token: str, session=Depends(get_session)):
             "relations": RELATIONS_ENUM,
         },
     )
+
+
+@router.get("/{token}", response_class=HTMLResponse, name="quiz_prefill")
+def quiz_prefill(request: Request, token: str, session=Depends(get_session)):
+    return render_invite_page(request, token, session)

@@ -10,6 +10,7 @@ from slowapi.util import get_remote_address
 from app.core.db import get_session
 from app.core.services.mbti_service import MBTIService
 from app.core.token import issue_token
+from app.urling import build_invite_url
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(tags=["Share"])
@@ -27,5 +28,8 @@ def make_share_link(request: Request,
     pair_id = svc.create_pair("friend", None,
                               my_name=name, my_email=email, my_mbti=my_mbti)
     token = issue_token(pair_id, my_mbti)
-    share_url = str(request.base_url.replace(path=f"/quiz/{token}"))
-    return RedirectResponse(url=f"/mbti/share_success?{urlencode({'url': share_url})}", status_code=303) 
+    share_url = build_invite_url(request, token=token)
+    return RedirectResponse(
+        url=f"/mbti/share_success?{urlencode({'url': share_url})}",
+        status_code=303,
+    )
