@@ -4,60 +4,16 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from pydantic import BaseModel, Field
 
-from ..config import get_settings
-from ..problem_bank import (
-    ProblemDataError,
-    ProblemRepository,
-    get_problems,
-    list_categories,
-    refresh_cache,
-)
-from ..repositories import AttemptRepository
+from ..category_service import resolve_allowed_categories
+from ..problem_bank import Problem, get_problems
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/api", tags=["problems"])
 
 
-def _get_problem_repository(request: Request) -> ProblemRepository:
-    repository = getattr(request.app.state, "problem_repository", None)
-    if repository is None:
-        repository = refresh_cache(force=True)
-        request.app.state.problem_repository = repository
-    return repository
-
-
-def _get_attempt_repository(request: Request) -> AttemptRepository:
-    repository = getattr(request.app.state, "attempt_repository", None)
-    if repository is None:
-        settings = get_settings()
-        repository = AttemptRepository(settings.attempts_database_path)
-        request.app.state.attempt_repository = repository
-    return repository
-
-
-def _resolve_allowed_categories() -> list[str]:
-    settings = get_settings()
-    categories = settings.allowed_problem_categories or list_categories()
-    return categories or list_categories()
-
-
-class ProblemAttemptRequest(BaseModel):
-    answer: int = Field(..., description="사용자가 제출한 답안")
-
-
-class ProblemAttemptResponse(BaseModel):
-    attempt_id: int
-    problem_id: str
-    category: str
-    is_correct: bool
-    submitted_answer: int
-    correct_answer: int
-    attempted_at: datetime
-
-
 @router.get("/categories", summary="사용 가능한 문제 카테고리 나열")
 async def categories() -> dict[str, list[str]]:
-    available = _resolve_allowed_categories()
+    available = resolve_allowed_categories()
     return {"categories": available, "count": len(available)}
 
 
@@ -68,7 +24,7 @@ async def problems(
         description="요청할 문제 유형 (기본값: 첫 번째 카테고리)",
     ),
 ) -> dict[str, object]:
-    categories = _resolve_allowed_categories()
+    categories = resolve_allowed_categories()
     selected_category = category or (categories[0] if categories else None)
 
     if not selected_category:
