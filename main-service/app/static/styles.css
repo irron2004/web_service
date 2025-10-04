@@ -1,0 +1,9 @@
+/* Basic layout enhancements for the Web Service Hub */
+body {
+    background-color: #020617;
+    color: #e2e8f0;
+}
+
+a {
+    color: inherit;
+}
