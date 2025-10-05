@@ -78,32 +78,9 @@
                         </div>
                     </div>
                     
-                    <!-- 게임 서비스 드롭다운 -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" 
-                                @click.away="open = false"
-                                class="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
-                            🎮 게임
-                            <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-                        
-                        <div x-show="open" 
-                             x-transition:enter="transition ease-out duration-100"
-                             x-transition:enter-start="transform opacity-0 scale-95"
-                             x-transition:enter-end="transform opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-75"
-                             x-transition:leave-start="transform opacity-100 scale-100"
-                             x-transition:leave-end="transform opacity-0 scale-95"
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                            <a href="/arcade" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                🎯 아케이드 게임
-                            </a>
-                            <a href="/arcade/stats" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                📊 게임 통계
-                            </a>
-                        </div>
+                    <!-- 미공개 게임 메뉴 자리표시자 -->
+                    <div class="text-gray-400 flex items-center text-sm">
+                        🎮 게임 (준비 중)
                     </div>
                 </div>
                 
@@ -147,15 +124,7 @@
                     </div>
                     
                     <div class="px-3 py-2">
-                        <div class="text-sm font-medium text-gray-500 mb-2">🎮 게임</div>
-                        <div class="pl-4 space-y-1">
-                            <a href="/arcade" class="block py-1 text-sm text-gray-600 hover:text-blue-600 transition-colors">
-                                🎯 아케이드 게임
-                            </a>
-                            <a href="/arcade/stats" class="block py-1 text-sm text-gray-600 hover:text-blue-600 transition-colors">
-                                📊 게임 통계
-                            </a>
-                        </div>
+                        <div class="text-sm font-medium text-gray-400">🎮 게임 기능은 준비 중입니다</div>
                     </div>
                 </div>
             </div>
@@ -179,8 +148,8 @@
                     <div class="flex space-x-4">
                         <a href="/" class="text-gray-400 hover:text-white transition-colors">홈</a>
                         <a href="/mbti" class="text-gray-400 hover:text-white transition-colors">MBTI</a>
-                        <a href="{{ calculate_service_url }}" class="text-gray-400 hover:text-white transition-colors">수학 연산</a>
-                        <a href="/arcade" class="text-gray-400 hover:text-white transition-colors">게임</a>
+                        <a href="/calculate" class="text-gray-400 hover:text-white transition-colors">수학 연산</a>
+                        <span class="text-gray-500">게임(준비 중)</span>
                     </div>
                 </div>
 
@@ -196,11 +165,8 @@
                 </div>
                 
                 <div>
-                    <h4 class="text-md font-semibold mb-3">🎮 게임</h4>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li><a href="/arcade" class="hover:text-white transition-colors">아케이드 게임</a></li>
-                        <li><a href="/arcade/stats" class="hover:text-white transition-colors">게임 통계</a></li>
-                    </ul>
+                    <h4 class="text-md font-semibold mb-3 text-gray-400">🎮 게임</h4>
+                    <p class="text-sm text-gray-500">새로운 게임 모드는 준비 중입니다.</p>
                 </div>
             </div>
             
@@ -213,4 +179,4 @@
 
     {% block scripts %}{% endblock %}
 </body>
-</html> 
+</html>
