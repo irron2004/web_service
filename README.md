@@ -2,7 +2,7 @@
 
 360Me delivers the "If I were you" perception-gap experience. We compare how people see themselves versus how others see them, surface the gaps, and make it easy to share insights. This monorepo keeps the FastAPI backend, supporting services, and the product/operations docs together so experiments and deployments stay consistent.
 
-- **Key specs**: [`mbti-arcade/docs/PRD.md`](mbti-arcade/docs/PRD.md), [`mbti-arcade/docs/DesignOptions.md`](mbti-arcade/docs/DesignOptions.md), [`mbti-arcade/docs/product/Tasks.md`](mbti-arcade/docs/product/Tasks.md), [`mbti-arcade/docs/DeploymentPlan.md`](mbti-arcade/docs/DeploymentPlan.md), [`mbti-arcade/AGENTS.md`](mbti-arcade/AGENTS.md), and the guides under `docs/`
+- **Key specs**: [`mbti-arcade/docs/PRD.md`](mbti-arcade/docs/PRD.md), [`mbti-arcade/docs/DesignOptions.md`](mbti-arcade/docs/DesignOptions.md), [`mbti-arcade/docs/product/Tasks.md`](mbti-arcade/docs/product/Tasks.md), [`mbti-arcade/docs/DeploymentPlan.md`](mbti-arcade/docs/DeploymentPlan.md), [`mbti-arcade/AGENTS.md`](mbti-arcade/AGENTS.md), and the guides under `mbti-arcade/docs/`
 - **Mandatory standards**: RFC 9457 error schema, WCAG 2.2 AA, Web Vitals (LCP≤2.5 s / INP≤200 ms / CLS≤0.1), OpenTelemetry observability, k≥3 anonymity safeguard, AdSense confirmed-click prevention
 
 ---
@@ -22,11 +22,11 @@
 
 | Area | Details |
 |------|---------|
-| Questionnaire & scoring | `docs/questionnaire.v1.json` seeds the 24+8+8 items; `app/data/questionnaire_loader.py` validates/normalises and assigns deterministic numeric IDs. Scoring follows the [PRD](mbti-arcade/docs/PRD.md) formulas (normalisation, weighted σ, GapScore).
+| Questionnaire & scoring | `mbti-arcade/docs/questionnaire.v1.json` seeds the 24+8+8 items; `app/data/questionnaire_loader.py` validates/normalises and assigns deterministic numeric IDs. Scoring follows the [PRD](mbti-arcade/docs/PRD.md) formulas (normalisation, weighted σ, GapScore).
 | API design | REST endpoints under `/api/*` use Pydantic v2 models, RFC 9457 error payloads, X-Request-ID propagation, and OpenTelemetry hooks. Session creation, self/other submissions, and aggregate retrieval stay within FastAPI.
 | Persistence | SQLAlchemy models (`app/models.py`) cover users, sessions, questions, responses, aggregates. Seed logic keeps DB questions in sync with the JSON source. Aggregation enforces k-anonymity before exposing chart data.
 | Frontend templates | Jinja templates (under `app/templates/mbti/`) render the self/other forms, friend/couple modes, and OG previews; Chart.js is the target for radar/scatter visualisations per [`DesignOptions`](mbti-arcade/docs/DesignOptions.md).
-| Observability & policy | Golden rules (defined in [`Claude`](mbti-arcade/docs/Claude.md)) require OpenTelemetry, Web Vitals monitoring, WCAG 2.2 accessibility patterns, and AdSense "confirmed click" avoidance. `docs/testing.md` explains the verification matrix.
+| Observability & policy | Golden rules (defined in [`Claude`](mbti-arcade/docs/Claude.md)) require OpenTelemetry, Web Vitals monitoring, WCAG 2.2 accessibility patterns, and AdSense "confirmed click" avoidance. [`Testing`](mbti-arcade/docs/testing.md) explains the verification matrix.
 
 ---
 
@@ -38,7 +38,6 @@ web_service_new/
 |- main-service/           # Hub/landing FastAPI app (Jinja templates)
 |- mbti-arcade/            # Core perception-gap API (FastAPI + SQLAlchemy) + MBTI docs
 |- nginx/                  # Local reverse-proxy sample configs
-|- docs/                   # Shared operational, testing, and style guides
 |- README-Docker-Integrated.md (additional reference)
 ```
 
@@ -104,7 +103,7 @@ Need to proxy multiple services behind one origin? See the `nginx/` folder for e
 ## 6. Quality & Testing
 
 - `mbti-arcade/tests/` includes E2E and integration coverage. FastAPI 0.110 removed `APIRouter.exception_handler`; adjust the legacy tests (`test_mbti.py`, `tests/test_share_flow.py`) when upgrading old flows.
-- `docs/testing.md` documents the test pyramid plus Web Vitals, WCAG, AdSense, and OpenTelemetry verification routines.
+- [`Testing`](mbti-arcade/docs/testing.md) documents the test pyramid plus Web Vitals, WCAG, AdSense, and OpenTelemetry verification routines.
 - Golden rules: every new capability ships with tests; any dataset with fewer than three raters stays private (no charts, no sharing).
 
 ---
@@ -131,10 +130,10 @@ Need to proxy multiple services behind one origin? See the `nginx/` folder for e
 | `mbti-arcade/docs/DeploymentPlan.md` | Cloudflare Pages + Cloud Run rollout plan and checklists |
 | `mbti-arcade/docs/README.md` | MBTI documentation index & pointers |
 | `mbti-arcade/docs/product/Tickets.md` | P0/P1 fixes with acceptance criteria and tests |
-| `docs/api_style.md` | REST patterns, RFC 9457 example payloads |
-| `docs/frontend_style.md` | React Router, TanStack Query, Zustand, Chart.js guidance |
-| `docs/testing.md` | Testing, performance, accessibility, observability strategy |
-| `docs/agent_runbook.md` | Operations, release, rollback procedures |
+| `mbti-arcade/docs/api_style.md` | REST patterns, RFC 9457 example payloads |
+| `mbti-arcade/docs/frontend_style.md` | React Router, TanStack Query, Zustand, Chart.js guidance |
+| `mbti-arcade/docs/testing.md` | Testing, performance, accessibility, observability strategy |
+| `mbti-arcade/docs/agent_runbook.md` | Operations, release, rollback procedures |
 | `CLOUDFLARE-SETUP.md` | Cloudflare Pages/Workers setup notes |
 | `mbti-arcade/AGENTS.md` | Contributor quick-start guidelines |
 

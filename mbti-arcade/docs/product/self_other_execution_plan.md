@@ -12,7 +12,7 @@
 - **입력**: 관계 라벨(`친구·동료·연인·가족·기타` ↔ enum `friend|coworker|partner|family|other`), PII 정책(닉네임 선택·이메일 비수집), 세션 스냅샷 필드(표시명/아바타/MBTI 공개 범위) 확인.
 - **산출물**: 데이터 사전(새 컬럼 정의, 라벨↔enum 매핑), 마이그레이션 운영 계획(읽기/쓰기 병행, 롤백 전략).
 - **세부 작업**: ParticipantRelation 표시 라벨 확정, snapshot 필드 노출 한계 정의, `core_scoring` 참조 필드 존치/폐기 정리.
-- **DoD**: `docs/self_other_schema_transaction.md`에 필드 설명·라벨·노출 정책·이행 단계 반영, 관계 라디오 옵션과 enum 매핑 1:1 일치.
+- **DoD**: `../self_other_schema_transaction.md`에 필드 설명·라벨·노출 정책·이행 단계 반영, 관계 라디오 옵션과 enum 매핑 1:1 일치.
 - **테스트**: “동료” 선택→`coworker` 저장/노출 스냅샷.
 
 **개발**
@@ -195,4 +195,3 @@ Problem+JSON 예시: `type,title,detail,status,instance,code` 필드 포함.
 - **프런트엔드**: OwnerProfile/인테이크/32문항/프리뷰 연결 및 카피 스냅샷.
 - **DevOps**: Canonical/ALLOWED_HOSTS/헤더/Cloudflare 설정 검증·캡처.
 - **QA**: D1~D3 테스트 스위트 구축, axe/Lighthouse CI 연동.
-

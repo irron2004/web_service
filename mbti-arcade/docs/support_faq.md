@@ -11,4 +11,4 @@
 3. `decision_packets`에서 `packet_sha256`을 조회해 최신 버전(`model_id`, `code_ref`)인지 검증.
 4. 안전 플래그 문의 시, 플래그 코드별 설명 문구(문서 링크 포함)를 제공하고 AdSense/금지 사례 기준을 확인.
 5. 재발급이 필요하면 보고서 렌더 파이프라인을 실행하고, `report.generated` AuditEvent가 기록됐는지 확인.
-6. 이슈 재발 방지를 위해 `docs/agent_runbook.md` 롤백/알림 절차를 검토하고, 필요 시 버그 리포트를 생성한다.
+6. 이슈 재발 방지를 위해 `mbti-arcade/docs/agent_runbook.md` 롤백/알림 절차를 검토하고, 필요 시 버그 리포트를 생성한다.

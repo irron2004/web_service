@@ -6,7 +6,7 @@
 ---
 
 ## 1. 제품 비전 & 범위 요약
-- **핵심 목표**: “If I were you” 인식 차이를 부부/커플 맥락으로 확장해 오해 → 이해 → 합의를 돕는 안전한 대화 컨테이너 제공. ([`PRD`](../mbti-arcade/docs/PRD.md))
+- **핵심 목표**: “If I were you” 인식 차이를 부부/커플 맥락으로 확장해 오해 → 이해 → 합의를 돕는 안전한 대화 컨테이너 제공. ([`PRD`](PRD.md))
 - **3단계 플로우**: ① 기존 perception gap 요약(타인지표, k≥3), ② SELF/GUESS 이중 설문, ③ 부부 심층 설문 및 Δ·플래그 계산. (`PRD` R-101~R-108)
 - **산출물**: 8축 하위척도 + Δ 히트맵, Top-3 이슈 카드, 주간 실습 가이드, 결정 패킷(decision_packet)으로 결과 봉인. (`PRD` R-103~R-113)
 - **비기능 요구**: API P95 <1s, Web Vitals(LCP≤2.5s/INP≤200ms/CLS≤0.1), WCAG 2.2 AA, X-Request-ID/OTel 100% 전파, k≥3 익명성. (`PRD` §5)
@@ -20,7 +20,6 @@ web_service_new/
 ├─ main-service/       # 허브/랜딩 FastAPI (Jinja)
 ├─ calculate_math/  # (신규) 독립 FastAPI 계산 서비스 (calculate_math로 이관)
 ├─ nginx/              # 로컬 reverse proxy 샘플
-├─ docs/               # PRD, DeploymentPlan, 운영 가이드, 본 리포트 등
 └─ docker-compose.yml  # 메인 허브 + mbti-arcade 통합 실행 (calculate/math 별도 배포)
 ```
 - **mbti-arcade**: 설문, 세션, 결과, OG 카드 등 모든 핵심 API·데이터. Alembic, OpenTelemetry, RFC 9457 오류 구조 유지. (README.md, mbti-arcade/docs/DeploymentPlan.md)
@@ -49,7 +48,7 @@ web_service_new/
 ### 3.3 모노레포 연동 상태
 - `docker-compose.yml`에서 math-app 서비스 제거 → 기본 스택은 `main-hub`, `mbti-arcade`만 기동 (math/calc는 별도 저장소).
 - `nginx/conf.d/default.conf`에서 `/calculate` 라우팅 제거.
-- `README.md`, `README-Docker-Integrated.md`, `docs/senior_brief.md`, `mbti-arcade/AGENTS.md` 등 문서에서 “독립 서비스”로 표기 업데이트.
+- `README.md`, `README-Docker-Integrated.md`, `mbti-arcade/docs/senior_brief.md`, `mbti-arcade/AGENTS.md` 등 문서에서 “독립 서비스”로 표기 업데이트.
 
 ### 3.4 단일 도메인 임시 연결 전략
 - **임시 버튼 추가**: `mbti-arcade/app/templates/` 내 원하는 템플릿(Jinja)에 `/calculate` 링크 버튼 삽입.
@@ -62,7 +61,7 @@ web_service_new/
 ## 4. 개발 진행 상황 (서비스별)
 ### 4.1 mbti-arcade (핵심 백엔드)
 - FastAPI + SQLAlchemy + Alembic. 세션/응답/결과/OG 이미지 라우터 구비.
-- RFC 9457, X-Request-ID, OpenTelemetry, k≥3 safeguard 등 골든 룰 준수. (README.md, docs/testing.md, mbti-arcade/docs/Claude.md)
+- RFC 9457, X-Request-ID, OpenTelemetry, k≥3 safeguard 등 골든 룰 준수. (README.md, mbti-arcade/docs/testing.md, mbti-arcade/docs/Claude.md)
 - 테스트: `mbti-arcade/tests/`에 E2E/통합/legacy 스위트 존재. `make check`로 Black/isort/flake8/pylint/pytest 일괄 실행.
 - 배포 계획: Cloud Run 컨테이너, Cloud SQL, Secrets, OpenTelemetry. (mbti-arcade/docs/DeploymentPlan.md)
 
@@ -94,18 +93,18 @@ web_service_new/
 
 ---
 
-## 6. 품질·보안·관측 정책 (mbti-arcade/AGENTS.md, docs/testing.md, mbti-arcade/docs/Claude.md)
+## 6. 품질·보안·관측 정책 (mbti-arcade/AGENTS.md, mbti-arcade/docs/testing.md, mbti-arcade/docs/Claude.md)
 - **코딩 스타일**: Python Black/isort/flake8/pylint, Jinja 템플릿 일관성.
 - **테스트 전략**: pytest 유닛/통합/E2E + Web Vitals + Axe 접근성 + k6 성능.
 - **보안**: TLS, Token 링크 만료, noindex, PII 최소화, AdSense confirmed-click 회피.
-- **관측성**: X-Request-ID, OpenTelemetry 스팬, 로그/트레이스 조인율 ≥99%. `docs/testing.md`에 검증 매트릭스.
+- **관측성**: X-Request-ID, OpenTelemetry 스팬, 로그/트레이스 조인율 ≥99%. [`Testing`](testing.md)에 검증 매트릭스.
 - **가드레일**: k<3 공유 금지, 안전 안내 루틴, 의사결정 패킷 기록.
 
 ---
 
 ## 7. 현재 위험·의존성·TODO
 - **calculate_math 재연결**: 단일 도메인 운영 중이라면 `/calculate` 프록시를 다시 붙이는 작업 필요. 추후 완전 분리를 염두에 두고 버튼·링크만 건드릴 것.
-- **mbti-arcade P0**: [`Tasks`](../mbti-arcade/docs/product/Tasks.md) 기준 Self→Invite→Aggregate, observability, OG 이미지, Decision Packet 등 남은 작업 존재.
+- **mbti-arcade P0**: [`Tasks`](product/Tasks.md) 기준 Self→Invite→Aggregate, observability, OG 이미지, Decision Packet 등 남은 작업 존재.
 - **CI/CD 분리**: calculate_math 전용 빌드/배포 파이프라인은 아직 없음 → 추후 Cloud Run/Pages/별도 호스팅 결정 필요.
 - **문서 싱크**: 본 리포트 외에도 `mbti-arcade/docs/DeploymentPlan.md` / `mbti-arcade/docs/PRD.md` 업데이트 시 동기화 필요.
 - **테스트 실행**: calculate_math 분리 후 `make test` 로컬 확인 필요(현재는 실행 로그 없음).
@@ -117,7 +116,7 @@ web_service_new/
 2. **테스트 수행**: `calculate_math` 디렉터리에서 `make dev && make test` 실행해 새 구조 검증.
 3. **CI 파이프라인 설계**: 분리 서비스용 GitHub Actions 워크플로(빌드/배포) 추가, Artifact Registry or 별도 컨테이너 레지스트리 결정.
 4. **관측 연동 계획 수립**: RequestContextMiddleware를 OpenTelemetry/구조화 로깅과 연결.
-5. **Documentation Sync**: 본 리포트를 `docs/` 인덱스에 추가 링크, 향후 변경 시 본 문서 갱신 절차 정의.
+5. **Documentation Sync**: 본 리포트를 `mbti-arcade/docs/README.md` 인덱스에 추가 링크, 향후 변경 시 본 문서 갱신 절차 정의.
 
 ---
 
@@ -125,8 +124,8 @@ web_service_new/
 - `README.md` — 제품 개요, 서비스 맵, 로컬 개발 방법.
 - `mbti-arcade/docs/PRD.md` — Couple Insight 기능/NFR/마일스톤/지표.
 - `mbti-arcade/docs/DeploymentPlan.md` — Cloudflare Pages + Cloud Run 배포 전략.
-- `docs/senior_brief.md` — 아키텍처 하이라이트, 즉시 다음 작업.
-- `docs/testing.md` — 테스트·관측·성능 검증 매트릭스.
+- `senior_brief.md` — 아키텍처 하이라이트, 즉시 다음 작업.
+- [`testing.md`](testing.md) — 테스트·관측·성능 검증 매트릭스.
 - `mbti-arcade/AGENTS.md` — 기여자 가이드, 개발 표준.
 - `calculate_math/README.md` — 신규 독립 서비스 사용법.
 
@@ -202,7 +201,7 @@ jobs:
 ```
 
 ### 10.8 Follow-up Checklist
-- [`Tasks`](../mbti-arcade/docs/product/Tasks.md): P0 ~ P1 항목(공통 핸들러, RequestID/OTel, Cloud Run 스테이징, calc 도메인 분리) 추가.
+- [`Tasks`](product/Tasks.md): P0 ~ P1 항목(공통 핸들러, RequestID/OTel, Cloud Run 스테이징, calc 도메인 분리) 추가.
 - `mbti-arcade/docs/DeploymentPlan.md`/README: GCP 단일 전략, Cloud Run·Secret Manager·경로필터 명시.
 - 커밋 메시지 예: `docs(status-report): log pm decisions for error/GCP/domain standards`.
 

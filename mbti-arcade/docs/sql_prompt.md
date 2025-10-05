@@ -7,7 +7,7 @@ version: "1.0"
 date: "2025-09-16"
 domains: ["backend"]
 owner: "이지율"
-source_of_truth: "docs/sql_prompt.md"
+source_of_truth: "mbti-arcade/docs/sql_prompt.md"
 use_browsing: false
 ---
 ```

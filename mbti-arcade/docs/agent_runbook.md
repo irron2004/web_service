@@ -7,7 +7,7 @@ version: "1.0"
 date: "2025-09-17"
 owner: "Ops 리드"
 domains: ["ops"]
-source_of_truth: "docs/agent_runbook.md"
+source_of_truth: "mbti-arcade/docs/agent_runbook.md"
 use_browsing: true
 ---
 ```

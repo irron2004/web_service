@@ -7,7 +7,7 @@ version: "1.0"
 date: "2025-09-17"
 owner: "FE 리드"
 domains: ["frontend"]
-source_of_truth: "docs/frontend_style.md"
+source_of_truth: "mbti-arcade/docs/frontend_style.md"
 use_browsing: true
 ---
 ```

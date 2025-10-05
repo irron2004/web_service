@@ -33,8 +33,7 @@ web_service_new/
 ├─ mbti-arcade/           # Production backend (FastAPI app, models, data loaders, tests)
 ├─ main-service/          # Landing hub FastAPI service
 ├─ calculate_math/        # Ignored checkout of standalone FastAPI + React 학습 서비스
-├─ docs/                  # Playbooks, testing guide, style guides, this brief
-├─ mbti-arcade/docs/DeploymentPlan.md      # Cloudflare Pages + Cloud Run rollout playbook
+-├─ mbti-arcade/docs/DeploymentPlan.md      # Cloudflare Pages + Cloud Run rollout playbook
 ├─ mbti-arcade/docs/PRD.md                 # Couple insight product requirements
 ├─ mbti-arcade/docs/DesignOptions.md       # Tech trade-off decisions (charts, OG images, aggregation)
 ├─ mbti-arcade/docs/product/Tasks.md   # Kanban with acceptance criteria & monitoring IDs
@@ -42,13 +41,9 @@ web_service_new/
 ```
 - `mbti-arcade/app/` houses FastAPI routers, domain services, SQLAlchemy models, and data seeds under `app/data/`.
 - `mbti-arcade/tests/` contains the primary pytest suites (E2E, integration, share flow legacy cases).
-- Documentation under `docs/` includes testing, frontend/api style, agent runbook, and observability procedures.
+- Documentation under `mbti-arcade/docs/` includes testing, frontend/api style, agent runbook, and observability procedures.
 
 ## 5. Current Delivery Status
-- **Requirements**: PRD v1.0 ([`PRD`](../mbti-arcade/docs/PRD.md)) defines 3-stage couple flow, Δ calculations, safety protocols, decision packet sealing, and KPI/test traceability.
-- **Design Decisions**: Chart.js selected for visualisations; server-side Satori/Sharp recommended for OG images; aggregation to run in backend worker. ([`DesignOptions`](../mbti-arcade/docs/DesignOptions.md))
-- **Deployment Readiness**: [`DeploymentPlan`](../mbti-arcade/docs/DeploymentPlan.md) v1.0 maps Cloudflare Pages + Cloud Run setup, CI/CD pipelines, WAF/rate-limit rules, and week-by-week rollout timeline.
-- **Implementation Backlog** ([`Tasks`](../mbti-arcade/docs/product/Tasks.md) & [`Couple`](../mbti-arcade/docs/product/couple.md)):
   - Backend P0 work pending: health checks, RFC 9457 middleware, self/other schema validation, OTel instrumentation, search-index guarding, OG image API.
   - Couple flow gaps: idempotent response upserts, decision packet schema, k-threshold exposure, audit logging, E2E failure scenarios, UX flows for tokens and result visualisations.
   - Observability and alerts: KPI exporter wiring, Slack/email alerts for stage transitions and rate limits, weekly smoke test cadence.
@@ -67,8 +62,12 @@ web_service_new/
 
 ## 8. Reference Docs
 - `README.md` – high-level product vision and repository map.
-- [`Tasks`](../mbti-arcade/docs/product/Tasks.md) – sprint/Kanban with acceptance tests & monitoring IDs.
-- `PRD.md` – couple insight requirements, metrics, and traceability.
-- [`DeploymentPlan`](../mbti-arcade/docs/DeploymentPlan.md) – environment setup, CI/CD, rollout checklist.
-- [`DesignOptions`](../mbti-arcade/docs/DesignOptions.md) – architecture trade-offs for charts, OG images, aggregation.
-- `docs/testing.md` – verification matrix across QA, performance, and observability.
+- **Requirements**: PRD v1.0 ([`PRD`](PRD.md)) defines 3-stage couple flow, Δ calculations, safety protocols, decision packet sealing, and KPI/test traceability.
+- **Design Decisions**: Chart.js selected for visualisations; server-side Satori/Sharp recommended for OG images; aggregation to run in backend worker. ([`DesignOptions`](DesignOptions.md))
+- **Deployment Readiness**: [`DeploymentPlan`](DeploymentPlan.md) v1.0 maps Cloudflare Pages + Cloud Run setup, CI/CD pipelines, WAF/rate-limit rules, and week-by-week rollout timeline.
+- **Implementation Backlog** ([`Tasks`](product/Tasks.md) & [`Couple`](product/couple.md)):
+- [`PRD`](PRD.md) – couple insight requirements, metrics, and traceability.
+- [`DeploymentPlan`](DeploymentPlan.md) – environment setup, CI/CD, rollout checklist.
+- [`DesignOptions`](DesignOptions.md) – architecture trade-offs for charts, OG images, aggregation.
+- [`testing`](testing.md) – verification matrix across QA, performance, and observability.
+- [`Tasks`](product/Tasks.md) – sprint/Kanban with acceptance tests & monitoring IDs.

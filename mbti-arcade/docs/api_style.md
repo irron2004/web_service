@@ -7,7 +7,7 @@ version: "1.0"
 date: "2025-09-17"
 owner: "BE 리드"
 domains: ["backend"]
-source_of_truth: "docs/api_style.md"
+source_of_truth: "mbti-arcade/docs/api_style.md"
 use_browsing: true
 ---
 ```

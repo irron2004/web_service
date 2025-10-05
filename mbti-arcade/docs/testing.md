@@ -7,7 +7,7 @@ version: "1.0"
 date: "2025-09-17"
 owner: "QA 리드"
 domains: ["qa"]
-source_of_truth: "docs/testing.md"
+source_of_truth: "mbti-arcade/docs/testing.md"
 use_browsing: true
 ---
 ```

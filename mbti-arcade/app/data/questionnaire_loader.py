@@ -125,7 +125,7 @@ def _resolve_questionnaire_path() -> Path:
         candidate = parent / "docs" / "questionnaire.v1.json"
         if candidate.exists():
             return candidate
-    raise FileNotFoundError("Unable to locate docs/questionnaire.v1.json relative to loader")
+    raise FileNotFoundError("Unable to locate questionnaire.v1.json relative to loader")
 
 
 def _load_raw_payload(path: Path) -> Dict[str, object]:

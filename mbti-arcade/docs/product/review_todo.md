@@ -28,7 +28,7 @@
 - [ ] CTA 문구를 “내 정보 입력하고 시작하기”(OwnerProfile)와 “초대 링크 만들기”(프로필 완료 시 노출)로 조정.
 
 ### Self 검사 (`/mbti/self-test`)
-- [x] 개발 레퍼런스 문구(DesignOptions.md, docs/frontend_style.md, WCAG 2.2 AA 등) 제거.
+- [x] 개발 레퍼런스 문구(DesignOptions.md, mbti-arcade/docs/frontend_style.md, WCAG 2.2 AA 등) 제거.
 - [ ] 라디오 그룹/키보드 접근성, 진행 바, 검사 종료 CTA 구현.
 - [ ] Self 유형 저장 후 초대 생성 화면으로 이동 흐름 완성.
 - [x] 상단 안내 카피를 “느낌에 가까운 쪽을 선택해 주세요. 키보드만으로도 응답할 수 있어요.”로 교체.

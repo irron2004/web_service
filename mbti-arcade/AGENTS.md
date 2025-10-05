@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 - Core MBTI arcade service lives in `mbti-arcade/app/` (FastAPI, SQLAlchemy, Jinja templates). Supporting data and migrations sit under `mbti-arcade/app/data/` and `mbti-arcade/alembic/`.
 - 학습용 계산 서비스는 별도 저장소 [`calculate_math`](https://github.com/irron2004/calculate_math)에 유지하며, 로컬에서는 `calculate_math/` 디렉터리로 체크아웃합니다.
-- Shared templates and lightweight API examples reside in `main-service/app/templates/`. Documentation lives under `mbti-arcade/docs/` (product specs, deployment plan, tasks) and root-level `docs/` (shared playbooks). Deployment assets (Docker, nginx) stay at the repository root.
+- Shared templates and lightweight API examples reside in `main-service/app/templates/`. Documentation lives under `mbti-arcade/docs/` (product specs, deployment plan, tasks, testing guides). Deployment assets (Docker, nginx) stay at the repository root.
 
 ## Build, Test, and Development Commands
 - `cd mbti-arcade && make setup` — create virtualenv and install Python dependencies.
@@ -13,7 +13,7 @@
 
 ## Coding Style & Naming Conventions
 - Python: Black (4 spaces, 88-char lines), isort, flake8, pylint. Use `snake_case` for functions, `CamelCase` for Pydantic models, and `PascalCase` for SQLAlchemy models.
-- Templates: keep Jinja blocks compact; align with styles in `docs/frontend_style.md`.
+- Templates: keep Jinja blocks compact; align with styles in `mbti-arcade/docs/frontend_style.md`.
 - Configuration and secrets live in `.env` files ignored by git—never hardcode credentials.
 
 ## Testing Guidelines

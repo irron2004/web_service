@@ -19,4 +19,4 @@
 
 ## Docs-Playbook-Update
 - DeploymentPlan에 003 마이그레이션 적용·롤백 절차와 백필 워커 실행·검증 단계를 기록했습니다.【F:DeploymentPlan.md†L36-L71】
-- 테스트 가이드에는 참가자 플로우 계약 테스트 실행 명령을 통합해 QA 체크리스트를 확장했습니다.【F:docs/testing.md†L15-L33】
+- 테스트 가이드에는 참가자 플로우 계약 테스트 실행 명령을 통합해 QA 체크리스트를 확장했습니다.【F:mbti-arcade/docs/testing.md†L15-L33】
