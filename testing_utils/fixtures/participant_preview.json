@@ -1,0 +1,29 @@
+{
+  "threshold": 3,
+  "unlocked": true,
+  "relations": [
+    {
+      "relation": "friend",
+      "respondent_count": 3,
+      "top_type": "ESTJ",
+      "top_fraction": 1.0,
+      "second_type": null,
+      "second_fraction": null,
+      "consensus": 1.0,
+      "pgi": 0.0,
+      "axes_payload": {
+        "EI": 0.0,
+        "SN": 0.0,
+        "TF": 0.0,
+        "JP": 0.0
+      }
+    }
+  ],
+  "participants": [
+    {
+      "relation": "friend",
+      "consent_display": true,
+      "perceived_type": "ESTJ"
+    }
+  ]
+}

@@ -121,6 +121,7 @@ from app.database import Base, engine, session_scope
 from app.routers import health
 from app.routers import couple as couple_router
 from app.routers import og as og_router
+from app.routers import participants as participants_router
 from app.routers import quiz as quiz_router
 from app.routers import report as report_router
 from app.routers import responses as responses_router
@@ -291,6 +292,7 @@ def _score_answers(answer_pairs: Iterable[tuple[int, int]]) -> tuple[str, Dict[s
 app.include_router(health.router)
 app.include_router(sessions_router.router)
 app.include_router(responses_router.router)
+app.include_router(participants_router.router)
 app.include_router(results_router.router)
 app.include_router(share_router.router)
 app.include_router(quiz_router.router)

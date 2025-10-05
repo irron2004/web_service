@@ -38,6 +38,12 @@ source_of_truth: "DeploymentPlan.md"
 
 ---
 
+### Version History
+
+* **2025-09-19 · v1.1** — 참가자 스키마 이행을 위한 `003` 마이그레이션과 백필 워커를 추가했습니다. A/B 롤백 시 `alembic downgrade 002`로 스키마를 복구하고, `python scripts/backfill_participants.py --dry-run`으로 상태를 검증한 뒤 직전 Cloud Run 리비전으로 트래픽을 되돌립니다. (참고: docs/self_other_schema_transaction.md §6)
+
+---
+
 ## 1) 환경/도메인 전략
 
 * **환경:** `dev` → 내부 개발, `stg` → 퍼블릭 베타, `prod` → 실서비스.
@@ -58,6 +64,8 @@ source_of_truth: "DeploymentPlan.md"
 * **런타임:** FastAPI + Uvicorn, Artifact Registry 이미지 → Cloud Run 서비스. ([Google Cloud][2])
 * **트래픽 관리:** 리비전별 트래픽 스플릿(Blue/Green/Canary) 및 즉시 롤백. ([Google Cloud][9])
 * **DB 연결:** Cloud SQL 커넥터/프록시, IAM 인증. ([Google Cloud][3])
+* **DB 마이그레이션 003:** 배포 직전 `alembic upgrade head`를 수행해 참가자 테이블과 relation aggregates 보강을 적용합니다. 문제 발생 시 `alembic downgrade 002`로 즉시 롤백하고 재배포 전에 docs/self_other_schema_transaction.md §6의 복구 절차를 따릅니다.
+* **백필 워커:** 신규 스키마 배포 후 `python scripts/backfill_participants.py --dry-run`으로 로그 검증 → 성공 시 `python scripts/backfill_participants.py` 실행 → `logs/backfill_participants.log`에서 요약 확인. (출처: docs/mbti_relationship_flow.md)
 * **비밀:** Secret Manager → Cloud Run 환경변수/파일 주입. ([Google Cloud][10])
 * **헬스 프로브:** Cloud Run은 `/healthz`(liveness)와 `/readyz`(readiness)를 사용하며, `/readyz`는 DB·Redis 핑이 성공해야 200을 반환한다. 배포 전 `pytest mbti-arcade/tests/test_health.py -q`와 `docker compose logs mbti-arcade | grep readyz`로 상태를 캡처한다.
 * **배포 예:** `gcloud run deploy api --image $IMAGE_URL --region asia-northeast3 --allow-unauthenticated` → 트래픽 점진 전환. ([Google Cloud][11])
