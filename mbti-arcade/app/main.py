@@ -238,6 +238,25 @@ async def request_id_middleware(request: Request, call_next):
     token = bind_request_id(request_id)
     try:
         response = await call_next(request)
+    except ProblemDetailsException as exc:
+        response = from_exception(request, exc)
+    except RequestValidationError as exc:
+        log.warning(
+            "Validation error",
+            extra={
+                "request_id": request_id,
+                "errors": exc.errors(),
+            },
+        )
+        response = from_validation_error(request, exc)
+    except HTTPException as exc:
+        response = from_http_exception(request, exc)
+    except Exception:
+        log.exception(
+            "Unhandled application error",
+            extra={"request_id": request_id},
+        )
+        response = internal_server_error(request)
     finally:
         reset_request_id(token)
     response.headers[REQUEST_ID_HEADER] = request_id

@@ -83,11 +83,11 @@
 <div class="mx-auto max-w-5xl space-y-10">
     <section class="rounded-3xl bg-gradient-to-br from-purple-600 via-sky-600 to-emerald-500 px-6 py-10 text-white">
         <div class="space-y-5">
-            <span class="inline-flex items-center rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-wide">Invite → Aggregate 단계</span>
-            <h1 class="text-3xl md:text-4xl font-bold leading-tight">🎯 {{ target_name }}를 위한 MBTI 관점 평가</h1>
+            <span class="inline-flex items-center rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-wide">초대 참여 안내</span>
+            <h1 class="text-3xl md:text-4xl font-bold leading-tight">🎯 {{ target_name }}님을 떠올리며 응답해 주세요</h1>
             <p class="text-base md:text-lg text-white/90">
-                {{ owner_name }}님의 자기 인식(Self) 응답과 비교해, 주변 시선이 어떻게 다른지 확인하는 단계입니다.
-                응답은 k≥3명이 모일 때만 집계·공유되며, 결과는 Δ 지표와 레이더 차트로 시각화됩니다.
+                {{ owner_name }}님이 마련한 인식 체크에 참여하는 단계입니다. 일상에서의 {{ target_name }}님의 모습을 떠올리며 솔직하게 답해 주세요.
+                답변은 익명으로 모이고, 3명 이상이 참여하면 결과 요약이 열립니다.
             </p>
             <dl class="grid gap-4 rounded-2xl bg-white/15 p-4 text-sm md:grid-cols-3">
                 <div>
@@ -107,16 +107,15 @@
     </section>
 
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 class="text-xl font-semibold text-slate-900">테스트 안내</h2>
+        <h2 class="text-xl font-semibold text-slate-900">참여 방법</h2>
         <p class="mt-3 text-sm text-slate-600">
-            각 문항은 "그 사람은…"이라는 제3자 관점 질문입니다. {{ target_name }}이 일상에서 보여주는 행동과
-            특성을 떠올리며 솔직하게 답변해주세요. 모든 문항은 1(전혀 그렇지 않다)에서 5(매우 그렇다) 사이의
-            Likert 척도를 사용합니다.
+            질문은 모두 "그 사람은…" 형식입니다. {{ target_name }}님이 평소에 보여주는 모습을 떠올리며, 가장 가까운 선택지를 골라 주세요.
+            1은 "전혀 그렇지 않다", 5는 "매우 그렇다"를 뜻합니다.
         </p>
         <ul class="mt-4 grid gap-3 text-sm text-slate-600 md:grid-cols-3">
-            <li class="rounded-xl bg-slate-50 px-4 py-3">✅ 응답은 익명으로 저장되며, 집계 결과에만 사용됩니다.</li>
-            <li class="rounded-xl bg-slate-50 px-4 py-3">📬 {{ owner_name }}님이 결과를 확인하고 Δ 인사이트를 공유합니다.</li>
-            <li class="rounded-xl bg-slate-50 px-4 py-3">🧠 Δ ≥ 1.6인 항목은 고위험 신호로 표시되어 추가 조언이 제공됩니다.</li>
+            <li class="rounded-xl bg-slate-50 px-4 py-3">✅ 답변은 익명으로 저장되며, 요약 결과에만 활용됩니다.</li>
+            <li class="rounded-xl bg-slate-50 px-4 py-3">📬 {{ owner_name }}님이 결과 요약을 확인하고 공유 여부를 결정합니다.</li>
+            <li class="rounded-xl bg-slate-50 px-4 py-3">📈 3명 이상 참여하면 강점과 차이점을 그래프로 보여드려요.</li>
         </ul>
     </section>
 
@@ -125,9 +124,9 @@
 
         <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <fieldset aria-describedby="relation-hint">
-                <legend class="text-xl font-semibold text-slate-900">🤝 {{ target_name }}와의 관계를 선택해주세요</legend>
+                <legend class="text-xl font-semibold text-slate-900">🤝 {{ target_name }}님과의 관계를 선택해 주세요</legend>
                 <p class="mt-2 text-sm text-slate-500" id="relation-hint">
-                    선택한 관계는 Δ 계산 시 가중치(Weight)로 반영됩니다.
+                    응답자 정보를 간단히 남겨 두면 리포트에서 관계별로 모아볼 수 있습니다.
                 </p>
                 <div class="mt-5 grid gap-4 sm:grid-cols-2">
                     {% for relation in relations %}
@@ -157,7 +156,7 @@
                     <span>{{ question.question }}</span>
                 </legend>
                 <p id="{{ base_name }}-hint" class="mt-3 text-sm text-slate-500">
-                    1은 "전혀 그렇지 않다", 5는 "매우 그렇다"를 의미합니다. 방향키 또는 탭+스페이스로 선택할 수 있습니다.
+                    방향키 또는 탭+스페이스로도 선택할 수 있어요. 고민될 땐 가장 가까운 쪽을 선택해 주세요.
                 </p>
                 <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5" role="radiogroup">
                     {% for value, label in scale_options %}
@@ -181,19 +180,19 @@
 
     <section class="grid gap-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-700 md:grid-cols-2">
         <div>
-            <h3 class="text-base font-semibold text-amber-800">💡 객관적으로 평가하는 팁</h3>
+            <h3 class="text-base font-semibold text-amber-800">💡 더 정확하게 답하는 방법</h3>
             <ul class="mt-3 space-y-1">
-                <li>• 최근 한두 번의 상황보다, 평소 반복되는 패턴을 떠올려 보세요.</li>
-                <li>• 다른 사람들과 함께 있을 때의 모습을 상상해보면 한층 정확해집니다.</li>
-                <li>• 애매하면 중간값(3)을 선택하고, 확신이 있을 때만 극단값을 선택하세요.</li>
+                <li>• 최근 한두 번의 일보다, 평소 반복되는 모습을 떠올려 보세요.</li>
+                <li>• 함께 지낸 다양한 순간을 돌이켜 보면 도움이 됩니다.</li>
+                <li>• 애매하면 중간값을 선택해도 괜찮아요. 확신이 있을 때만 극단값을 선택하세요.</li>
             </ul>
         </div>
         <div>
-            <h3 class="text-base font-semibold text-amber-800">📊 결과는 이렇게 활용돼요</h3>
+            <h3 class="text-base font-semibold text-amber-800">📊 결과는 이렇게 보여드려요</h3>
             <ul class="mt-3 space-y-1">
-                <li>• Self ↔ Others 간 Δ, σ, Top-3 이슈 카드가 생성됩니다.</li>
-                <li>• Δ ≥ 1.6 항목은 고위험 구간으로 표시되어 코칭 카드가 따라옵니다.</li>
-                <li>• 제출한 답변은 안전하게 저장되어 나중에 다시 비교할 수 있습니다.</li>
+                <li>• 참여가 모이면 강점과 다른 점을 요약한 카드가 생성됩니다.</li>
+                <li>• 관계별로 느낀 차이를 그래프와 문장으로 정리해 드립니다.</li>
+                <li>• 제출한 답변은 안전하게 저장되어 나중에 다시 확인할 수 있어요.</li>
             </ul>
         </div>
     </section>
