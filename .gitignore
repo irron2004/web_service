@@ -153,4 +153,8 @@ logs/
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+calculate_math/
+code_game/
+bible/
+stock/

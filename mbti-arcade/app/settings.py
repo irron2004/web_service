@@ -44,7 +44,7 @@ def _resolve_calculate_service_base_url() -> str:
             normalized = candidate.rstrip("/")
             return normalized or "/"
 
-    return "/calculate"
+    return "https://calc.360me.app"
 
 
 def _load_allowed_hosts() -> list[str]:
@@ -70,4 +70,3 @@ ALLOWED_HOSTS = _load_allowed_hosts()
 
 
 CALCULATE_SERVICE_BASE_URL = _resolve_calculate_service_base_url()
-

@@ -10,8 +10,6 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - main-hub
-      - math-backend
-      - math-frontend
       - mbti-arcade
     networks:
       - web-service-network
@@ -28,31 +26,6 @@ services:
     networks:
       - web-service-network
     container_name: main-hub
-
-  # Math App Backend
-  math-backend:
-    build: ./math-app/backend
-    expose:
-      - "8000"
-    environment:
-      - DATABASE_URL=sqlite:///./math_app.db
-    volumes:
-      - ./math-app/backend:/app
-      - /app/__pycache__
-    networks:
-      - web-service-network
-    container_name: math-backend
-
-  # Math App Frontend
-  math-frontend:
-    build: ./math-app/frontend
-    expose:
-      - "80"
-    depends_on:
-      - math-backend
-    networks:
-      - web-service-network
-    container_name: math-frontend
 
   # MBTI Arcade Service
   mbti-arcade:

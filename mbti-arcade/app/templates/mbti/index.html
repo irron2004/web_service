@@ -69,16 +69,49 @@
                 </li>
             </ol>
         </div>
-        <aside class="relative overflow-hidden rounded-3xl bg-slate-900 text-white">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
-            <img src="https://images.unsplash.com/photo-1529336953121-497f6c1ed0b9?auto=format&fit=crop&w=900&q=80" alt="데이터를 논의하는 사람들" class="h-full w-full object-cover" loading="lazy">
-            <div class="relative z-10 p-8 space-y-4">
-                <h3 class="text-2xl font-semibold">관계 맥락까지 함께 보는 인사이트</h3>
-                <p class="text-sm text-white/80">
-                    단순한 결과표를 넘어, 서로를 더 잘 이해할 수 있도록 대화 팁과 다음 행동 아이디어를 함께 제공합니다.
+        <aside class="rounded-3xl bg-slate-900 text-white">
+            <div class="space-y-6 p-8">
+                <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white/80">
+                    누구와 함께 이야기할까요?
+                </span>
+                <h3 class="text-2xl font-semibold">이런 관계와 나누면 인사이트가 선명해져요</h3>
+                <p class="text-sm leading-relaxed text-white/75">
+                    Self 테스트를 마친 뒤 아래 사람들에게 링크를 전송하면 서로의 관점을 비교하며 대화를 시작하기가 훨씬 수월합니다.
                 </p>
-                <a href="/mbti/friend-system" class="focus-outline inline-flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25">
-                    시스템 상세 보기 →
+                <ul class="grid gap-4 text-sm" aria-label="관계별 추천">
+                    <li class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                        <div class="flex items-center gap-2 text-base font-semibold">
+                            <span aria-hidden="true">👥</span> 친구
+                        </div>
+                        <p class="mt-1 text-white/70">늘 솔직하게 이야기해 주는 친구에게 부탁하면 내가 놓친 강점이나 행동 습관을 자연스럽게 확인할 수 있어요.</p>
+                    </li>
+                    <li class="rounded-2xl border border-cyan-200/20 bg-cyan-400/10 p-4">
+                        <div class="flex items-center gap-2 text-base font-semibold">
+                            <span aria-hidden="true">💼</span> 동료
+                        </div>
+                        <p class="mt-1 text-white/70">협업 중인 동료의 응답은 일하는 방식과 커뮤니케이션 기대치를 맞추는 데 큰 도움이 됩니다.</p>
+                    </li>
+                    <li class="rounded-2xl border border-rose-200/20 bg-rose-400/10 p-4">
+                        <div class="flex items-center gap-2 text-base font-semibold">
+                            <span aria-hidden="true">💕</span> 연인·배우자
+                        </div>
+                        <p class="mt-1 text-white/70">가장 가까운 관계일수록 작은 차이를 크게 느낄 수 있어요. 관점 차이를 안전하게 정리해 보세요.</p>
+                    </li>
+                    <li class="rounded-2xl border border-amber-200/20 bg-amber-400/10 p-4">
+                        <div class="flex items-center gap-2 text-base font-semibold">
+                            <span aria-hidden="true">🏠</span> 가족
+                        </div>
+                        <p class="mt-1 text-white/70">부모님이나 형제자매와 비교하면 세대·라이프스타일에 따른 관점 차이를 이해하기 쉬워집니다.</p>
+                    </li>
+                    <li class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                        <div class="flex items-center gap-2 text-base font-semibold">
+                            <span aria-hidden="true">🌱</span> 기타
+                        </div>
+                        <p class="mt-1 text-white/70">스터디, 멘토, 코치 등 다양한 관계의 응답을 모으면 전체 인사이트가 더욱 풍성해집니다.</p>
+                    </li>
+                </ul>
+                <a href="/mbti/share" class="focus-outline inline-flex items-center justify-center rounded-xl bg-white px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white/90">
+                    🔗 지금 바로 초대 링크 만들기
                 </a>
             </div>
         </aside>

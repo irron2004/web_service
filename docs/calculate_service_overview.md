@@ -1,8 +1,11 @@
 # Calculate Service Overview
 
+> **참고**
+> 이제 Calculate Math 서비스 코드는 별도 저장소([irron2004/calculate_math](https://github.com/irron2004/calculate_math))에서 관리됩니다. 아래 내용은 구조를 설명하기 위한 문서이며, 최신 구현은 새 저장소를 참고하세요.
+
 ## 서비스 구성
 
-`calculate-service`는 FastAPI 기반의 초등 수학 문제 연습 서비스를 제공합니다. 핵심 컴포넌트는 다음과 같습니다.
+`calculate_math`는 FastAPI 기반의 초등 수학 문제 연습 서비스를 제공합니다. 핵심 컴포넌트는 다음과 같습니다.
 
 - **API 라우터**: `/api/problems`를 통해 카테고리별 문제 세트를 JSON 으로 제공합니다.
 - **페이지 라우터**: `/`, `/problems` 등 웹 페이지를 렌더링하며, 모든 HTML 응답에는 `X-Robots-Tag: noindex` 헤더를 추가해 검색 노출을 차단합니다.
@@ -47,13 +50,13 @@ Invite 기능은 연습 결과를 가족이나 친구와 공유할 수 있도록
 
 ## 앱 구성 및 라우터 주입
 
-- FastAPI 앱은 `calculate-service/app/__init__.py`에서 생성되며, `Jinja2Templates` 인스턴스를 애플리케이션 상태와 페이지/초대 라우터에 동시에 주입해 템플릿 엔진을 공유합니다.
+- FastAPI 앱은 `calculate_math/app/__init__.py`에서 생성되며, `Jinja2Templates` 인스턴스를 애플리케이션 상태와 페이지/초대 라우터에 동시에 주입해 템플릿 엔진을 공유합니다.
 - 이전 브랜치와의 호환성을 위해 라우터 모듈에 `get_router()` 팩토리가 존재하는 경우에는 해당 함수를 통해 라우터를 등록하고, 모듈 수준 `router` 객체만 노출될 때는 이를 그대로 사용합니다.
 - 이렇게 구성하면 오래된 브랜치에서 병합되던 라우터 초기화 방식과 최신 Invite 흐름을 모두 안전하게 공존시킬 수 있어 충돌을 방지합니다.
 
 ## 테스트 커버리지
 
-`calculate-service/tests/test_invites.py`는 다음 시나리오를 검증합니다.
+`calculate_math/tests/test_invites.py`는 다음 시나리오를 검증합니다.
 
 - 초대 생성 시 토큰, 만료 시각, 요약 데이터가 올바르게 반환된다.
 - 생성된 토큰을 조회할 수 있으며 공유 페이지는 200 응답을 제공한다.
