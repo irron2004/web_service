@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from enum import Enum as PyEnum
 from typing import List
 
 from sqlalchemy import (
     Boolean,
-    Column,
     DateTime,
     Float,
     ForeignKey,
     Integer,
+    JSON,
     String,
     UniqueConstraint,
 )
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -32,6 +34,14 @@ class TimestampMixin:
         onupdate=_utcnow,
         nullable=False,
     )
+
+
+class ParticipantRelation(str, PyEnum):
+    FRIEND = "friend"
+    COWORKER = "coworker"
+    FAMILY = "family"
+    PARTNER = "partner"
+    OTHER = "other"
 
 
 class User(Base, TimestampMixin):
@@ -54,6 +64,9 @@ class Session(Base, TimestampMixin):
     is_anonymous: Mapped[bool] = mapped_column(Boolean, default=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     max_raters: Mapped[int] = mapped_column(Integer, default=50)
+    self_mbti: Mapped[str | None] = mapped_column(String(4))
+    snapshot_owner_name: Mapped[str | None] = mapped_column(String(120))
+    snapshot_owner_avatar: Mapped[str | None] = mapped_column(String(255))
 
     owner: Mapped[User | None] = relationship(back_populates="sessions")
     self_responses: Mapped[List["SelfResponse"]] = relationship(
@@ -64,6 +77,12 @@ class Session(Base, TimestampMixin):
     )
     aggregate: Mapped[Aggregate | None] = relationship(
         back_populates="session", uselist=False, cascade="all, delete-orphan"
+    )
+    participants: Mapped[List["Participant"]] = relationship(
+        back_populates="session", cascade="all, delete-orphan"
+    )
+    relation_aggregates: Mapped[List["RelationAggregate"]] = relationship(
+        back_populates="session", cascade="all, delete-orphan"
     )
 
 
@@ -106,6 +125,9 @@ class OtherResponse(Base, TimestampMixin):
         String(36), ForeignKey("sessions.id"), primary_key=True
     )
     rater_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    participant_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("participants.id"), nullable=True
+    )
     question_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("questions.id"), primary_key=True
     )
@@ -114,6 +136,9 @@ class OtherResponse(Base, TimestampMixin):
 
     session: Mapped[Session] = relationship(back_populates="other_responses")
     question: Mapped[Question] = relationship()
+    participant: Mapped["Participant | None"] = relationship(
+        back_populates="legacy_responses"
+    )
 
 
 class Aggregate(Base, TimestampMixin):
@@ -143,3 +168,71 @@ class Aggregate(Base, TimestampMixin):
 
     session: Mapped[Session] = relationship(back_populates="aggregate")
 
+
+class Participant(Base, TimestampMixin):
+    __tablename__ = "participants"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    session_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("sessions.id"), nullable=False
+    )
+    invite_token: Mapped[str] = mapped_column(String(60), nullable=False)
+    relation: Mapped[ParticipantRelation] = mapped_column(
+        SAEnum(ParticipantRelation, name="participantrelation"),
+        nullable=False,
+    )
+    display_name: Mapped[str | None] = mapped_column(String(120))
+    consent_display: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    perceived_type: Mapped[str | None] = mapped_column(String(4))
+    axes_payload: Mapped[dict[str, float] | None] = mapped_column(JSON)
+    answers_submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    computed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    session: Mapped[Session] = relationship(back_populates="participants")
+    answers: Mapped[List["ParticipantAnswer"]] = relationship(
+        back_populates="participant", cascade="all, delete-orphan"
+    )
+    legacy_responses: Mapped[List["OtherResponse"]] = relationship(
+        back_populates="participant"
+    )
+
+
+class ParticipantAnswer(Base, TimestampMixin):
+    __tablename__ = "participant_answers"
+
+    participant_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("participants.id"), primary_key=True
+    )
+    question_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("questions.id"), primary_key=True
+    )
+    value: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    participant: Mapped[Participant] = relationship(back_populates="answers")
+    question: Mapped[Question] = relationship()
+
+
+class RelationAggregate(Base, TimestampMixin):
+    __tablename__ = "relation_aggregates"
+    __table_args__ = (
+        UniqueConstraint("session_id", "relation", name="uq_relation_per_session"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    session_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("sessions.id"), nullable=False
+    )
+    relation: Mapped[ParticipantRelation] = mapped_column(
+        SAEnum(ParticipantRelation, name="participantrelation"),
+        nullable=False,
+    )
+    respondent_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    top_type: Mapped[str | None] = mapped_column(String(4))
+    top_fraction: Mapped[float | None] = mapped_column(Float)
+    second_type: Mapped[str | None] = mapped_column(String(4))
+    second_fraction: Mapped[float | None] = mapped_column(Float)
+    consensus: Mapped[float | None] = mapped_column(Float)
+    pgi: Mapped[float | None] = mapped_column(Float)
+    axes_payload: Mapped[dict[str, float] | None] = mapped_column(JSON)
+
+    session: Mapped[Session] = relationship(back_populates="relation_aggregates")
