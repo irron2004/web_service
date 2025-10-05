@@ -18,7 +18,7 @@ use_browsing: true
   - `/healthz`는 서비스 메타데이터·업타임을 제공하고, `/readyz`는 DB/Redis 핑이 모두 성공해야 200(준비 완료)을 반환합니다.
   - `pytest mbti-arcade/tests/test_health.py -q` 스냅샷과 `docker compose logs mbti-arcade`에서 확인한 준비 상태 타임스탬프를 Runbook에 기록합니다.
   - Cloud Run 배포 체크리스트(DeploymentPlan.md)에 초기화 순서와 SLA(≤30s)를 업데이트합니다.
-- [ ] **RFC 9457 오류 미들웨어 프로토타입** — `BE-02`
+- [x] **RFC 9457 오류 미들웨어 프로토타입** — `BE-02`
   - 공통 예외 → RFC 9457 JSON 매퍼를 만들고, `X-Request-ID` 전파 및 로깅 필드를 포함합니다.
   - 실패 케이스(unit + integration) 테스트를 추가하고, 기존 라우터에서 의존성 주입 변경 사항을 검토합니다.
   - Ask 게이트 검토를 위해 설계 제안(PRD 링크 포함)을 초안으로 작성합니다.
