@@ -92,6 +92,14 @@ app = FastAPI(
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+_calculate_base_url = settings.CALCULATE_SERVICE_BASE_URL or "/"
+if _calculate_base_url != "/":
+    _calculate_base_url = _calculate_base_url.rstrip("/")
+templates.env.globals.setdefault("calculate_service_url", _calculate_base_url)
+templates.env.globals.setdefault(
+    "calculate_service_problems_url",
+    f"{_calculate_base_url}/problems" if _calculate_base_url != "/" else "/problems",
+)
 
 
 def _escape_js(value: object) -> str:
