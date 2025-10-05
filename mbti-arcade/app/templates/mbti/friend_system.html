@@ -5,112 +5,72 @@
 {% block content %}
 <div class="max-w-4xl mx-auto">
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">
-            👥 친구 평가 시스템
-        </h1>
-        <p class="text-xl text-gray-600 mb-6">
-            친구와 서로의 MBTI를 평가해보고 차이점을 확인해보세요!
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">👥 친구 평가 시스템</h1>
+        <p class="text-lg text-gray-600">
+            관계를 선택하고 닉네임(선택)을 입력한 뒤, 1분 만에 친구 관점 MBTI 설문에 참여하세요.
         </p>
     </div>
 
-    <div class="bg-white rounded-lg shadow-lg p-8">
-        <div class="grid md:grid-cols-2 gap-8">
-            <!-- 시스템 설명 -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">🎯 시스템 개요</h2>
-                <p class="text-gray-600 mb-4">
-                    친구 평가 시스템은 서로 다른 관점에서 MBTI를 평가하여 
-                    더 객관적이고 정확한 성격 유형을 파악할 수 있도록 도와줍니다.
+    <div class="bg-white rounded-3xl shadow-xl p-8 space-y-10">
+        <section class="grid gap-8 md:grid-cols-2">
+            <div class="space-y-4">
+                <h2 class="text-2xl font-semibold text-gray-900">🎯 시스템 핵심</h2>
+                <p class="text-sm md:text-base text-gray-600 leading-relaxed">
+                    MBTI 친구 평가는 <strong>표시명(닉네임)과 관계 태그</strong>만으로 시작합니다. 이메일은 수집하지 않고,
+                    응답은 익명으로 합산돼요. 서로의 관점을 비교하며 오해를 줄이고 대화를 시작할 수 있도록 돕습니다.
                 </p>
-                
-                <div class="bg-blue-50 p-4 rounded-lg mb-6">
-                    <h3 class="font-semibold text-blue-800 mb-2">💡 핵심 아이디어</h3>
-                    <p class="text-sm text-blue-700">
-                        "내가 친구의 입장에서 생각하고 MBTI를 작성해보자"
-                    </p>
-                </div>
-
-                <h3 class="text-lg font-semibold text-gray-800 mb-3">📋 평가 과정</h3>
-                <ol class="list-decimal list-inside space-y-2 text-gray-600">
-                    <li>친구 정보 입력 (이름, 이메일, 관계)</li>
-                    <li>친구의 입장에서 MBTI 테스트 진행</li>
-                    <li>결과 확인 및 분석</li>
-                    <li>친구와 결과 공유</li>
-                </ol>
-            </div>
-
-            <!-- 장점 -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">✨ 시스템 장점</h2>
-                
-                <div class="space-y-4">
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <h3 class="font-semibold text-green-800 mb-2">🎯 객관성 향상</h3>
-                        <p class="text-sm text-green-700">
-                            제3자 관점에서 평가하므로 더 객관적인 결과를 얻을 수 있습니다.
-                        </p>
-                    </div>
-
-                    <div class="bg-purple-50 p-4 rounded-lg">
-                        <h3 class="font-semibold text-purple-800 mb-2">🤝 상호 이해</h3>
-                        <p class="text-sm text-purple-700">
-                            서로를 더 깊이 이해하고 관계를 개선할 수 있습니다.
-                        </p>
-                    </div>
-
-                    <div class="bg-orange-50 p-4 rounded-lg">
-                        <h3 class="font-semibold text-orange-800 mb-2">📊 비교 분석</h3>
-                        <p class="text-sm text-orange-700">
-                            자신의 평가와 친구의 평가를 비교하여 차이점을 확인할 수 있습니다.
-                        </p>
-                    </div>
-
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h3 class="font-semibold text-blue-800 mb-2">🎮 재미있는 경험</h3>
-                        <p class="text-sm text-blue-700">
-                            친구와 함께하는 새로운 형태의 MBTI 테스트 경험을 제공합니다.
-                        </p>
-                    </div>
+                <div class="rounded-2xl bg-indigo-50 p-4 text-indigo-700 text-sm">
+                    <p class="font-semibold">💡 왜 필요한가요?</p>
+                    <p class="mt-1 leading-relaxed">"내가 느끼는 나"와 "친구가 바라보는 나"의 차이를 간단한 24~32문항으로 확인하고,
+                        관계별 인사이트를 발견할 수 있어요.</p>
                 </div>
             </div>
-        </div>
+            <div class="space-y-4">
+                <h2 class="text-2xl font-semibold text-gray-900">✨ 이런 점이 좋아요</h2>
+                <ul class="space-y-3 text-sm md:text-base text-gray-600">
+                    <li class="flex items-start gap-3"><span class="mt-1 text-xl">🛡️</span><span><strong>개인정보 걱정 없이</strong> 닉네임과 관계만 남기면 됩니다. 입력하지 않으면 자동으로 ‘익명’으로 저장돼요.</span></li>
+                    <li class="flex items-start gap-3"><span class="mt-1 text-xl">⌛</span><span>약 1분이면 완료되는 문항으로 빠르게 인식을 수집할 수 있어요.</span></li>
+                    <li class="flex items-start gap-3"><span class="mt-1 text-xl">📊</span><span>응답이 <strong>3명 이상</strong> 모이면 관계별 비교 인사이트가 열려요.</span></li>
+                    <li class="flex items-start gap-3"><span class="mt-1 text-xl">🔗</span><span>초대 링크로만 접근하므로 검색 노출 없이 원하는 사람에게만 공유할 수 있어요.</span></li>
+                </ul>
+            </div>
+        </section>
 
-        <!-- 사용 방법 -->
-        <div class="mt-8 p-6 bg-gray-50 rounded-lg">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">📖 사용 방법</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="text-center">
-                    <div class="text-4xl mb-3">1️⃣</div>
-                    <h3 class="font-semibold text-gray-800 mb-2">친구 정보 입력</h3>
-                    <p class="text-sm text-gray-600">
-                        평가할 친구의 이름과 이메일을 입력하고, 
-                        친구에 대한 간단한 설명을 작성합니다.
-                    </p>
+        <section class="rounded-2xl bg-gray-50 p-6">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">📋 진행 순서</h2>
+            <div class="grid gap-6 md:grid-cols-3">
+                <div class="text-center space-y-2">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">1</div>
+                    <h3 class="text-base font-semibold text-gray-800">표시명 & 관계 선택</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">평가 대상 표시명을 확인하고,<br>응답자의 관계(친구·가족·부부·직장·기타)를 고릅니다.</p>
                 </div>
-                <div class="text-center">
-                    <div class="text-4xl mb-3">2️⃣</div>
-                    <h3 class="font-semibold text-gray-800 mb-2">MBTI 테스트</h3>
-                    <p class="text-sm text-gray-600">
-                        친구의 입장에서 생각하며 24문항의 MBTI 테스트를 진행합니다.
-                    </p>
+                <div class="text-center space-y-2">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">2</div>
+                    <h3 class="text-base font-semibold text-gray-800">닉네임은 선택 사항</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">닉네임을 입력하면 결과 카드에 표시되고,<br>비워두면 자동으로 ‘익명’으로 저장돼요.</p>
                 </div>
-                <div class="text-center">
-                    <div class="text-4xl mb-3">3️⃣</div>
-                    <h3 class="font-semibold text-gray-800 mb-2">결과 공유</h3>
-                    <p class="text-sm text-gray-600">
-                        결과를 확인하고 친구와 공유하여 서로의 관점을 비교해봅니다.
-                    </p>
+                <div class="text-center space-y-2">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">3</div>
+                    <h3 class="text-base font-semibold text-gray-800">24~32문항 설문 참여</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">친구를 떠올리며 문항을 선택하면 즉시 결과로 이어지고,<br>링크로 다시 초대할 수 있습니다.</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- 시작하기 버튼 -->
-        <div class="text-center mt-8">
-            <a href="/mbti/friend" 
-               class="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-colors">
+        <section class="rounded-2xl bg-white/60 p-6 border border-gray-100">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-3">🔐 데이터는 이렇게 다룹니다</h2>
+            <ul class="space-y-2 text-sm md:text-base text-gray-600">
+                <li>• 응답은 익명으로 합산되고, 세부 인사이트는 3명 이상 모여야 열립니다.</li>
+                <li>• 초대 링크로만 참여 가능하며 검색엔진에는 노출되지 않습니다.</li>
+                <li>• 소유자는 언제든 링크를 새로 만들거나 비활성화할 수 있도록 준비 중입니다.</li>
+            </ul>
+        </section>
+
+        <div class="text-center">
+            <a href="/mbti/friend" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/40 transition hover:-translate-y-0.5">
                 🚀 친구 평가 시작하기
             </a>
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

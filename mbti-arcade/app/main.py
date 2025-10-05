@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import time
 from email.utils import formatdate
+from http import HTTPStatus
 from pathlib import Path
 from typing import Dict, Iterable, Tuple
 from uuid import uuid4
@@ -11,7 +12,10 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.datastructures import Headers, URL
+from starlette.middleware.trustedhost import ENFORCE_DOMAIN_WILDCARD
+from starlette.responses import RedirectResponse
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 try:
     from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
@@ -47,6 +51,65 @@ except ImportError:  # pragma: no cover - fallback for older Starlette versions
                     request.scope["client"] = (client_ip, client[1] or 0)
 
             return await call_next(request)
+
+
+class ProblemDetailsTrustedHostMiddleware:
+    def __init__(
+        self,
+        app: ASGIApp,
+        allowed_hosts: Iterable[str] | None = None,
+        www_redirect: bool = True,
+    ) -> None:
+        if allowed_hosts is None:
+            allowed_hosts = ["*"]
+
+        patterns = list(allowed_hosts)
+        for pattern in patterns:
+            assert "*" not in pattern[1:], ENFORCE_DOMAIN_WILDCARD
+            if pattern.startswith("*") and pattern != "*":
+                assert pattern.startswith("*."), ENFORCE_DOMAIN_WILDCARD
+
+        self.app = app
+        self.allowed_hosts = patterns
+        self.allow_any = "*" in patterns
+        self.www_redirect = www_redirect
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if self.allow_any or scope["type"] not in {"http", "websocket"}:  # pragma: no cover
+            await self.app(scope, receive, send)
+            return
+
+        headers = Headers(scope=scope)
+        host = headers.get("host", "").split(":")[0]
+        is_valid_host = False
+        found_www_redirect = False
+        for pattern in self.allowed_hosts:
+            if host == pattern or (pattern.startswith("*") and host.endswith(pattern[1:])):
+                is_valid_host = True
+                break
+            if f"www.{host}" == pattern:
+                found_www_redirect = True
+
+        if is_valid_host:
+            await self.app(scope, receive, send)
+            return
+
+        if found_www_redirect and self.www_redirect:
+            url = URL(scope=scope)
+            redirect_url = url.replace(netloc=f"www.{url.netloc}")
+            response = RedirectResponse(url=str(redirect_url))
+            await response(scope, receive, send)
+            return
+
+        request = Request(scope, receive)
+        response = problem_response(
+            request,
+            status=HTTPStatus.BAD_REQUEST,
+            title=HTTPStatus.BAD_REQUEST.phrase,
+            detail="허용되지 않은 호스트에서 요청했습니다.",
+            type_suffix="invalid-host",
+        )
+        await response(scope, receive, send)
 
 from app import settings
 from app.core.config import REQUEST_ID_HEADER
@@ -132,7 +195,7 @@ if "testserver" not in _allowed_hosts:
     _allowed_hosts.append("testserver")
 
 app.add_middleware(ProxyHeadersMiddleware)
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=_allowed_hosts)
+app.add_middleware(ProblemDetailsTrustedHostMiddleware, allowed_hosts=_allowed_hosts)
 
 try:  # pragma: no cover - optional dependency hook
     from opentelemetry import trace  # type: ignore[import]
@@ -378,7 +441,6 @@ async def mbti_self_test(request: Request):
 async def mbti_friend(
     request: Request,
     prefill_name: str | None = None,
-    prefill_email: str | None = None,
     prefill_mbti: str | None = None,
 ):
     return templates.TemplateResponse(
@@ -386,7 +448,6 @@ async def mbti_friend(
         {
             "request": request,
             "prefill_name": prefill_name or "",
-            "prefill_email": prefill_email or "",
             "prefill_mbti": prefill_mbti or "",
         },
     )
@@ -397,9 +458,9 @@ async def submit_friend(request: Request):
     form = await request.form()
     friend_info = {
         "name": form.get("friend_name", ""),
-        "email": form.get("friend_email", ""),
-        "description": form.get("friend_description", ""),
-        "my_perspective": form.get("my_perspective", ""),
+        "mbti": form.get("friend_mbti", ""),
+        "relationship": form.get("relationship", ""),
+        "responder_name": form.get("responder_name", ""),
     }
     questions = _build_questions("friend", perspective="other")
     return templates.TemplateResponse(
@@ -416,18 +477,18 @@ async def submit_friend(request: Request):
 async def mbti_test(
     request: Request,
     friend_name: str | None = None,
-    friend_email: str | None = None,
-    friend_description: str | None = None,
-    my_perspective: str | None = None,
+    friend_mbti: str | None = None,
+    relationship: str | None = None,
+    responder_name: str | None = None,
 ):
     questions = _build_questions("friend", perspective="other")
     friend_info = None
-    if friend_name or friend_email or friend_description or my_perspective:
+    if friend_name or friend_mbti or relationship or responder_name:
         friend_info = {
             "name": friend_name or "",
-            "email": friend_email or "",
-            "description": friend_description or "",
-            "my_perspective": my_perspective or "",
+            "mbti": friend_mbti or "",
+            "relationship": relationship or "",
+            "responder_name": responder_name or "",
         }
     return templates.TemplateResponse(
         "mbti/test.html",
@@ -495,6 +556,11 @@ async def mbti_result(request: Request):
 
     result = MBTI_SUMMARIES.get(mbti_type, _DEFAULT_SUMMARY)
 
+    friend_name = (form.get("friend_name") or "").strip()
+    friend_relationship = (form.get("relationship") or "").strip()
+    responder_name = (form.get("responder_name") or "").strip()
+    friend_mbti = (form.get("friend_mbti") or "").strip()
+
     response = templates.TemplateResponse(
         "mbti/result.html",
         {
@@ -504,6 +570,10 @@ async def mbti_result(request: Request):
             "result": result,
             "pair_token": None,
             "robots_meta": NOINDEX_VALUE,
+            "friend_name": friend_name or None,
+            "friend_relationship": friend_relationship or None,
+            "responder_name": responder_name or None,
+            "friend_mbti": friend_mbti or None,
         },
     )
     apply_noindex_headers(response)

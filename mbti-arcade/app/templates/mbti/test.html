@@ -4,6 +4,11 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
+    {% set friend_name_value = friend_info.name if friend_info else request.query_params.get('friend_name', '') %}
+    {% set friend_mbti_value = friend_info.mbti if friend_info else request.query_params.get('friend_mbti', request.query_params.get('mbti', '')) %}
+    {% set relationship_value = friend_info.relationship if friend_info else request.query_params.get('relationship', '') %}
+    {% set responder_value = friend_info.responder_name if friend_info else request.query_params.get('responder_name', '') %}
+    {% set has_friend_context = friend_name_value or relationship_value or responder_value %}
     <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-4">
             🧠 MBTI 성격 유형 테스트
@@ -13,13 +18,11 @@
         </p>
         <div class="bg-blue-50 p-4 rounded-lg max-w-2xl mx-auto">
             <p class="text-sm text-blue-800">
-                <strong>💡 테스트 안내:</strong> 
-                {% if friend_info %}
-                    각 문항은 "{{ friend_info.name }}은..."으로 시작하는 제3자 관점의 질문입니다. 
-                    {{ friend_info.name }}님을 객관적으로 평가해주세요.
+                <strong>💡 테스트 안내:</strong>
+                {% if friend_name_value %}
+                    각 문항은 "{{ friend_name_value }}은..."으로 시작하는 제3자 관점의 질문입니다. {{ friend_name_value }}님을 떠올리며 답해주세요.
                 {% else %}
-                    각 문항은 "그 사람은..."으로 시작하는 제3자 관점의 질문입니다. 
-                    자신을 객관적으로 바라보는 마음으로 답변해주세요.
+                    각 문항은 "그 사람은..."으로 시작하는 제3자 관점의 질문입니다. 자신을 객관적으로 바라보는 마음으로 답변해주세요.
                 {% endif %}
             </p>
         </div>
@@ -27,49 +30,38 @@
 
     <form method="POST" action="/mbti/result" class="bg-white rounded-lg shadow-lg p-8">
         <!-- 친구 평가 정보 (URL 파라미터 또는 컨텍스트에서 가져옴) -->
-        <input type="hidden" name="friend_email" value="{{ friend_info.email if friend_info else request.query_params.get('friend_email', '') }}">
-        {% if friend_info and friend_info.my_perspective %}
-        <input type="hidden" name="my_perspective" value="{{ friend_info.my_perspective }}">
-        {% endif %}
-        
+        <input type="hidden" name="friend_name" value="{{ friend_name_value }}">
+        <input type="hidden" name="friend_mbti" value="{{ friend_mbti_value }}">
+        <input type="hidden" name="relationship" value="{{ relationship_value }}">
+        <input type="hidden" name="responder_name" value="{{ responder_value }}">
+
         <!-- 평가자 정보 입력 -->
-        {% if (friend_info and friend_info.email) or request.query_params.get('friend_email') %}
+        {% if has_friend_context %}
         <div class="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
             <h3 class="text-lg font-semibold text-purple-800 mb-3">👥 친구 평가 모드</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="evaluator_name" class="block text-sm font-medium text-gray-700 mb-1">
-                        평가자 이름 (선택사항)
-                    </label>
-                    <input type="text" 
-                           id="evaluator_name" 
-                           name="evaluator_name" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                           placeholder="당신의 이름을 입력하세요">
+                <div class="text-sm text-purple-700">
+                    평가 대상: <strong>{{ friend_name_value or '친구' }}</strong>
+                    {% if relationship_value %}<span class="ml-1 text-purple-600">({{ relationship_value }})</span>{% endif %}
+                    {% if friend_mbti_value %}<div class="mt-1 text-xs text-purple-500">참고 MBTI: {{ friend_mbti_value }}</div>{% endif %}
                 </div>
-                <div class="flex items-end">
-                    <p class="text-sm text-purple-600">
-                        {% if friend_info and friend_info.email %}
-                        친구: <strong>{{ friend_info.name }}</strong> ({{ friend_info.email }})
-                        {% else %}
-                        친구 이메일: <strong>{{ request.query_params.get('friend_email') }}</strong>
-                        {% endif %}
-                    </p>
+                <div class="text-sm text-purple-700">
+                    내 닉네임: <strong>{{ responder_value or '익명' }}</strong>
                 </div>
             </div>
-            
+
             <!-- 상대방 입장에서 MBTI 평가 안내 -->
             <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p class="text-sm text-yellow-800">
-                    <strong>🎯 평가 방식:</strong> 
-                    {% if friend_info %}
-                        "내가 <strong>{{ friend_info.name }}</strong>이라고 생각하고 MBTI를 작성해주세요"
+                    <strong>🎯 평가 방식:</strong>
+                    {% if friend_name_value %}
+                        "내가 <strong>{{ friend_name_value }}</strong>이라면 어떻게 행동할까?"를 떠올리며 응답해 주세요.
                     {% else %}
-                        "내가 [친구 이름]이라고 생각하고 MBTI를 작성해주세요"
+                        "내가 [친구 이름]이라면 어떻게 행동할까?"를 떠올리며 응답해 주세요.
                     {% endif %}
                 </p>
                 <p class="text-xs text-yellow-700 mt-1">
-                    상대방의 입장에서 생각하고 답변해주세요. 객관적인 관찰을 바탕으로 평가해주세요.
+                    관계를 생각하며 솔직하게 답해주세요. 닉네임은 결과에 익명으로 표시됩니다.
                 </p>
             </div>
         </div>

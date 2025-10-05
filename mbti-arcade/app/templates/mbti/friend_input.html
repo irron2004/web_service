@@ -27,62 +27,55 @@
 
 {% block content %}
 {% set default_friend_name = prefill_name or "친구" %}
-{% set default_friend_email = prefill_email or "" %}
 {% set default_friend_mbti = prefill_mbti or "" %}
+{% set relationship_options = ["친구", "가족", "부부", "직장", "기타"] %}
 
 <div class="mx-auto max-w-4xl space-y-10">
     <section class="rounded-3xl bg-gradient-to-br from-purple-600 via-sky-500 to-slate-900 px-6 py-10 text-white">
         <div class="space-y-6">
             <div class="flex flex-wrap items-center gap-3">
-                <span class="info-pill">1분 작성</span>
-                <span class="info-pill">익명 참여</span>
-                <span class="info-pill">3명 이상 모이면 공개</span>
+                <span class="info-pill">1분 준비</span>
+                <span class="info-pill">익명 응답</span>
+                <span class="info-pill">3명 이상 공개</span>
             </div>
-            <h1 class="text-3xl md:text-4xl font-bold leading-tight">👥 친구 MBTI 평가 링크 만들기</h1>
+            <h1 class="text-3xl md:text-4xl font-bold leading-tight">👥 친구 MBTI 평가 시작하기</h1>
             <p class="text-base md:text-lg text-white/90">
-                친구나 동료에게 “나를 어떻게 보고 있을까?”를 물어보세요. 아래 정보를 입력하면 바로 공유할 수 있는
-                참여 링크가 만들어집니다. 설문은 짧고 간단하며 누구나 편하게 답할 수 있어요.
+                관계를 고르고 닉네임(선택)을 입력하면 바로 설문이 시작돼요. <span class="font-semibold" id="target-name-hero">{{ default_friend_name }}</span>님에 대한 인식이 익명으로 모여,
+                응답 3명이 모이면 상세 인사이트가 열립니다.
             </p>
             <ul class="grid gap-3 text-sm text-white/85 md:grid-cols-3">
-                <li class="rounded-2xl bg-white/15 px-4 py-3">🔐 응답은 익명으로 저장되어 요약 결과로만 활용됩니다.</li>
-                <li class="rounded-2xl bg-white/15 px-4 py-3">🔔 3명 이상 모이면 차이점과 공통점을 한눈에 볼 수 있어요.</li>
-                <li class="rounded-2xl bg-white/15 px-4 py-3">🚫 검색에 노출되지 않으니 링크를 받은 사람만 참여할 수 있어요.</li>
+                <li class="rounded-2xl bg-white/15 px-4 py-3">🔐 닉네임을 비워두면 ‘익명’으로 저장돼요.</li>
+                <li class="rounded-2xl bg-white/15 px-4 py-3">🕒 설문은 약 1분 정도 소요됩니다.</li>
+                <li class="rounded-2xl bg-white/15 px-4 py-3">🚫 링크로만 참여할 수 있어 검색에 노출되지 않아요.</li>
             </ul>
         </div>
     </section>
 
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 class="text-xl font-semibold text-slate-900">이렇게 진행돼요</h2>
+        <h2 class="text-xl font-semibold text-slate-900">진행 순서</h2>
         <ol class="mt-4 space-y-3 text-sm text-slate-600">
-            <li class="flex items-start gap-3"><span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">1</span> 친구가 누구를 평가하는지 표시명을 입력해요.</li>
-            <li class="flex items-start gap-3"><span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">2</span> 링크를 공유하면 친구가 {{ default_friend_name }}을(를) 떠올리며 질문에 답합니다.</li>
-            <li class="flex items-start gap-3"><span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">3</span> 참여자가 3명 이상 모이면 차이와 공통점을 정리한 인사이트가 열립니다.</li>
+            <li class="flex items-start gap-3"><span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">1</span> 평가 대상 표시명을 확인하거나 수정해요.</li>
+            <li class="flex items-start gap-3"><span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">2</span> 응답자의 관계(친구/가족/부부/직장/기타)를 선택하고 닉네임을 입력하면 설문이 시작돼요.</li>
+            <li class="flex items-start gap-3"><span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">3</span> 응답이 3명 이상 모이면 {{ default_friend_name }}님에게 익명 인사이트가 열립니다.</li>
         </ol>
     </section>
 
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
         <form method="POST" class="space-y-6">
-            {% if prefill_name or prefill_email or prefill_mbti %}
+            {% if prefill_name or prefill_mbti %}
             <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                 <p class="font-semibold">✅ 저장해 둔 정보가 불러와졌어요.</p>
                 <ul class="mt-2 space-y-1">
-                    {% if prefill_name %}<li>• 친구 이름: {{ prefill_name }}</li>{% endif %}
-                    {% if prefill_email %}<li>• 친구 이메일: {{ prefill_email }}</li>{% endif %}
-                    {% if prefill_mbti %}<li>• 친구 MBTI: {{ prefill_mbti }}</li>{% endif %}
+                    {% if prefill_name %}<li>• 표시명: {{ prefill_name }}</li>{% endif %}
+                    {% if prefill_mbti %}<li>• 실제 MBTI: {{ prefill_mbti }}</li>{% endif %}
                 </ul>
             </div>
             {% endif %}
 
             <div>
-                <label for="friend_name" class="block text-sm font-medium text-slate-700">친구 이름 *</label>
+                <label for="friend_name" class="block text-sm font-medium text-slate-700">평가 대상 표시명 *</label>
                 <input id="friend_name" name="friend_name" value="{{ default_friend_name if default_friend_name != '친구' else '' }}" required maxlength="50" class="input-field mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-base text-slate-900 shadow-sm focus-visible:ring-4 focus-visible:ring-indigo-200" placeholder="예: 김서윤">
-                <p class="mt-2 text-xs text-slate-500">문항 속 지칭과 결과 카드에 그대로 사용됩니다.</p>
-            </div>
-
-            <div>
-                <label for="friend_email" class="block text-sm font-medium text-slate-700">친구 이메일</label>
-                <input id="friend_email" type="email" name="friend_email" value="{{ default_friend_email }}" maxlength="120" class="input-field mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-base text-slate-900 shadow-sm focus-visible:ring-4 focus-visible:ring-indigo-200" placeholder="friend@example.com">
-                <p class="mt-2 text-xs text-slate-500">선택 사항 · 결과 링크를 자동 전달하려면 이메일을 입력하세요.</p>
+                <p class="mt-2 text-xs text-slate-500">설문과 결과 카드에 그대로 사용돼요. 필요하면 닉네임으로 바꿔도 괜찮아요.</p>
             </div>
 
             <div>
@@ -91,18 +84,32 @@
                 <p class="mt-2 text-xs text-slate-500">알고 있는 경우 입력하면 결과 비교 카드에 표시돼요.</p>
             </div>
 
+            <fieldset>
+                <legend class="block text-sm font-medium text-slate-700">응답자와의 관계 *</legend>
+                <p class="mt-2 text-xs text-slate-500">가장 가까운 관계를 선택하면 맞춤 안내가 제공돼요.</p>
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    {% for option in relationship_options %}
+                    {% set option_id = "relationship-" ~ loop.index %}
+                    <label for="{{ option_id }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-indigo-400 hover:bg-indigo-50">
+                        <input id="{{ option_id }}" type="radio" name="relationship" value="{{ option }}" class="h-4 w-4 text-indigo-600" required>
+                        <span>{{ option }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
             <div>
-                <label for="friend_relationship" class="block text-sm font-medium text-slate-700">관계 메모</label>
-                <input id="friend_relationship" name="friend_relationship" maxlength="80" class="input-field mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-base text-slate-900 shadow-sm focus-visible:ring-4 focus-visible:ring-indigo-200" placeholder="예: 대학 동기, 직장 동료, 가족 등">
-                <p class="mt-2 text-xs text-slate-500">상대가 평가하면서 참고할 간단한 설명을 남겨주세요.</p>
+                <label for="responder_name" class="block text-sm font-medium text-slate-700">내 닉네임 (선택)</label>
+                <input id="responder_name" name="responder_name" maxlength="40" class="input-field mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-base text-slate-900 shadow-sm focus-visible:ring-4 focus-visible:ring-indigo-200" placeholder="비워두면 익명으로 저장돼요">
+                <p class="mt-2 text-xs text-slate-500">닉네임은 결과 요약에만 익명으로 표시됩니다.</p>
             </div>
 
             <div class="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-                <p><strong>안내:</strong> 아래 테스트는 <span id="friend_name_display">{{ default_friend_name }}</span>을(를) 떠올리며 진행돼요.<br>“내가 <span id="friend_name_display2">{{ default_friend_name }}</span>이라면 어떻게 행동할까?”를 생각하며 응답을 부탁해 주세요.</p>
+                <p><strong>안내:</strong> 아래 테스트는 <span id="friend_name_display">{{ default_friend_name }}</span>님을 떠올리며 진행돼요.<br>관계를 선택하고 닉네임을 남기면 설문이 바로 시작됩니다.</p>
             </div>
 
             <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-600/40 transition hover:-translate-y-0.5">
-                🔗 MBTI 평가 링크 생성
+                🔗 설문 시작하기
             </button>
         </form>
 
@@ -115,8 +122,8 @@
         <h2 class="text-base font-semibold text-purple-900">안심하고 사용하세요</h2>
         <ul class="mt-3 space-y-1">
             <li>• 응답자는 익명으로 참여하며, 결과는 요약 통계로만 보여집니다.</li>
-            <li>• 링크는 검색엔진에 노출되지 않아 초대한 사람만 접근할 수 있어요.</li>
-            <li>• 언제든지 새로운 링크를 만들어 필요한 사람에게만 공유할 수 있습니다.</li>
+            <li>• 3명 이상 모여야 상세 비교가 열리며, 부족하면 요약만 확인할 수 있어요.</li>
+            <li>• 링크는 검색엔진에 노출되지 않아 초대한 사람만 접근할 수 있습니다.</li>
         </ul>
     </section>
 </div>
@@ -125,12 +132,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     var friendNameInput = document.getElementById('friend_name');
     var display1 = document.getElementById('friend_name_display');
-    var display2 = document.getElementById('friend_name_display2');
+    var heroTarget = document.getElementById('target-name-hero');
 
     var updateDisplays = function (value) {
         var fallback = value && value.trim() ? value.trim() : '{{ default_friend_name|escapejs }}';
         display1.textContent = fallback;
-        display2.textContent = fallback;
+        if (heroTarget) {
+            heroTarget.textContent = fallback;
+        }
     };
 
     if (friendNameInput) {
@@ -142,15 +151,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var params = new URLSearchParams(window.location.search);
     var nameParam = params.get('name');
-    var emailParam = params.get('email');
     var mbtiParam = params.get('mbti');
     if (nameParam && friendNameInput && !friendNameInput.value) {
         friendNameInput.value = nameParam;
         updateDisplays(nameParam);
-    }
-    var emailInput = document.getElementById('friend_email');
-    if (emailParam && emailInput && !emailInput.value) {
-        emailInput.value = emailParam;
     }
     var mbtiInput = document.getElementById('friend_mbti');
     if (mbtiParam && mbtiInput && !mbtiInput.value) {
