@@ -17,6 +17,7 @@ use_browsing: true
 * **Unit:** 정규화/가중치/σ/Gap 공식, RFC 9457 스키마 검증. ([RFC Editor][1])
 * **Integration:** DB/Redis/메일 모의, OG 이미지 API 200ms SLA.
   * 헬스 프로브: `pytest mbti-arcade/tests/test_health.py -q`로 스냅샷을 남기고, `docker compose logs mbti-arcade | grep readyz`로 스타트업 타임스탬프를 확인합니다.
+  * 참가자 플로우 계약: `pytest mbti-arcade/tests/integration/test_participant_flow.py -q`로 Self→Invite→Other→Preview 흐름을 검증하고 RFC 9457 스냅샷을 캡처합니다. (참고: docs/mbti_relationship_flow.md)
 * **E2E:** Self→초대→응답→집계→차트→OG 공유.
 * **성능:** Lighthouse CI + RUM/CrUX, LCP/INP/CLS 75p 합격. ([web.dev][2])
 * **A11y:** WCAG 2.2 AA, 키보드 포커스·명도 대비. ([W3C][3])

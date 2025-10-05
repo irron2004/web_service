@@ -5,6 +5,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+from app.models import ParticipantRelation
+
 DIMENSIONS = ("EI", "SN", "TF", "JP")
 
 
@@ -109,3 +111,67 @@ class ProblemDetails(BaseModel):
     detail: str
     instance: str
     errors: Optional[Dict[str, List[str]]] = None
+
+
+class ParticipantRegistrationRequest(BaseModel):
+    relation: ParticipantRelation
+    display_name: Optional[str] = Field(default=None, max_length=120)
+    consent_display: bool = False
+
+
+class ParticipantRegistrationResponse(BaseModel):
+    participant_id: int
+    session_id: str
+    invite_token: str
+    relation: ParticipantRelation
+    display_name: Optional[str]
+    consent_display: bool
+    answers_submitted: bool
+    answers_submitted_at: Optional[datetime]
+
+
+class ParticipantAnswerSubmitRequest(BaseModel):
+    answers: List[AnswerItem]
+
+
+class ParticipantAnswerSubmitResponse(BaseModel):
+    participant_id: int
+    session_id: str
+    relation: ParticipantRelation
+    axes_payload: Dict[str, float]
+    perceived_type: str
+    respondent_count: int
+    unlocked: bool
+    threshold: int
+
+
+class ParticipantPreviewParticipant(BaseModel):
+    participant_id: int
+    display_name: Optional[str]
+    relation: ParticipantRelation
+    consent_display: bool
+    answers_submitted_at: Optional[datetime]
+    perceived_type: Optional[str]
+    axes_payload: Optional[Dict[str, float]]
+
+
+class ParticipantPreviewRelation(BaseModel):
+    relation: ParticipantRelation
+    respondent_count: int
+    top_type: Optional[str]
+    top_fraction: Optional[float]
+    second_type: Optional[str]
+    second_fraction: Optional[float]
+    consensus: Optional[float]
+    pgi: Optional[float]
+    axes_payload: Optional[Dict[str, float]]
+
+
+class ParticipantPreviewResponse(BaseModel):
+    session_id: str
+    invite_token: str
+    respondent_count: int
+    threshold: int
+    unlocked: bool
+    relations: List[ParticipantPreviewRelation]
+    participants: List[ParticipantPreviewParticipant]
