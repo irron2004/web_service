@@ -1,11 +1,11 @@
 # Viral Intake Feedback TODOs
 
 ## Immediate Fixes (48h)
-- [ ] Remove mandatory email collection from `/mbti/friend` and `/mbti/share`; collect only display name (optional) and relationship tag per PRD.
-- [ ] Strip developer-facing copy (e.g., RFC 9457, X-Request-ID, OpenTelemetry, `noindex`) from public pages; replace with user-friendly messaging outlined in feedback.
-- [ ] Introduce respondent intake on `/mbti/friend` with required relationship selection (친구/가족/부부/직장/기타) and optional display name with anonymous fallback before survey questions.
+- [x] Remove mandatory email collection from `/mbti/friend` and `/mbti/share`; collect only display name (optional) and relationship tag per PRD.
+- [x] Strip developer-facing copy (e.g., RFC 9457, X-Request-ID, OpenTelemetry, `noindex`) from public pages; replace with user-friendly messaging outlined in feedback.
+- [x] Introduce respondent intake on `/mbti/friend` with required relationship selection (친구/가족/부부/직장/기타) and optional display name with anonymous fallback before survey questions.
 - [ ] Create dedicated owner profile flow: collect owner display name, avatar, and MBTI → generate `/i/{token}` invite with owner identity surfaced in header.
-- [ ] Hide unfinished Arcade/Statistics navigation entries until backed by live pages or feature flags.
+- [x] Hide unfinished Arcade/Statistics navigation entries until backed by live pages or feature flags.
 - [ ] Upgrade self-test UX: remove internal documentation references, ensure accessible radio controls, add progress indicator and completion CTA that stores self type and advances to invite creation.
 
 ## Follow-up Items (Next Sprint)
@@ -14,9 +14,9 @@
 - [ ] Update deployment/security documentation after implementing the above (e.g., DeploymentPlan, Tickets status).
 
 ## Copy Updates Needed
-- [ ] `/mbti/friend`: Replace technical copy with guidance on choosing relationship, optional nickname, anonymity, and k≥3 insight unlock condition.
-- [ ] `/mbti/friend-system`: Update evaluation steps to emphasize display name + relationship selection, 24~32 question flow, and link-only sharing (email optional/omitted).
-- [ ] `/mbti/self-test`: Replace reference text with user instruction: "느낌에 가까운 쪽을 선택해 주세요. 키보드만으로도 응답할 수 있어요."
+- [x] `/mbti/friend`: Replace technical copy with guidance on choosing relationship, optional nickname, anonymity, and k≥3 insight unlock condition.
+- [x] `/mbti/friend-system`: Update evaluation steps to emphasize display name + relationship selection, 24~32 question flow, and link-only sharing (email optional/omitted).
+- [x] `/mbti/self-test`: Replace reference text with user instruction: "느낌에 가까운 쪽을 선택해 주세요. 키보드만으로도 응답할 수 있어요."
 
 ## Validation/Testing Checklist
 - [ ] Verify `/mbti/friend` loads without server errors post-update and routes respondents through new intake before the survey.
