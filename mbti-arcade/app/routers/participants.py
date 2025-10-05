@@ -32,13 +32,11 @@ from app.services.aggregator import (
     recalculate_aggregate,
     recalculate_relation_aggregates,
 )
-from app.services.scoring import ScoringError, compute_norms
+from app.services.scoring import ScoringError, compute_norms, norms_to_mbti
 from app.utils.problem_details import ProblemDetailsException
 
 router = APIRouter(prefix="/v1", tags=["participants"])
 
-MBTI_NEGATIVE = {"EI": "I", "SN": "N", "TF": "F", "JP": "P"}
-MBTI_POSITIVE = {"EI": "E", "SN": "S", "TF": "T", "JP": "J"}
 UNLOCK_THRESHOLD = 3
 
 
@@ -65,17 +63,6 @@ def _ensure_capacity(session: SessionModel, db: Session) -> None:
             detail="해당 세션의 응답 한도를 초과했습니다.",
             type_suffix="rate-limit",
         )
-
-
-def _compute_mbti(norms: Dict[str, float]) -> str:
-    letters: List[str] = []
-    for dim in ("EI", "SN", "TF", "JP"):
-        value = norms.get(dim, 0.0)
-        if value >= 0:
-            letters.append(MBTI_POSITIVE[dim])
-        else:
-            letters.append(MBTI_NEGATIVE[dim])
-    return "".join(letters)
 
 
 @router.post(
@@ -208,7 +195,7 @@ async def submit_participant_answers(
         answer_pairs = [(item.question_id, item.value) for item in answers]
         norms = compute_norms(answer_pairs, lookup)
         participant.axes_payload = {dim: round(value, 6) for dim, value in norms.items()}
-        participant.perceived_type = _compute_mbti(norms)
+        participant.perceived_type = norms_to_mbti(norms)
         now = datetime.now(timezone.utc)
         participant.answers_submitted_at = now
         participant.computed_at = now

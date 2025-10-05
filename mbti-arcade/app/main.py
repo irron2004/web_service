@@ -124,6 +124,7 @@ from app.routers import og as og_router
 from app.routers import participants as participants_router
 from app.routers import quiz as quiz_router
 from app.routers import report as report_router
+from app.routers import reporting as reporting_router
 from app.routers import responses as responses_router
 from app.routers import results as results_router
 from app.routers import sessions as sessions_router
@@ -297,6 +298,7 @@ app.include_router(results_router.router)
 app.include_router(share_router.router)
 app.include_router(quiz_router.router)
 app.include_router(report_router.router)
+app.include_router(reporting_router.router)
 app.include_router(og_router.router)
 app.include_router(couple_router.router)
 

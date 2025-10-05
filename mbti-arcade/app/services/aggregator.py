@@ -184,7 +184,9 @@ def recalculate_aggregate(db: Session, session: SessionModel) -> AggregateResult
     )
 
 
-def _load_self_norm(db: Session, session: SessionModel, lookup: Dict[int, Tuple[str, int]]) -> Dict[str, float] | None:
+def load_self_norm(
+    db: Session, session: SessionModel, lookup: Dict[int, Tuple[str, int]]
+) -> Dict[str, float] | None:
     aggregate = db.get(Aggregate, session.id)
     if aggregate and all(
         getattr(aggregate, f"{dim.lower()}_self") is not None for dim in DIMENSIONS
@@ -225,7 +227,7 @@ def recalculate_relation_aggregates(session_id: str, db: Session) -> RelationAgg
 
     questions = db.query(Question).all()
     lookup = build_question_lookup(questions)
-    self_norm = _load_self_norm(db, session, lookup)
+    self_norm = load_self_norm(db, session, lookup)
 
     participants = (
         db.query(Participant)

@@ -24,7 +24,7 @@ from app.services.aggregator import (
     recalculate_aggregate,
     recalculate_relation_aggregates,
 )
-from app.services.scoring import ScoringError, compute_norms
+from app.services.scoring import ScoringError, compute_norms, norms_to_mbti
 
 LOG_PATH = Path(__file__).resolve().parents[1] / "logs" / "backfill_participants.log"
 RELATION_DEFAULT = ParticipantRelation.OTHER
@@ -45,20 +45,6 @@ def _normalize_relation(tag: str | None) -> ParticipantRelation:
 
 def _participant_rater_hash(participant_id: int) -> str:
     return f"participant:{participant_id}"
-
-
-def _compute_mbti(norms: Dict[str, float]) -> str:
-    positive = {"EI": "E", "SN": "S", "TF": "T", "JP": "J"}
-    negative = {"EI": "I", "SN": "N", "TF": "F", "JP": "P"}
-    letters: List[str] = []
-    for dim in ("EI", "SN", "TF", "JP"):
-        value = norms.get(dim, 0.0)
-        if value >= 0:
-            letters.append(positive[dim])
-        else:
-            letters.append(negative[dim])
-    return "".join(letters)
-
 
 def _participant_answers(rows: Iterable[OtherResponse]) -> List[tuple[int, int]]:
     return [(row.question_id, row.value) for row in rows]
@@ -138,7 +124,7 @@ def backfill_participants(dry_run: bool = False) -> Dict[str, int]:
                     continue
 
                 participant.axes_payload = {dim: round(value, 6) for dim, value in norms.items()}
-                participant.perceived_type = _compute_mbti(norms)
+                participant.perceived_type = norms_to_mbti(norms)
                 latest_ts = max((row.created_at for row in rows if row.created_at), default=None)
                 if latest_ts is None:
                     latest_ts = datetime.now(timezone.utc)

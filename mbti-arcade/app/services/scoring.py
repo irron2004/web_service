@@ -20,6 +20,10 @@ class ScoringError(ValueError):
     pass
 
 
+MBTI_NEGATIVE = {"EI": "I", "SN": "N", "TF": "F", "JP": "P"}
+MBTI_POSITIVE = {"EI": "E", "SN": "S", "TF": "T", "JP": "J"}
+
+
 def compute_norms(
     answers: Iterable[tuple[int, int]], question_lookup: Dict[int, tuple[str, int]]
 ) -> Dict[str, float]:
@@ -91,3 +95,14 @@ def compute_gap_metrics(
 
     gap_score = fmean(abs(gaps[dim]) for dim in DIMENSIONS) * 100
     return agg_other, sigma, gaps, gap_score
+
+
+def norms_to_mbti(norms: Dict[str, float]) -> str:
+    letters: List[str] = []
+    for dim in ("EI", "SN", "TF", "JP"):
+        value = norms.get(dim, 0.0)
+        if value >= 0:
+            letters.append(MBTI_POSITIVE[dim])
+        else:
+            letters.append(MBTI_NEGATIVE[dim])
+    return "".join(letters)

@@ -175,3 +175,42 @@ class ParticipantPreviewResponse(BaseModel):
     unlocked: bool
     relations: List[ParticipantPreviewRelation]
     participants: List[ParticipantPreviewParticipant]
+
+
+class ParticipantReportAxis(BaseModel):
+    dimension: str
+    self_value: float
+    participant_value: float
+    delta: float
+
+
+class ParticipantReportResponse(BaseModel):
+    participant_id: int
+    session_id: str
+    self_type: str
+    participant_type: str
+    self_axes: Dict[str, float]
+    participant_axes: Dict[str, float]
+    diff_axes: List[ParticipantReportAxis]
+    respondent_count: int
+
+
+class SessionRelationReportItem(BaseModel):
+    relation: ParticipantRelation
+    respondent_count: int
+    top_type: Optional[str]
+    top_fraction: Optional[float]
+    second_type: Optional[str]
+    second_fraction: Optional[float]
+    consensus: Optional[float]
+    pgi: Optional[float]
+    axes_payload: Optional[Dict[str, float]]
+
+
+class SessionReportResponse(BaseModel):
+    session_id: str
+    self_type: Optional[str]
+    respondent_count: int
+    threshold: int
+    unlocked: bool
+    relations: List[SessionRelationReportItem]
