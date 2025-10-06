@@ -133,3 +133,14 @@ def test_problem_details_for_missing_invite(client):
     assert body["type"].endswith("/invite-not-found")
     assert body["title"] == "Invite Not Found"
     assert body["status"] == HTTPStatus.NOT_FOUND
+
+
+def test_participant_registration_defaults_to_anonymous_name(client):
+    session = _create_session(client)
+    response = client.post(
+        f"/v1/participants/{session['invite_token']}",
+        json={"relation": "friend", "display_name": None, "consent_display": False},
+    )
+    assert response.status_code == HTTPStatus.CREATED
+    body = response.json()
+    assert body["display_name"] == "익명"

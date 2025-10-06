@@ -92,11 +92,13 @@ async def register_participant(
 
     _ensure_capacity(session, db)
 
+    display_name = (payload.display_name or "").strip() or "익명"
+
     participant = Participant(
         session_id=session.id,
         invite_token=invite_token,
         relation=payload.relation,
-        display_name=payload.display_name,
+        display_name=display_name,
         consent_display=payload.consent_display,
     )
 

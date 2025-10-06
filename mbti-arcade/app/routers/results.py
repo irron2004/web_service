@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Session as SessionModel
+from app.models import Aggregate, Session as SessionModel
 from app.schemas import ResultDetail
 from app.services.aggregator import recalculate_aggregate
 from app.services.scoring import ScoringError, norm_to_radar
@@ -32,9 +32,59 @@ PREVIEW_RESULT = ResultDetail(
 )
 
 
+def _build_result_detail(
+    session: SessionModel,
+    aggregate_result,
+    publish_other: bool,
+) -> ResultDetail:
+    return ResultDetail(
+        session_id=session.id,
+        mode=session.mode,
+        n=aggregate_result.n,
+        self_norm=aggregate_result.self_norm,
+        other_norm=aggregate_result.other_norm if publish_other else None,
+        gap=aggregate_result.gap if publish_other else None,
+        sigma=aggregate_result.sigma if publish_other else None,
+        gap_score=aggregate_result.gap_score if publish_other else None,
+        radar_self=aggregate_result.radar_self,
+        radar_other=aggregate_result.radar_other if publish_other else None,
+        unlocked=publish_other,
+    )
+
+
 @router.get("/result/preview", response_model=ResultDetail)
-async def preview_result() -> ResultDetail:
-    return PREVIEW_RESULT
+async def preview_result(
+    response: Response,
+    db: Session = Depends(get_db),
+) -> ResultDetail:
+    session = (
+        db.query(SessionModel)
+        .join(Aggregate, Aggregate.session_id == SessionModel.id)
+        .filter(Aggregate.n >= 3)
+        .order_by(SessionModel.updated_at.desc())
+        .first()
+    )
+
+    if session is None:
+        return PREVIEW_RESULT
+
+    try:
+        aggregate_result = recalculate_aggregate(db, session)
+    except ScoringError as exc:
+        raise ProblemDetailsException(
+            status_code=503,
+            title="Preview Unavailable",
+            detail="지금은 결과 미리보기를 제공할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+            type_suffix="preview-unavailable",
+        ) from exc
+
+    db.commit()
+
+    publish_other = session.mode == "couple" or (aggregate_result.n or 0) >= 3
+
+    result_payload = _build_result_detail(session, aggregate_result, publish_other)
+    apply_noindex_headers(response)
+    return result_payload
 
 
 @router.get("/result/{invite_token}", response_model=ResultDetail)
@@ -57,7 +107,7 @@ async def fetch_result(
         )
 
     try:
-        result = recalculate_aggregate(db, session)
+        aggregate_result = recalculate_aggregate(db, session)
     except ScoringError as exc:
         raise ProblemDetailsException(
             status_code=400,
@@ -68,22 +118,9 @@ async def fetch_result(
 
     db.commit()
 
-    publish_other = True
-    if session.mode != "couple" and (result.n or 0) < 3:
-        publish_other = False
+    publish_other = session.mode == "couple" or (aggregate_result.n or 0) >= 3
 
-    result_payload = ResultDetail(
-        session_id=session.id,
-        mode=session.mode,
-        n=result.n,
-        self_norm=result.self_norm,
-        other_norm=result.other_norm if publish_other else None,
-        gap=result.gap if publish_other else None,
-        sigma=result.sigma if publish_other else None,
-        gap_score=result.gap_score if publish_other else None,
-        radar_self=result.radar_self,
-        radar_other=result.radar_other if publish_other else None,
-    )
+    result_payload = _build_result_detail(session, aggregate_result, publish_other)
 
     apply_noindex_headers(response)
 

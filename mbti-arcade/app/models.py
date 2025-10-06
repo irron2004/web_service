@@ -54,6 +54,19 @@ class User(Base, TimestampMixin):
     sessions: Mapped[List["Session"]] = relationship(back_populates="owner")
 
 
+class OwnerProfile(Base, TimestampMixin):
+    __tablename__ = "owner_profiles"
+    __table_args__ = (UniqueConstraint("owner_key", name="uq_owner_profile_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_key: Mapped[str] = mapped_column(String(255), nullable=False)
+    display_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    avatar_url: Mapped[str | None] = mapped_column(String(512))
+    mbti_source: Mapped[str] = mapped_column(String(20), default="input", nullable=False)
+    mbti_value: Mapped[str | None] = mapped_column(String(4))
+    show_public: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+
 class Session(Base, TimestampMixin):
     __tablename__ = "sessions"
 

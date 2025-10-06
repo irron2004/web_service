@@ -3,7 +3,14 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+    FieldValidationInfo,
+    HttpUrl,
+    field_validator,
+)
 
 from app.models import ParticipantRelation
 
@@ -102,6 +109,7 @@ class ResultDetail(BaseModel):
     gap_score: Optional[float]
     radar_self: Dict[str, float]
     radar_other: Optional[Dict[str, float]]
+    unlocked: bool
 
 
 class ProblemDetails(BaseModel):
@@ -207,6 +215,61 @@ class SessionRelationReportItem(BaseModel):
     axes_payload: Optional[Dict[str, float]]
 
 
+VALID_MBTI_TYPES = {
+    "ISTJ",
+    "ISFJ",
+    "INFJ",
+    "INTJ",
+    "ISTP",
+    "ISFP",
+    "INFP",
+    "INTP",
+    "ESTP",
+    "ESFP",
+    "ENFP",
+    "ENTP",
+    "ESTJ",
+    "ESFJ",
+    "ENFJ",
+    "ENTJ",
+}
+
+
+class ProfileCreateRequest(BaseModel):
+    display_name: str = Field(min_length=2, max_length=20)
+    avatar_url: HttpUrl | None = None
+    mbti_source: str = Field(default="input", pattern="^(input|self_test)$")
+    mbti_value: Optional[str] = Field(default=None, max_length=4)
+    show_public: bool = True
+
+    @field_validator("mbti_value")
+    @classmethod
+    def validate_mbti_value(
+        cls, value: Optional[str], info: FieldValidationInfo
+    ) -> Optional[str]:
+        source = info.data.get("mbti_source", "input")
+        if source == "input":
+            if not value:
+                raise ValueError("MBTI 값을 입력해 주세요.")
+            upper_value = value.upper()
+            if upper_value not in VALID_MBTI_TYPES:
+                raise ValueError("MBTI 형식이 올바르지 않습니다.")
+            return upper_value
+        # self_test 경로에서는 값이 없어야 한다.
+        return None
+
+
+class ProfileResponse(BaseModel):
+    profile_id: int
+    display_name: str
+    avatar_url: Optional[str]
+    mbti_source: str
+    mbti_value: Optional[str]
+    show_public: bool
+    created_at: datetime
+    updated_at: datetime
+
+
 class SessionReportResponse(BaseModel):
     session_id: str
     self_type: Optional[str]
@@ -214,3 +277,18 @@ class SessionReportResponse(BaseModel):
     threshold: int
     unlocked: bool
     relations: List[SessionRelationReportItem]
+
+
+class InviteCreateRequest(BaseModel):
+    expires_in_days: int = Field(default=3, ge=1, le=30)
+    max_raters: int = Field(default=50, ge=1, le=500)
+
+
+class InviteCreateResponse(BaseModel):
+    session_id: str
+    invite_token: str
+    expires_at: datetime
+    max_raters: int
+    show_public: bool
+    owner_display_name: str
+    owner_avatar_url: Optional[str]

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
+from datetime import datetime, timezone
 from email.utils import formatdate
 from http import HTTPStatus
 from pathlib import Path
@@ -16,6 +17,7 @@ from starlette.datastructures import Headers, URL
 from starlette.middleware.trustedhost import ENFORCE_DOMAIN_WILDCARD
 from starlette.responses import RedirectResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
+from sqlalchemy.orm import Session as OrmSession
 
 try:
     from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
@@ -117,11 +119,12 @@ from app.core.db import get_session as get_core_session
 from app.data.loader import seed_questions
 from app.data.questionnaire_loader import get_question_lookup
 from app.data.questions import questions_for_mode
-from app.database import Base, engine, session_scope
+from app.database import Base, engine, session_scope, get_db
 from app.routers import health
 from app.routers import couple as couple_router
 from app.routers import og as og_router
 from app.routers import participants as participants_router
+from app.routers import profile as profile_router
 from app.routers import quiz as quiz_router
 from app.routers import report as report_router
 from app.routers import reporting as reporting_router
@@ -129,6 +132,7 @@ from app.routers import responses as responses_router
 from app.routers import results as results_router
 from app.routers import sessions as sessions_router
 from app.routers import share as share_router
+from app.routers import invites as invites_router
 from app.observability import bind_request_id, configure_observability, reset_request_id
 from app.utils.problem_details import (
     ProblemDetailsException,
@@ -138,9 +142,11 @@ from app.utils.problem_details import (
     internal_server_error,
     problem_response,
 )
+from app.models import Session as SessionModel, Participant, ParticipantRelation
 from app.utils.privacy import apply_noindex_headers, NOINDEX_VALUE
-from app.schemas import DIMENSIONS
+from app.schemas import DIMENSIONS, ParticipantRegistrationRequest
 from app.services.scoring import compute_norms, norm_to_radar
+from app.routers.participants import register_participant
 
 try:  # pragma: no cover - optional dependency
     from slowapi.errors import RateLimitExceeded  # type: ignore[import]
@@ -165,6 +171,14 @@ templates.env.globals.setdefault(
     "calculate_service_problems_url",
     f"{_calculate_base_url}/problems" if _calculate_base_url != "/" else "/problems",
 )
+
+RELATION_LABELS: dict[str, str] = {
+    "friend": "친구",
+    "family": "가족",
+    "partner": "부부/커플",
+    "coworker": "직장",
+    "other": "기타",
+}
 
 
 def _escape_js(value: object) -> str:
@@ -301,6 +315,8 @@ app.include_router(report_router.router)
 app.include_router(reporting_router.router)
 app.include_router(og_router.router)
 app.include_router(couple_router.router)
+app.include_router(invites_router.router)
+app.include_router(profile_router.router)
 
 if hasattr(share_router, "limiter"):
     app.state.limiter = share_router.limiter
@@ -447,27 +463,70 @@ async def mbti_friend(
     prefill_name: str | None = None,
     prefill_mbti: str | None = None,
 ):
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "mbti/friend_input.html",
         {
             "request": request,
             "prefill_name": prefill_name or "",
             "prefill_mbti": prefill_mbti or "",
+            "owner_avatar": None,
+            "robots_meta": NOINDEX_VALUE,
         },
     )
+    apply_noindex_headers(response)
+    return response
 
 
 @app.post("/mbti/friend", response_class=HTMLResponse)
 async def submit_friend(request: Request):
     form = await request.form()
+
+    invite_token = (form.get("invite_token") or "").strip()
+    friend_name = (form.get("friend_name") or "").strip() or "친구"
+    friend_mbti = (form.get("friend_mbti") or "").strip()
+    relation_value = (form.get("relationship") or "").strip()
+    responder_name = (form.get("responder_name") or "").strip()
+
+    relation_label = RELATION_LABELS.get(relation_value, relation_value or "")
+
+    registration = None
+    if invite_token:
+        if not relation_value:
+            raise HTTPException(status_code=400, detail="관계를 선택해 주세요.")
+
+        try:
+            ParticipantRelation(relation_value)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail="지원하지 않는 관계입니다.") from exc
+
+        registration_payload = ParticipantRegistrationRequest(
+            relation=relation_value,
+            display_name=responder_name or None,
+            consent_display=False,
+        )
+
+        with session_scope() as db:
+            registration = await register_participant(
+                invite_token=invite_token,
+                payload=registration_payload,
+                db=db,
+            )
+
+        responder_name = registration.display_name
+
     friend_info = {
-        "name": form.get("friend_name", ""),
-        "mbti": form.get("friend_mbti", ""),
-        "relationship": form.get("relationship", ""),
-        "responder_name": form.get("responder_name", ""),
+        "name": friend_name,
+        "mbti": friend_mbti,
+        "relationship": relation_value,
+        "relation_label": relation_label,
+        "responder_name": responder_name,
+        "participant_id": registration.participant_id if registration else None,
+        "session_id": registration.session_id if registration else None,
+        "invite_token": invite_token,
     }
+
     questions = _build_questions("friend", perspective="other")
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "mbti/test.html",
         {
             "request": request,
@@ -475,6 +534,8 @@ async def submit_friend(request: Request):
             "friend_info": friend_info,
         },
     )
+    apply_noindex_headers(response)
+    return response
 
 
 @app.get("/mbti/test", response_class=HTMLResponse)
@@ -724,7 +785,59 @@ async def mbti_share_success(
 
 
 @app.get("/i/{token}", response_class=HTMLResponse, name="invite_public")
-def invite_public(request: Request, token: str, session=Depends(get_core_session)):
+def invite_public(
+    request: Request,
+    token: str,
+    session=Depends(get_core_session),
+    db: OrmSession = Depends(get_db),
+):
+    session_record = (
+        db.query(SessionModel)
+        .filter(SessionModel.invite_token == token)
+        .one_or_none()
+    )
+
+    if session_record is not None:
+        now = datetime.now(timezone.utc)
+        if session_record.expires_at <= now:
+            owner_name = session_record.snapshot_owner_name or "초대한 분"
+            return problem_response(
+                request,
+                status=410,
+                title="Invite Expired",
+                detail=f"초대가 만료되었어요. {owner_name}님께 새 링크를 요청해 주세요.",
+                type_suffix="invite-expired",
+            )
+
+        respondent_count = (
+            db.query(Participant)
+            .filter(Participant.session_id == session_record.id)
+            .count()
+        )
+
+        if respondent_count >= session_record.max_raters:
+            return problem_response(
+                request,
+                status=429,
+                title="Invite Capacity Reached",
+                detail="참여 인원이 모두 모였어요. 관심에 감사드립니다!",
+                type_suffix="invite-capacity",
+            )
+
+        response = templates.TemplateResponse(
+            "mbti/friend_input.html",
+            {
+                "request": request,
+                "prefill_name": session_record.snapshot_owner_name or "",
+                "prefill_mbti": session_record.self_mbti or "",
+                "owner_avatar": session_record.snapshot_owner_avatar or "",
+                "invite_token": token,
+                "robots_meta": NOINDEX_VALUE,
+            },
+        )
+        apply_noindex_headers(response)
+        return response
+
     return quiz_router.render_invite_page(request, token, session)
 
 @app.get("/api", tags=["system"])

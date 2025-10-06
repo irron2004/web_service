@@ -1,31 +1,39 @@
 {% extends "base.html" %}
 
-{% block title %}MBTI 테스트 - MBTI & Arcade Web Service{% endblock %}
+{% block title %}MBTI 테스트 - MBTI Insight Hub{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
     {% set friend_name_value = friend_info.name if friend_info else request.query_params.get('friend_name', '') %}
     {% set friend_mbti_value = friend_info.mbti if friend_info else request.query_params.get('friend_mbti', request.query_params.get('mbti', '')) %}
     {% set relationship_value = friend_info.relationship if friend_info else request.query_params.get('relationship', '') %}
+    {% set relation_label_value = friend_info.relation_label if friend_info else request.query_params.get('relation_label', '') %}
     {% set responder_value = friend_info.responder_name if friend_info else request.query_params.get('responder_name', '') %}
     {% set has_friend_context = friend_name_value or relationship_value or responder_value %}
     <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-4">
-            🧠 MBTI 성격 유형 테스트
+            {{ friend_name_value or '친구' }} 님을 떠올리며 답해 주세요
         </h1>
         <p class="text-gray-600 mb-4">
-            각 질문에 솔직하게 답해주세요. 정답은 없습니다!
+            문장을 읽고 느낌에 가장 가까운 쪽을 선택하면 됩니다. 정답은 없어요!
         </p>
-        <div class="bg-blue-50 p-4 rounded-lg max-w-2xl mx-auto">
+        {% if has_friend_context %}
+        <div class="bg-blue-50 p-4 rounded-lg max-w-2xl mx-auto text-left">
             <p class="text-sm text-blue-800">
-                <strong>💡 테스트 안내:</strong>
                 {% if friend_name_value %}
-                    각 문항은 "{{ friend_name_value }}은..."으로 시작하는 제3자 관점의 질문입니다. {{ friend_name_value }}님을 떠올리며 답해주세요.
+                    <strong>{{ friend_name_value }}</strong> 님과의 관계는 <strong>{{ relation_label_value or '친구' }}</strong>입니다.
+                {% endif %}
+                {% if responder_value %}
+                    내 닉네임은 <strong>{{ responder_value }}</strong>로 기록돼요.
                 {% else %}
-                    각 문항은 "그 사람은..."으로 시작하는 제3자 관점의 질문입니다. 자신을 객관적으로 바라보는 마음으로 답변해주세요.
+                    닉네임을 비웠으므로 ‘익명’으로 기록됩니다.
+                {% endif %}
+                {% if friend_mbti_value %}
+                    참고로 알고 있는 유형은 {{ friend_mbti_value }}입니다.
                 {% endif %}
             </p>
         </div>
+        {% endif %}
     </div>
 
     <form method="POST" action="/mbti/result" class="bg-white rounded-lg shadow-lg p-8">
@@ -33,39 +41,16 @@
         <input type="hidden" name="friend_name" value="{{ friend_name_value }}">
         <input type="hidden" name="friend_mbti" value="{{ friend_mbti_value }}">
         <input type="hidden" name="relationship" value="{{ relationship_value }}">
+        <input type="hidden" name="relation_label" value="{{ relation_label_value }}">
         <input type="hidden" name="responder_name" value="{{ responder_value }}">
+        <input type="hidden" name="participant_id" value="{{ friend_info.participant_id if friend_info else '' }}">
+        <input type="hidden" name="invite_token" value="{{ friend_info.invite_token if friend_info else '' }}">
 
-        <!-- 평가자 정보 입력 -->
-        {% if has_friend_context %}
-        <div class="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-            <h3 class="text-lg font-semibold text-purple-800 mb-3">👥 친구 평가 모드</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="text-sm text-purple-700">
-                    평가 대상: <strong>{{ friend_name_value or '친구' }}</strong>
-                    {% if relationship_value %}<span class="ml-1 text-purple-600">({{ relationship_value }})</span>{% endif %}
-                    {% if friend_mbti_value %}<div class="mt-1 text-xs text-purple-500">참고 MBTI: {{ friend_mbti_value }}</div>{% endif %}
-                </div>
-                <div class="text-sm text-purple-700">
-                    내 닉네임: <strong>{{ responder_value or '익명' }}</strong>
-                </div>
-            </div>
-
-            <!-- 상대방 입장에서 MBTI 평가 안내 -->
-            <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p class="text-sm text-yellow-800">
-                    <strong>🎯 평가 방식:</strong>
-                    {% if friend_name_value %}
-                        "내가 <strong>{{ friend_name_value }}</strong>이라면 어떻게 행동할까?"를 떠올리며 응답해 주세요.
-                    {% else %}
-                        "내가 [친구 이름]이라면 어떻게 행동할까?"를 떠올리며 응답해 주세요.
-                    {% endif %}
-                </p>
-                <p class="text-xs text-yellow-700 mt-1">
-                    관계를 생각하며 솔직하게 답해주세요. 닉네임은 결과에 익명으로 표시됩니다.
-                </p>
-            </div>
+        <!-- 평가 안내 -->
+        <div class="mb-6 rounded-2xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+            <p><strong>Tip.</strong> “{{ friend_name_value or '친구' }}는 대개 …”라고 마음속으로 읽어 보며 느껴지는 쪽을 골라 주세요. 고민이 되면 처음 떠오른 느낌을 선택하면 충분합니다.</p>
         </div>
-        {% endif %}
+
         {% for question in questions %}
         <div class="mb-8 p-6 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">
@@ -86,12 +71,12 @@
             <div class="space-y-3">
                 <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                     <input type="radio" name="q{{ question.id }}" value="1" class="mr-3 text-blue-600" required>
-                    <span class="text-gray-700">전혀 아니다</span>
+                    <span class="text-gray-700">전혀 그렇지 않다</span>
                 </label>
                 
                 <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                     <input type="radio" name="q{{ question.id }}" value="2" class="mr-3 text-blue-600" required>
-                    <span class="text-gray-700">아니다</span>
+                    <span class="text-gray-700">그렇지 않은 편이다</span>
                 </label>
                 
                 <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
@@ -101,7 +86,7 @@
                 
                 <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                     <input type="radio" name="q{{ question.id }}" value="4" class="mr-3 text-blue-600" required>
-                    <span class="text-gray-700">그렇다</span>
+                    <span class="text-gray-700">그런 편이다</span>
                 </label>
                 
                 <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
@@ -115,7 +100,7 @@
         <div class="text-center">
             <button type="submit" 
                     class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
-                🎯 결과 확인하기
+                🎯 답변 제출하기
             </button>
         </div>
     </form>

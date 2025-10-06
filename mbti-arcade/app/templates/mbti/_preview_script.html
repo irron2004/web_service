@@ -1,0 +1,134 @@
+<script>
+(function () {
+  const dimensionMeta = {
+    EI: {
+      label: '외향성 ↔ 내향성',
+      positive: { letter: 'E', text: '외향성' },
+      negative: { letter: 'I', text: '내향성' },
+    },
+    SN: {
+      label: '감각 ↔ 직관',
+      positive: { letter: 'S', text: '감각' },
+      negative: { letter: 'N', text: '직관' },
+    },
+    TF: {
+      label: '사고 ↔ 감정',
+      positive: { letter: 'T', text: '사고' },
+      negative: { letter: 'F', text: '감정' },
+    },
+    JP: {
+      label: '판단 ↔ 인식',
+      positive: { letter: 'J', text: '판단' },
+      negative: { letter: 'P', text: '인식' },
+    },
+  };
+
+  const abbreviate = (value) => {
+    if (!value || typeof value !== 'string') {
+      return '미정';
+    }
+    return value.slice(0, 8).toUpperCase();
+  };
+
+  const toPercent = (value) => {
+    const numeric = Math.abs(value * 100);
+    if (!Number.isFinite(numeric)) {
+      return '소폭';
+    }
+    if (numeric < 1) {
+      return '소폭';
+    }
+    return `${Math.round(numeric)}%`;
+  };
+
+  const setState = (root, state) => {
+    const loading = root.querySelector('[data-preview-loading]');
+    const success = root.querySelector('[data-preview-success]');
+    const error = root.querySelector('[data-preview-error]');
+    if (loading) loading.hidden = state !== 'loading';
+    if (success) success.hidden = state !== 'success';
+    if (error) error.hidden = state !== 'error';
+  };
+
+  const renderSuccess = (root, payload) => {
+    const sessionEl = root.querySelector('[data-preview-session]');
+    const respondentsEl = root.querySelector('[data-preview-respondents]');
+    const gapScoreCard = root.querySelector('[data-preview-gap-card]');
+    const gapScoreEl = root.querySelector('[data-preview-gap-score]');
+    const insightBlock = root.querySelector('[data-preview-insight]');
+    const lockedBlock = root.querySelector('[data-preview-locked]');
+    const dimensionsList = root.querySelector('[data-preview-dimensions]');
+
+    if (sessionEl) sessionEl.textContent = abbreviate(payload.session_id);
+    if (respondentsEl) respondentsEl.textContent = typeof payload.n === 'number' ? payload.n : '0';
+
+    const hasOthers = payload && payload.other_norm && payload.gap && typeof payload.n === 'number' && payload.n >= 3;
+
+    if (gapScoreCard && gapScoreEl) {
+      if (hasOthers && typeof payload.gap_score === 'number' && Number.isFinite(payload.gap_score)) {
+        gapScoreCard.hidden = false;
+        gapScoreEl.textContent = Math.round(payload.gap_score);
+      } else {
+        gapScoreCard.hidden = true;
+      }
+    }
+
+    if (insightBlock) insightBlock.hidden = !hasOthers;
+    if (lockedBlock) lockedBlock.hidden = hasOthers;
+
+    if (dimensionsList) {
+      dimensionsList.innerHTML = '';
+      if (hasOthers) {
+        Object.keys(dimensionMeta).forEach((dim) => {
+          const gapValue = payload.gap[dim];
+          if (typeof gapValue !== 'number') {
+            return;
+          }
+          const meta = dimensionMeta[dim];
+          const direction = gapValue >= 0 ? meta.positive : meta.negative;
+          const description = document.createElement('li');
+          description.className = 'rounded-2xl border border-slate-200 bg-slate-50 p-4';
+          description.innerHTML = `<p class="text-sm font-semibold text-slate-700">${meta.label}</p>
+            <p class="mt-1 text-sm text-slate-600"><span class="font-medium text-slate-900">${direction.text}(${direction.letter})</span> 쪽으로 ${toPercent(gapValue)} 더 인식되고 있어요.</p>`;
+          dimensionsList.appendChild(description);
+        });
+      }
+    }
+  };
+
+  const requestPreview = (root) => {
+    setState(root, 'loading');
+    fetch('/api/result/preview', { headers: { Accept: 'application/json' } })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('preview request failed');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        renderSuccess(root, data);
+        setState(root, 'success');
+      })
+      .catch(() => {
+        setState(root, 'error');
+      });
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const roots = document.querySelectorAll('[data-preview-root]');
+    if (!roots.length) {
+      return;
+    }
+    roots.forEach((root) => {
+      const retryButtons = root.querySelectorAll('[data-preview-retry]');
+      retryButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.preventDefault();
+          requestPreview(root);
+        });
+      });
+      requestPreview(root);
+    });
+  });
+})();
+</script>

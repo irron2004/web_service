@@ -34,3 +34,13 @@ def client(app: FastAPI):
         yield test_client
     finally:
         test_client.close()
+
+
+@pytest.fixture
+def user_token() -> str:
+    return "test-user-token"
+
+
+@pytest.fixture
+def auth_headers(user_token: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {user_token}"}
