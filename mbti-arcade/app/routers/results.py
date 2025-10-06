@@ -29,6 +29,7 @@ PREVIEW_RESULT = ResultDetail(
     gap_score=PREVIEW_GAP_SCORE,
     radar_self=norm_to_radar(PREVIEW_SELF_NORM),
     radar_other=norm_to_radar(PREVIEW_OTHER_NORM),
+    unlocked=True,
 )
 
 
