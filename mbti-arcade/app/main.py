@@ -622,9 +622,11 @@ async def mbti_friend_result(request: Request, token: str):
 
     # 친구 정보 구성
     friend_info = {
-        "name": pair.my_name,
-        "email": pair.my_email,
-        "my_mbti": my_mbti
+        "name": pair.my_name or "",
+        "display_name": pair.my_name or "",
+        "show_public": pair.show_public,
+        "avatar": pair.my_avatar,
+        "mbti": my_mbti or (pair.my_mbti or ""),
     }
 
     # 통계 정보 구성 (기본값)
@@ -701,12 +703,19 @@ async def mbti_share(
 
 
 @app.get("/mbti/share_success", response_class=HTMLResponse)
-async def mbti_share_success(request: Request, url: str | None = None):
+async def mbti_share_success(
+    request: Request,
+    url: str | None = None,
+    name: str | None = None,
+    mbti: str | None = None,
+):
     response = templates.TemplateResponse(
         "mbti/share_success.html",
         {
             "request": request,
             "url": url,
+            "name": name,
+            "mbti": mbti,
             "robots_meta": NOINDEX_VALUE,
         },
     )

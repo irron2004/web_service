@@ -23,6 +23,9 @@ class Pair(SQLModel, table=True):
     my_name: str | None = None     # 내 이름 (공유자 정보)
     my_email: str | None = None    # 내 이메일 (공유자 정보)
     my_mbti: str | None = None     # 내 MBTI (공유자 정보)
+    my_avatar: Optional[str] = None
+    my_mbti_source: str = Field(default="input")  # input | self_test
+    show_public: bool = Field(default=True)
     completed: bool = False
     created_at: datetime = Field(default_factory=_utcnow)
 

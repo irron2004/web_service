@@ -9,7 +9,10 @@
     "default_counts": {
       "common": 24,
       "romance": 8,
-      "friend": 8
+      "friend": 48,
+      "work": 48,
+      "partner": 48,
+      "family": 48
     },
     "notes": [
       "Avoid trademarked MBTI terms; dimensions use neutral language.",
@@ -405,88 +408,528 @@
           "id": "F-EI-01",
           "dim": "EI",
           "sign": 1,
-          "prompt_self": "나는 친구들을 모아 단체 모임이나 보드게임 밤을 자주 주선한다.",
-          "prompt_other": "그 사람은 친구들을 모아 단체 모임이나 보드게임 밤을 자주 주선한다.",
+          "prompt_self": "나는 친구들 단톡에서 새 대화를 자주 시작한다.",
+          "prompt_other": "그 사람은 친구들 단톡에서 새 대화를 자주 시작한다.",
           "context": {
-            "theme": "community_builder",
-            "scenario": "Group coordination"
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_01"
           }
         },
         {
           "id": "F-EI-02",
           "dim": "EI",
           "sign": -1,
-          "prompt_self": "나는 큰 모임보다 깊이 있는 1:1 대화를 더 선호한다.",
-          "prompt_other": "그 사람은 큰 모임보다 깊이 있는 1:1 대화를 더 선호한다.",
+          "prompt_self": "나는 큰 모임보다 1:1 만남을 더 편안해한다.",
+          "prompt_other": "그 사람은 큰 모임보다 1:1 만남을 더 편안해한다.",
           "context": {
-            "theme": "connection_depth",
-            "scenario": "Friend check-ins"
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_02"
+          }
+        },
+        {
+          "id": "F-EI-03",
+          "dim": "EI",
+          "sign": 1,
+          "prompt_self": "나는 모임에서 처음 보는 사람에게 먼저 말을 건다.",
+          "prompt_other": "그 사람은 모임에서 처음 보는 사람에게 먼저 말을 건다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_03"
+          }
+        },
+        {
+          "id": "F-EI-04",
+          "dim": "EI",
+          "sign": -1,
+          "prompt_self": "나는 시끄러운 자리에서는 금방 지치는 편이다.",
+          "prompt_other": "그 사람은 시끄러운 자리에서는 금방 지치는 편이다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_04"
+          }
+        },
+        {
+          "id": "F-EI-05",
+          "dim": "EI",
+          "sign": 1,
+          "prompt_self": "나는 여러 사람을 모아 놀거리를 제안하기를 즐긴다.",
+          "prompt_other": "그 사람은 여러 사람을 모아 놀거리를 제안하기를 즐긴다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_05"
+          }
+        },
+        {
+          "id": "F-EI-06",
+          "dim": "EI",
+          "sign": -1,
+          "prompt_self": "나는 단톡에서는 주로 읽고 지나간다.",
+          "prompt_other": "그 사람은 단톡에서는 주로 읽고 지나간다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_06"
+          }
+        },
+        {
+          "id": "F-EI-07",
+          "dim": "EI",
+          "sign": 1,
+          "prompt_self": "나는 침묵이 흐르면 먼저 화제를 던져 분위기를 띄운다.",
+          "prompt_other": "그 사람은 침묵이 흐르면 먼저 화제를 던져 분위기를 띄운다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_07"
+          }
+        },
+        {
+          "id": "F-EI-08",
+          "dim": "EI",
+          "sign": -1,
+          "prompt_self": "나는 소수 친구들과 깊게 대화하는 시간을 선호한다.",
+          "prompt_other": "그 사람은 소수 친구들과 깊게 대화하는 시간을 선호한다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_08"
+          }
+        },
+        {
+          "id": "F-EI-09",
+          "dim": "EI",
+          "sign": 1,
+          "prompt_self": "나는 파티나 모임에서 다양한 사람들과 두루 인사한다.",
+          "prompt_other": "그 사람은 파티나 모임에서 다양한 사람들과 두루 인사한다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_09"
+          }
+        },
+        {
+          "id": "F-EI-10",
+          "dim": "EI",
+          "sign": -1,
+          "prompt_self": "나는 새로운 사람에게 먼저 다가가는 편이 아니다.",
+          "prompt_other": "그 사람은 새로운 사람에게 먼저 다가가는 편이 아니다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_10"
+          }
+        },
+        {
+          "id": "F-EI-11",
+          "dim": "EI",
+          "sign": 1,
+          "prompt_self": "나는 친구 모임의 게임이나 활동을 자주 주도한다.",
+          "prompt_other": "그 사람은 친구 모임의 게임이나 활동을 자주 주도한다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_11"
+          }
+        },
+        {
+          "id": "F-EI-12",
+          "dim": "EI",
+          "sign": -1,
+          "prompt_self": "나는 주말에 혼자 쉬며 에너지를 충전하는 편이다.",
+          "prompt_other": "그 사람은 주말에 혼자 쉬며 에너지를 충전하는 편이다.",
+          "context": {
+            "theme": "friend_ei",
+            "scenario": "friend_f_ei_12"
           }
         },
         {
           "id": "F-SN-01",
           "dim": "SN",
           "sign": 1,
-          "prompt_self": "나는 계획을 세울 때 친구들이 말했던 작은 취향까지 잘 기억해 둔다.",
-          "prompt_other": "그 사람은 계획을 세울 때 친구들이 말했던 작은 취향까지 잘 기억해 둔다.",
+          "prompt_self": "나는 약속 시간·장소·예산 같은 세부를 먼저 확인한다.",
+          "prompt_other": "그 사람은 약속 시간·장소·예산 같은 세부를 먼저 확인한다.",
           "context": {
-            "theme": "practical_care",
-            "scenario": "Planning details"
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_01"
           }
         },
         {
           "id": "F-SN-02",
           "dim": "SN",
           "sign": -1,
-          "prompt_self": "나는 해 본 적 없는 상상 가득한 활동도 친구들에게 제안하곤 한다.",
-          "prompt_other": "그 사람은 해 본 적 없는 상상 가득한 활동도 친구들에게 제안하곤 한다.",
+          "prompt_self": "나는 모임에 새로운 콘셉트나 테마를 떠올리길 좋아한다.",
+          "prompt_other": "그 사람은 모임에 새로운 콘셉트나 테마를 떠올리길 좋아한다.",
           "context": {
-            "theme": "adventure",
-            "scenario": "Plan ideation"
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_02"
+          }
+        },
+        {
+          "id": "F-SN-03",
+          "dim": "SN",
+          "sign": 1,
+          "prompt_self": "나는 처음 가는 가게를 미리 검색하고 리뷰를 확인한다.",
+          "prompt_other": "그 사람은 처음 가는 가게를 미리 검색하고 리뷰를 확인한다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_03"
+          }
+        },
+        {
+          "id": "F-SN-04",
+          "dim": "SN",
+          "sign": -1,
+          "prompt_self": "나는 분위기나 스토리가 있는 장소를 선호한다.",
+          "prompt_other": "그 사람은 분위기나 스토리가 있는 장소를 선호한다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_04"
+          }
+        },
+        {
+          "id": "F-SN-05",
+          "dim": "SN",
+          "sign": 1,
+          "prompt_self": "나는 지난 모임의 구체적 디테일(메뉴, 가격)을 잘 기억한다.",
+          "prompt_other": "그 사람은 지난 모임의 구체적 디테일(메뉴, 가격)을 잘 기억한다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_05"
+          }
+        },
+        {
+          "id": "F-SN-06",
+          "dim": "SN",
+          "sign": -1,
+          "prompt_self": "나는 친구들 성향의 패턴을 읽고 그에 맞춰 아이디어를 낸다.",
+          "prompt_other": "그 사람은 친구들 성향의 패턴을 읽고 그에 맞춰 아이디어를 낸다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_06"
+          }
+        },
+        {
+          "id": "F-SN-07",
+          "dim": "SN",
+          "sign": 1,
+          "prompt_self": "나는 사진·영수증 등 기록을 남겨두는 편이다.",
+          "prompt_other": "그 사람은 사진·영수증 등 기록을 남겨두는 편이다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_07"
+          }
+        },
+        {
+          "id": "F-SN-08",
+          "dim": "SN",
+          "sign": -1,
+          "prompt_self": "나는 장기적으로 함께 해볼 프로젝트나 모임을 자주 제안한다.",
+          "prompt_other": "그 사람은 장기적으로 함께 해볼 프로젝트나 모임을 자주 제안한다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_08"
+          }
+        },
+        {
+          "id": "F-SN-09",
+          "dim": "SN",
+          "sign": 1,
+          "prompt_self": "나는 계획을 실행 가능한 단계로 잘 쪼갠다.",
+          "prompt_other": "그 사람은 계획을 실행 가능한 단계로 잘 쪼갠다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_09"
+          }
+        },
+        {
+          "id": "F-SN-10",
+          "dim": "SN",
+          "sign": -1,
+          "prompt_self": "나는 유행이나 밈을 조합해 색다른 놀거리를 만든다.",
+          "prompt_other": "그 사람은 유행이나 밈을 조합해 색다른 놀거리를 만든다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_10"
+          }
+        },
+        {
+          "id": "F-SN-11",
+          "dim": "SN",
+          "sign": 1,
+          "prompt_self": "나는 검증된 코스나 가게를 우선 고른다.",
+          "prompt_other": "그 사람은 검증된 코스나 가게를 우선 고른다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_11"
+          }
+        },
+        {
+          "id": "F-SN-12",
+          "dim": "SN",
+          "sign": -1,
+          "prompt_self": "나는 가능성을 탐색하며 새로운 곳을 먼저 시도한다.",
+          "prompt_other": "그 사람은 가능성을 탐색하며 새로운 곳을 먼저 시도한다.",
+          "context": {
+            "theme": "friend_sn",
+            "scenario": "friend_f_sn_12"
           }
         },
         {
           "id": "F-TF-01",
           "dim": "TF",
           "sign": 1,
-          "prompt_self": "나는 친구가 도움을 청하면 돌려 말하지 않고 솔직하게 조언한다.",
-          "prompt_other": "그 사람은 친구가 도움을 청하면 돌려 말하지 않고 솔직하게 조언한다.",
+          "prompt_self": "나는 고민 상담에서 해결책과 선택지를 먼저 정리해준다.",
+          "prompt_other": "그 사람은 고민 상담에서 해결책과 선택지를 먼저 정리해준다.",
           "context": {
-            "theme": "support_style",
-            "scenario": "Problem solving"
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_01"
           }
         },
         {
           "id": "F-TF-02",
           "dim": "TF",
           "sign": -1,
-          "prompt_self": "나는 해결책을 제시하기 전에 먼저 감정을 공감하고 인정해 주려 한다.",
-          "prompt_other": "그 사람은 해결책을 제시하기 전에 먼저 감정을 공감하고 인정해 주려 한다.",
+          "prompt_self": "나는 상대의 감정을 먼저 확인하고 공감해준다.",
+          "prompt_other": "그 사람은 상대의 감정을 먼저 확인하고 공감해준다.",
           "context": {
-            "theme": "emotional_support",
-            "scenario": "Friend venting"
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_02"
+          }
+        },
+        {
+          "id": "F-TF-03",
+          "dim": "TF",
+          "sign": 1,
+          "prompt_self": "나는 논쟁에서 근거와 자료를 분명히 제시한다.",
+          "prompt_other": "그 사람은 논쟁에서 근거와 자료를 분명히 제시한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_03"
+          }
+        },
+        {
+          "id": "F-TF-04",
+          "dim": "TF",
+          "sign": -1,
+          "prompt_self": "나는 다툼이 생기면 분위기를 부드럽게 만들려 노력한다.",
+          "prompt_other": "그 사람은 다툼이 생기면 분위기를 부드럽게 만들려 노력한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_04"
+          }
+        },
+        {
+          "id": "F-TF-05",
+          "dim": "TF",
+          "sign": 1,
+          "prompt_self": "나는 회비나 정산을 원칙대로 꼼꼼히 처리한다.",
+          "prompt_other": "그 사람은 회비나 정산을 원칙대로 꼼꼼히 처리한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_05"
+          }
+        },
+        {
+          "id": "F-TF-06",
+          "dim": "TF",
+          "sign": -1,
+          "prompt_self": "나는 말할 때 상대가 상처받지 않도록 표현을 완화한다.",
+          "prompt_other": "그 사람은 말할 때 상대가 상처받지 않도록 표현을 완화한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_06"
+          }
+        },
+        {
+          "id": "F-TF-07",
+          "dim": "TF",
+          "sign": 1,
+          "prompt_self": "나는 약속이나 규칙을 정해두면 그 기준을 우선한다.",
+          "prompt_other": "그 사람은 약속이나 규칙을 정해두면 그 기준을 우선한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_07"
+          }
+        },
+        {
+          "id": "F-TF-08",
+          "dim": "TF",
+          "sign": -1,
+          "prompt_self": "나는 친구의 기분이 상하면 계획을 바꿔서라도 맞춰준다.",
+          "prompt_other": "그 사람은 친구의 기분이 상하면 계획을 바꿔서라도 맞춰준다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_08"
+          }
+        },
+        {
+          "id": "F-TF-09",
+          "dim": "TF",
+          "sign": 1,
+          "prompt_self": "나는 문제의 원인과 논리를 차분히 분석한다.",
+          "prompt_other": "그 사람은 문제의 원인과 논리를 차분히 분석한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_09"
+          }
+        },
+        {
+          "id": "F-TF-10",
+          "dim": "TF",
+          "sign": -1,
+          "prompt_self": "나는 축하·위로 같은 감정 표현을 중요하게 여긴다.",
+          "prompt_other": "그 사람은 축하·위로 같은 감정 표현을 중요하게 여긴다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_10"
+          }
+        },
+        {
+          "id": "F-TF-11",
+          "dim": "TF",
+          "sign": 1,
+          "prompt_self": "나는 합리적 이유가 없으면 부탁을 정중히 거절한다.",
+          "prompt_other": "그 사람은 합리적 이유가 없으면 부탁을 정중히 거절한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_11"
+          }
+        },
+        {
+          "id": "F-TF-12",
+          "dim": "TF",
+          "sign": -1,
+          "prompt_self": "나는 갈등에서 서로의 마음을 풀어주는 말을 잘한다.",
+          "prompt_other": "그 사람은 갈등에서 서로의 마음을 풀어주는 말을 잘한다.",
+          "context": {
+            "theme": "friend_tf",
+            "scenario": "friend_f_tf_12"
           }
         },
         {
           "id": "F-JP-01",
           "dim": "JP",
           "sign": 1,
-          "prompt_self": "나는 모두가 참여할 수 있도록 일정을 미리 조율하는 편이다.",
-          "prompt_other": "그 사람은 모두가 참여할 수 있도록 일정을 미리 조율하는 편이다.",
+          "prompt_self": "나는 약속 시간을 잘 지키고 보통 10분 일찍 도착한다.",
+          "prompt_other": "그 사람은 약속 시간을 잘 지키고 보통 10분 일찍 도착한다.",
           "context": {
-            "theme": "coordination",
-            "scenario": "Event planning"
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_01"
           }
         },
         {
           "id": "F-JP-02",
           "dim": "JP",
           "sign": -1,
-          "prompt_self": "나는 약속 당일에도 상황에 맞춰 계획을 유연하게 바꾸는 편이다.",
-          "prompt_other": "그 사람은 약속 당일에도 상황에 맞춰 계획을 유연하게 바꾸는 편이다.",
+          "prompt_self": "나는 번개 약속이 생겨도 부담 없이 참여한다.",
+          "prompt_other": "그 사람은 번개 약속이 생겨도 부담 없이 참여한다.",
           "context": {
-            "theme": "spontaneity",
-            "scenario": "Day-of adjustments"
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_02"
+          }
+        },
+        {
+          "id": "F-JP-03",
+          "dim": "JP",
+          "sign": 1,
+          "prompt_self": "나는 일정·예산을 사전에 정리해 공유한다.",
+          "prompt_other": "그 사람은 일정·예산을 사전에 정리해 공유한다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_03"
+          }
+        },
+        {
+          "id": "F-JP-04",
+          "dim": "JP",
+          "sign": -1,
+          "prompt_self": "나는 계획이 바뀌어도 스트레스를 크게 받지 않는다.",
+          "prompt_other": "그 사람은 계획이 바뀌어도 스트레스를 크게 받지 않는다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_04"
+          }
+        },
+        {
+          "id": "F-JP-05",
+          "dim": "JP",
+          "sign": 1,
+          "prompt_self": "나는 모임 역할(예약/정산)을 미리 배분하길 선호한다.",
+          "prompt_other": "그 사람은 모임 역할(예약/정산)을 미리 배분하길 선호한다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_05"
+          }
+        },
+        {
+          "id": "F-JP-06",
+          "dim": "JP",
+          "sign": -1,
+          "prompt_self": "나는 모임 중 즉석에서 코스를 바꾸는 것을 즐긴다.",
+          "prompt_other": "그 사람은 모임 중 즉석에서 코스를 바꾸는 것을 즐긴다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_06"
+          }
+        },
+        {
+          "id": "F-JP-07",
+          "dim": "JP",
+          "sign": 1,
+          "prompt_self": "나는 약속 변경 시 이유와 대안을 명확히 정리한다.",
+          "prompt_other": "그 사람은 약속 변경 시 이유와 대안을 명확히 정리한다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_07"
+          }
+        },
+        {
+          "id": "F-JP-08",
+          "dim": "JP",
+          "sign": -1,
+          "prompt_self": "나는 체크리스트보다 즉흥적인 발견을 우선한다.",
+          "prompt_other": "그 사람은 체크리스트보다 즉흥적인 발견을 우선한다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_08"
+          }
+        },
+        {
+          "id": "F-JP-09",
+          "dim": "JP",
+          "sign": 1,
+          "prompt_self": "나는 선물/행사를 미리 준비해 깜짝 실수를 줄인다.",
+          "prompt_other": "그 사람은 선물/행사를 미리 준비해 깜짝 실수를 줄인다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_09"
+          }
+        },
+        {
+          "id": "F-JP-10",
+          "dim": "JP",
+          "sign": -1,
+          "prompt_self": "나는 시작부터 완벽히 정해두기보다 하면서 정한다.",
+          "prompt_other": "그 사람은 시작부터 완벽히 정해두기보다 하면서 정한다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_10"
+          }
+        },
+        {
+          "id": "F-JP-11",
+          "dim": "JP",
+          "sign": 1,
+          "prompt_self": "나는 단톡 공지를 요약해 핀으로 정리해 둔다.",
+          "prompt_other": "그 사람은 단톡 공지를 요약해 핀으로 정리해 둔다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_11"
+          }
+        },
+        {
+          "id": "F-JP-12",
+          "dim": "JP",
+          "sign": -1,
+          "prompt_self": "나는 시간을 딱 맞춰 움직이기보다 유동적으로 움직인다.",
+          "prompt_other": "그 사람은 시간을 딱 맞춰 움직이기보다 유동적으로 움직인다.",
+          "context": {
+            "theme": "friend_jp",
+            "scenario": "friend_f_jp_12"
           }
         }
       ],

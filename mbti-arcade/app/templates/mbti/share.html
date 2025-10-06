@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}MBTI 결과 공유 - MBTI & Arcade Web Service{% endblock %}
+{% block title %}초대 링크 만들기 - MBTI Insight Hub{% endblock %}
 
 {% block head %}
     {{ super() }}
@@ -10,312 +10,129 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">
-            📤 MBTI 결과 공유하기
-        </h1>
-        <p class="text-xl text-gray-600 mb-6">
-            친구들과 MBTI 결과를 공유해보세요!
-        </p>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-lg p-8">
-        <!-- 공유할 결과 정보 -->
-        {% if name and mbti %}
-        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 class="text-lg font-semibold text-blue-800 mb-2">📋 공유할 결과</h3>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                    <span class="font-medium text-gray-700">이름:</span>
-                    <span class="text-gray-900">{{ name }}</span>
-                </div>
-                <div>
-                    <span class="font-medium text-gray-700">MBTI:</span>
-                    <span class="text-gray-900 font-bold">{{ mbti }}</span>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- 친구 평가 공유 폼 -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">👥 친구 평가 공유하기</h2>
-            <form action="/share" method="POST" class="space-y-6">
-                <!-- 내 정보 -->
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-blue-800 mb-3">📤 내 정보</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">이름 *</label>
-                            <input type="text" name="my_name" required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                   placeholder="내 이름">
-                        </div>
-                        <div class="md:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">내 MBTI *</label>
-                            <select name="my_mbti" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                                <option value="">MBTI 선택</option>
-                                <option value="INTJ">INTJ - 건축가</option>
-                                <option value="INTP">INTP - 논리술사</option>
-                                <option value="ENTJ">ENTJ - 통솔자</option>
-                                <option value="ENTP">ENTP - 변론가</option>
-                                <option value="INFJ">INFJ - 옹호자</option>
-                                <option value="INFP">INFP - 중재자</option>
-                                <option value="ENFJ">ENFJ - 선도자</option>
-                                <option value="ENFP">ENFP - 활동가</option>
-                                <option value="ISTJ">ISTJ - 현실주의자</option>
-                                <option value="ISFJ">ISFJ - 수호자</option>
-                                <option value="ESTJ">ESTJ - 경영자</option>
-                                <option value="ESFJ">ESFJ - 집정관</option>
-                                <option value="ISTP">ISTP - 만능재주꾼</option>
-                                <option value="ISFP">ISFP - 모험가</option>
-                                <option value="ESTP">ESTP - 사업가</option>
-                                <option value="ESFP">ESFP - 연예인</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 친구 정보 -->
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-green-800 mb-3">👤 친구 정보</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">친구 이름 *</label>
-                            <input type="text" name="friend_name" required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                   placeholder="친구 이름 또는 닉네임">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">안내 문구 (선택)</label>
-                            <input type="text" name="friend_note"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                   placeholder="예: 관계나 초대 메모를 남겨보세요">
-                        </div>
-                    </div>
-                    </div>
-
-                <!-- 관계 선택 -->
-                <div class="bg-purple-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-purple-800 mb-3">🤝 관계</h3>
-                    <p class="text-xs text-purple-600 mb-3">초대 링크에는 관계만 표시되고 이메일은 수집하지 않습니다.</p>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        <label class="flex items-center p-3 border rounded-lg hover:bg-white cursor-pointer">
-                            <input type="radio" name="relation" value="친구" required class="mr-3">
-                            <span class="font-medium">친구</span>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg hover:bg-white cursor-pointer">
-                            <input type="radio" name="relation" value="가족" required class="mr-3">
-                            <span class="font-medium">가족</span>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg hover:bg-white cursor-pointer">
-                            <input type="radio" name="relation" value="부부" required class="mr-3">
-                            <span class="font-medium">부부/커플</span>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg hover:bg-white cursor-pointer">
-                            <input type="radio" name="relation" value="직장" required class="mr-3">
-                            <span class="font-medium">직장</span>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg hover:bg-white cursor-pointer">
-                            <input type="radio" name="relation" value="기타" required class="mr-3">
-                            <span class="font-medium">기타</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 제출 버튼 -->
-                <div class="text-center">
-                    <button type="submit" 
-                            class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg text-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all">
-                        🚀 공유 링크 생성하기
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- 공유 방법 선택 -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">🎯 공유 방법 선택</h2>
-            
-            <div class="space-y-4">
-                <!-- 직접 링크 공유 -->
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-2">🔗 직접 링크 공유</h3>
-                    <p class="text-sm text-gray-600 mb-3">
-                        아래 링크를 복사하여 친구에게 보내세요.
-                    </p>
-                    <div class="flex">
-                        <input type="text" 
-                               id="shareLink" 
-                               value="{{ request.url }}" 
-                               class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md text-sm"
-                               readonly>
-                        <button onclick="copyText('shareLink')" 
-                                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
-                            복사
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 소셜 미디어 공유 -->
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-2">📱 소셜 미디어 공유</h3>
-                    <p class="text-sm text-gray-600 mb-3">
-                        소셜 미디어에 결과를 공유하세요.
-                    </p>
-                    <div class="flex space-x-2">
-                        <button onclick="shareToTwitter()" 
-                                class="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 transition-colors">
-                            Twitter
-                        </button>
-                        <button onclick="shareToFacebook()" 
-                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
-                            Facebook
-                        </button>
-                        <button onclick="shareToKakao()" 
-                                class="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500 transition-colors">
-                            KakaoTalk
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 이메일 공유 -->
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-2">📧 이메일 공유</h3>
-                    <p class="text-sm text-gray-600 mb-3">
-                        이메일로 결과를 공유하세요.
-                    </p>
-                    <button onclick="shareToEmail()" 
-                            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors">
-                        이메일로 공유
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- QR 코드 (선택사항) -->
-        <div class="mb-8 p-4 bg-gray-50 rounded-lg">
-            <h3 class="font-semibold text-gray-800 mb-2">📱 QR 코드</h3>
-            <p class="text-sm text-gray-600 mb-3">
-                모바일에서 QR 코드를 스캔하여 바로 접속하세요.
+<div class="mx-auto max-w-4xl space-y-10 py-10">
+    <section class="rounded-3xl bg-gradient-to-br from-indigo-600 via-sky-500 to-emerald-500 px-6 py-10 text-white shadow-xl">
+        <div class="space-y-6">
+            <p class="inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white/90">Self → Invite → Aggregate</p>
+            <h1 class="text-3xl font-bold leading-tight md:text-4xl">
+                ✨ 나를 소개하고 친구 초대 링크를 만들어 보세요
+            </h1>
+            <p class="text-base text-white/90 md:text-lg">
+                표시명과 MBTI를 정리하면 초대 페이지 상단에 그대로 노출돼요. 닉네임과 관계 정보만 요구하며 이메일은 수집하지 않습니다.
             </p>
-            <div class="text-center">
-                <div class="inline-block p-4 bg-white rounded-lg">
-                    <div class="w-32 h-32 bg-gray-200 rounded flex items-center justify-center">
-                        <span class="text-gray-500 text-xs">QR Code</span>
-                    </div>
+            <ul class="grid gap-3 text-sm text-white/90 md:grid-cols-3">
+                <li class="rounded-2xl bg-white/15 px-4 py-3">🔒 링크 참여자는 모두 익명으로 집계돼요.</li>
+                <li class="rounded-2xl bg-white/15 px-4 py-3">🕑 초대는 기본 3일 동안 열려 있으며 필요 시 연장 가능.</li>
+                <li class="rounded-2xl bg-white/15 px-4 py-3">📊 응답 3명이 모이면 인사이트가 자동으로 열립니다.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
+        <form action="/share" method="POST" class="space-y-8" novalidate>
+            <div class="space-y-3">
+                <h2 class="text-xl font-semibold text-slate-900">1. 소유자 프로필</h2>
+                <p class="text-sm text-slate-600">초대 페이지 상단과 리포트에 그대로 사용돼요. 표시명은 2~20자의 닉네임이나 이름을 추천합니다.</p>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <label class="flex flex-col gap-2">
+                        <span class="text-sm font-medium text-slate-700">표시명 *</span>
+                        <input type="text" name="display_name" minlength="2" maxlength="20" required value="{{ name or '' }}" placeholder="예: 은하수" class="rounded-xl border border-slate-300 px-4 py-3 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                    </label>
+                    <label class="flex flex-col gap-2">
+                        <span class="text-sm font-medium text-slate-700">아바타 URL (선택)</span>
+                        <input type="url" name="avatar_url" placeholder="https://example.com/avatar.png" class="rounded-xl border border-slate-300 px-4 py-3 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                        <span class="text-xs text-slate-500">이미지를 직접 업로드하지 않고 공개 URL을 입력하세요.</span>
+                    </label>
                 </div>
             </div>
-        </div>
 
-        <!-- 추가 액션 -->
-        <div class="flex justify-center space-x-4">
-            <a href="/mbti" 
-               class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
-                🧠 다시 테스트하기
-            </a>
-            <a href="/mbti/types" 
-               class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition-colors">
-                📊 모든 유형 보기
-            </a>
-            <a href="/" 
-               class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors">
-                🏠 홈으로
-            </a>
-        </div>
-    </div>
+            <div class="space-y-3">
+                <h2 class="text-xl font-semibold text-slate-900">2. MBTI 정보</h2>
+                <p class="text-sm text-slate-600">입력하거나 추후 Self 검사를 진행할 수 있어요. 지금 유형을 입력하면 초대 페이지에 함께 표시됩니다.</p>
+                <fieldset class="space-y-4 rounded-2xl border border-slate-200 p-4">
+                    <legend class="px-2 text-sm font-semibold text-slate-700">MBTI 입력 방식</legend>
+                    <div class="flex flex-col gap-3 md:flex-row md:items-center">
+                        <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+                            <input type="radio" name="mbti_source" value="input" checked>
+                            <span>지금 직접 입력할게요</span>
+                        </label>
+                        <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+                            <input type="radio" name="mbti_source" value="self_test">
+                            <span>Self 테스트 후 입력할게요</span>
+                        </label>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] md:items-center">
+                        <label class="flex flex-col gap-2">
+                            <span class="text-sm font-medium text-slate-700">내 MBTI</span>
+                            <input type="text" name="mbti_value" value="{{ mbti or '' }}" maxlength="4" placeholder="예: INFP" class="rounded-xl border border-slate-300 px-4 py-3 text-base uppercase shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500" data-mbti-input>
+                        </label>
+                        <p class="text-sm text-slate-500">
+                            Self 테스트를 진행하면 결과가 자동으로 갱신돼요. 지금 입력하지 않더라도 초대 링크는 발급됩니다.
+                        </p>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-xl font-semibold text-slate-900">3. 공개 설정</h2>
+                <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-800">
+                    <label class="flex items-start gap-3">
+                        <input type="checkbox" name="show_public" value="on" checked class="mt-1 h-5 w-5 rounded border-emerald-400 text-emerald-600 focus:ring-emerald-500">
+                        <span>
+                            <strong>초대 페이지 상단에 내 표시명을 보여주세요</strong><br>
+                            닉네임과 유형만 노출되며 이메일 등 개인정보는 저장하지 않습니다.
+                        </span>
+                    </label>
+                </div>
+                <p class="text-xs text-slate-500">
+                    표시명 비공개를 원하면 체크 해제하세요. 초대 링크는 언제든 다시 만들 수 있어요.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div class="text-sm text-slate-500">
+                    제출과 동시에 초대 토큰이 발급되며, 링크는 검색엔진에 노출되지 않습니다.
+                </div>
+                <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-600/40 transition hover:-translate-y-0.5 hover:shadow-xl">
+                    🚀 초대 링크 생성하기
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+        <h2 class="text-base font-semibold text-slate-900">다음 단계 미리보기</h2>
+        <ul class="mt-3 space-y-2">
+            <li>• 초대 링크: `/i/{token}` 형태로 발급되며, 친구들은 관계와 닉네임만 선택하면 됩니다.</li>
+            <li>• 응답 수집: 3명 이상 모이면 Self ↔ Others 인사이트가 잠금 해제됩니다.</li>
+            <li>• 공유용 리소스: 성공 화면에서 링크 복사, QR 코드, 추가 안내 카피를 제공합니다.</li>
+        </ul>
+        <p class="mt-3">
+            Self 검사가 필요하다면 <a href="/mbti/self-test" class="font-semibold text-indigo-600 hover:text-indigo-700">Self 테스트</a>에서 바로 시작할 수 있어요.
+        </p>
+    </section>
 </div>
 
 <script>
-async function copyText(id){
-  const el = document.getElementById(id);
-  try {
-    // Modern Clipboard API 사용
-    await navigator.clipboard.writeText(el.value);
-    showCopySuccess();
-  } catch(err) {
-    // Fallback: execCommand 사용
-    try {
-      el.select(); 
-      document.execCommand('copy');
-      showCopySuccess();
-    } catch(fallbackErr) {
-      // 최종 fallback: 수동 복사 안내
-      showManualCopy(el.value);
-    }
-  }
-}
-
-function showCopySuccess() {
-  const button = event.target;
-  const originalText = button.textContent;
-  button.textContent = '복사됨!';
-  button.classList.add('bg-green-600');
-  setTimeout(() => {
-    button.textContent = originalText;
-    button.classList.remove('bg-green-600');
-  }, 2000);
-}
-
-function showManualCopy(text) {
-  const message = `링크를 수동으로 복사해주세요:\n${text}`;
-  if (confirm(message + '\n\n확인을 누르면 링크가 선택됩니다.')) {
-    const el = document.getElementById('shareUrl');
-    el.select();
-    el.focus();
-  }
-}
-
-function shareToTwitter() {
-    const text = "{% if name and mbti %}{{ name }}님의 MBTI 결과: {{ mbti }}{% else %}MBTI 테스트 결과{% endif %}";
-    const url = "{{ request.url }}";
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-    window.open(twitterUrl, '_blank');
-}
-
-function shareToFacebook() {
-    const url = "{{ request.url }}";
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-    window.open(facebookUrl, '_blank');
-}
-
-function shareToKakao() {
-    const text = "{% if name and mbti %}{{ name }}님의 MBTI 결과: {{ mbti }}{% else %}MBTI 테스트 결과{% endif %}";
-    const url = "{{ request.url }}";
-    const kakaoUrl = `https://story.kakao.com/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-    window.open(kakaoUrl, '_blank');
-}
-
-function shareToEmail() {
-    const subject = "{% if name and mbti %}{{ name }}님의 MBTI 결과{% else %}MBTI 테스트 결과{% endif %}";
-    const body = `{% if name and mbti %}{{ name }}님의 MBTI 결과: {{ mbti }}{% else %}MBTI 테스트 결과{% endif %}
-
-결과 확인하기: {{ request.url }}
-
-MBTI & Arcade Web Service에서 제공`;
-    
-    const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = emailUrl;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var btn = document.getElementById('make_share_link');
-    if (btn) {
-        btn.onclick = function() {
-            var nameInput = document.getElementById('input_name');
-            var mbtiInput = document.getElementById('input_mbti');
-            if (!nameInput || !mbtiInput) {
-                return;
-            }
-            var name = encodeURIComponent(nameInput.value);
-            var mbti = encodeURIComponent(mbtiInput.value);
-            var baseUrl = window.location.origin + '/mbti/friend';
-            var params = `?prefill_name=${name}&prefill_mbti=${mbti}`;
-            document.getElementById('generated_share_link').value = baseUrl + params;
+document.addEventListener('DOMContentLoaded', function () {
+    const mbtiRadios = document.querySelectorAll('input[name="mbti_source"]');
+    const mbtiInput = document.querySelector('[data-mbti-input]');
+    const toggleInputState = () => {
+        const selected = document.querySelector('input[name="mbti_source"]:checked');
+        if (!selected || !mbtiInput) {
+            return;
         }
-    }
+        const isDirectInput = selected.value === 'input';
+        mbtiInput.disabled = !isDirectInput;
+        mbtiInput.setAttribute('aria-disabled', String(!isDirectInput));
+        if (!isDirectInput) {
+            mbtiInput.value = '';
+        }
+    };
+    mbtiRadios.forEach(function (radio) {
+        radio.addEventListener('change', toggleInputState);
+    });
+    toggleInputState();
 });
 </script>
-{% endblock %} 
+{% endblock %}

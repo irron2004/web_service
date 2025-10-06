@@ -20,3 +20,8 @@ This directory now owns the MBTI product documentation that previously lived at 
 - [`product/viral_feedback_todo.md`](product/viral_feedback_todo.md): Copy/UX fixes from viral intake review.
 
 Shared assets such as questionnaire JSON and FAQ remain alongside these docs for ease of reference.
+
+## Question Bank & Templates
+- [questionnaire.v1.json](questionnaire.v1.json): Full prompt dataset (Self/Other variants).
+- [relationship_modules.md](relationship_modules.md): Module inventory (items, audits, report templates).
+- [friend_report_template.yaml](friend_report_template.yaml) / [work_report_template.yaml](work_report_template.yaml) / [partner_report_template.yaml](partner_report_template.yaml) / [family_report_template.yaml](family_report_template.yaml): External report phrasing.

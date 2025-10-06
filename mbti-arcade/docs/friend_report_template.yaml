@@ -1,0 +1,74 @@
+meta:
+  version: 1.0
+  language: ko
+  relation_label: 친구
+  tone: friendly-neutral
+variables:
+  user_name: ""
+  self_type: ""
+  n_friends: 0
+  top1_type: ""
+  top1_pct: 0
+  top2_type: ""
+  top2_pct: 0
+  conf_score: 0.0
+  conf_label: ""
+  pgi_score: 0
+  diff_axes: []
+  axis_shift:
+    EI: ""
+    SN: ""
+    TF: ""
+    JP: ""
+templates:
+  tldr: |
+    {{user_name}} 님의 Self는 {{self_type}}입니다.
+    친구들은 {{top1_type}}(약 {{top1_pct}}%)로 보는 경향이며, 의견 일치도는 {{conf_label}}입니다.
+    전체 Perception Gap 지수는 {{pgi_score}}/100으로, {{diff_axes | length}}개 축에서 차이가 관찰됩니다.
+
+  summary: |
+    총 {{n_friends}}명의 친구 응답이 집계되었습니다. 최빈 유형은 {{top1_type}}이며, 다음으로 {{top2_type}}(약 {{top2_pct}}%)가 나타났습니다.
+    합의도({{conf_label}})는 응답 분포의 집중도를 의미합니다. 값이 높을수록 동일한 인식이 모였다는 뜻입니다.
+
+  gap_analysis: |
+    Self({{self_type}})와 친구 평균 사이에 차이가 큰 축: {{diff_axes | join(", ")}}.
+    {% if axis_shift.EI %}- **EI**: 친구들은 {{ "외향(E)" if axis_shift.EI == "E" else "내향(I)" }} 쪽으로 보었습니다.{% endif %}
+    {% if axis_shift.SN %}- **SN**: 친구들은 {{ "감각(S)" if axis_shift.SN == "S" else "직관(N)" }} 신호를 더 강하게 보았습니다.{% endif %}
+    {% if axis_shift.TF %}- **TF**: 친구들은 {{ "사고(T)" if axis_shift.TF == "T" else "감정(F)" }} 기준을 더 두드러지게 보았습니다.{% endif %}
+    {% if axis_shift.JP %}- **JP**: 친구들은 {{ "판단(J)" if axis_shift.JP == "J" else "인식(P)" }} 성향을 더 자주 관찰했습니다.{% endif %}
+
+  suggestions_header: "친구들과 더 편안한 상호작용을 위한 제안:"
+  suggestions_body:
+    - "{{tips.dynamic_intro}}"
+    - "{% for line in tips.axis_based %}{{ line }}{% endfor %}"
+    - "{{tips.end_note}}"
+
+phrasebook:
+  confidence_labels:
+    - { if: "conf_score >= 0.67", label: "높음" }
+    - { if: "0.34 <= conf_score < 0.67", label: "중간" }
+    - { if: "conf_score < 0.34", label: "낮음" }
+
+  tips_by_axis:
+    EI:
+      E: "모임에서 발언이 많아 보일 수 있어요. 가끔은 다른 사람의 발언 기회를 먼저 열어주면 균형이 좋아집니다."
+      I: "조용함이 오해로 비치지 않게, 시작 전 '오늘은 듣는 쪽'처럼 간단히 신호를 주면 편해요."
+    SN:
+      S: "장소/시간/예산을 간단히 정리해 공유하면 모두가 안심해요."
+      N: "새로운 콘셉트 제안 시, 간단한 예산/시간 틀도 함께 주면 설득력이 큽니다."
+    TF:
+      T: "해결책을 말하기 전, 감정을 1문장으로 먼저 확인해 주세요(예: '속상했겠다')."
+      F: "공감 후 결정을 미루지 말고, 다음 단계 1가지를 함께 합의해 보세요."
+    JP:
+      J: "체크리스트/공지 요약은 좋지만, 현장에서 생기는 변수에 작은 여유를 남겨두세요."
+      P: "즉흥 제안이 매력적입니다. 단톡에 최소 가이드(시간·예산)만 덧붙이면 혼선이 줄어요."
+
+defaults:
+  tips:
+    dynamic_intro: "친구들이 보는 강점은 살리고, 차이가 큰 축은 작은 습관으로 보완해 보세요."
+    axis_based: []
+    end_note: "이 리포트는 재미/자기이해 목적이며, 관계 대화의 출발점으로 활용해 주세요."
+
+disclaimer: |
+  본 리포트는 오락 및 자기이해를 돕기 위한 정보입니다. 심리 진단이 아니며,
+  응답 분포/맥락에 따라 결과가 달라질 수 있습니다.

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ friend_info.name }}님의 MBTI 평가 결과{% endblock %}
+{% block title %}{{ friend_info.display_name or friend_info.name }} 인식 결과 - MBTI Insight Hub{% endblock %}
 
 {% block head %}
     {{ super() }}
@@ -10,320 +10,155 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- 친구 정보 헤더 -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ friend_info.name }}님의 MBTI 평가 결과</h1>
-            <p class="text-gray-600">{{ friend_info.email }}</p>
-            {% if friend_info.description %}
-            <p class="text-gray-500 mt-2">{{ friend_info.description }}</p>
-            {% endif %}
-        </div>
-
-        <!-- 실제 MBTI 입력/표시 섹션 -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">🎯 {{ friend_info.name }}의 실제 MBTI는 무엇인가요?</h3>
-            
-            {% if friend_info.actual_mbti %}
-            <!-- 실제 MBTI가 있는 경우 -->
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-green-800 mb-1">실제 MBTI:</p>
-                        <p class="text-2xl font-bold text-green-600">{{ friend_info.actual_mbti }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm text-green-600">업데이트: {{ friend_info.mbti_updated_at.split('T')[0] if friend_info.mbti_updated_at else '날짜 없음' }}</p>
-                        <button onclick="showMbtiForm()" class="text-sm text-green-700 underline hover:text-green-800">
-                            수정하기
-                        </button>
-                    </div>
-                </div>
-            </div>
+{% set owner_name = friend_info.display_name or friend_info.name or '친구' %}
+{% set perceived_mbti = mbti_type %}
+{% set owner_mbti = friend_info.mbti %}
+{% if pair_token %}
+    {% set invite_url = request.url_for('invite_public', token=pair_token) %}
+{% else %}
+    {% set invite_url = '' %}
+{% endif %}
+<div class="mx-auto max-w-4xl space-y-10 py-10">
+    <section class="rounded-3xl bg-gradient-to-br from-indigo-600 via-sky-500 to-emerald-500 px-6 py-10 text-white shadow-xl">
+        <div class="flex flex-col items-center gap-6 text-center md:flex-row md:text-left">
+            {% if friend_info.avatar %}
+            <img src="{{ friend_info.avatar }}" alt="{{ owner_name }} avatar" class="h-24 w-24 rounded-full border-4 border-white/60 object-cover shadow-lg" referrerpolicy="no-referrer">
             {% else %}
-            <!-- 실제 MBTI가 없는 경우 -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p class="text-yellow-800 mb-3">아직 실제 MBTI가 입력되지 않았습니다.</p>
-                <button onclick="showMbtiForm()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
-                    실제 MBTI 입력하기
-                </button>
+            <div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/60 text-3xl font-semibold shadow-lg">
+                {{ owner_name[:2] if owner_name else '🙂' }}
             </div>
             {% endif %}
-
-            <!-- 실제 MBTI 입력 폼 (숨겨진 상태) -->
-            <div id="mbti-form" class="mt-4 {% if not friend_info.actual_mbti %}hidden{% endif %}">
-                <form method="POST" action="/mbti/update_actual_mbti" class="space-y-4">
-                    <input type="hidden" name="friend_email" value="{{ friend_info.email }}">
-                    <div>
-                        <label for="actual_mbti" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ friend_info.name }}의 실제 MBTI
-                        </label>
-                        <select id="actual_mbti" 
-                                name="actual_mbti" 
-                                required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
-                            <option value="">MBTI를 선택하세요</option>
-                            <option value="ISTJ" {% if friend_info.actual_mbti == 'ISTJ' %}selected{% endif %}>ISTJ - 청렴결백한 논리주의자</option>
-                            <option value="ISFJ" {% if friend_info.actual_mbti == 'ISFJ' %}selected{% endif %}>ISFJ - 용감한 수호자</option>
-                            <option value="INFJ" {% if friend_info.actual_mbti == 'INFJ' %}selected{% endif %}>INFJ - 선의의 옹호자</option>
-                            <option value="INTJ" {% if friend_info.actual_mbti == 'INTJ' %}selected{% endif %}>INTJ - 용의주도한 전략가</option>
-                            <option value="ISTP" {% if friend_info.actual_mbti == 'ISTP' %}selected{% endif %}>ISTP - 만능 재주꾼</option>
-                            <option value="ISFP" {% if friend_info.actual_mbti == 'ISFP' %}selected{% endif %}>ISFP - 모험을 즐기는 사교형</option>
-                            <option value="INFP" {% if friend_info.actual_mbti == 'INFP' %}selected{% endif %}>INFP - 열정적인 중재자</option>
-                            <option value="INTP" {% if friend_info.actual_mbti == 'INTP' %}selected{% endif %}>INTP - 논리적인 사색가</option>
-                            <option value="ESTP" {% if friend_info.actual_mbti == 'ESTP' %}selected{% endif %}>ESTP - 모험을 즐기는 사업가</option>
-                            <option value="ESFP" {% if friend_info.actual_mbti == 'ESFP' %}selected{% endif %}>ESFP - 자유로운 영혼의 연예인</option>
-                            <option value="ENFP" {% if friend_info.actual_mbti == 'ENFP' %}selected{% endif %}>ENFP - 재기발랄한 활동가</option>
-                            <option value="ENTP" {% if friend_info.actual_mbti == 'ENTP' %}selected{% endif %}>ENTP - 뜨거운 논쟁을 즐기는 변론가</option>
-                            <option value="ESTJ" {% if friend_info.actual_mbti == 'ESTJ' %}selected{% endif %}>ESTJ - 엄격한 관리자</option>
-                            <option value="ESFJ" {% if friend_info.actual_mbti == 'ESFJ' %}selected{% endif %}>ESFJ - 사교적인 외교관</option>
-                            <option value="ENFJ" {% if friend_info.actual_mbti == 'ENFJ' %}selected{% endif %}>ENFJ - 정의로운 사회운동가</option>
-                            <option value="ENTJ" {% if friend_info.actual_mbti == 'ENTJ' %}selected{% endif %}>ENTJ - 대담한 통솔자</option>
-                        </select>
-                    </div>
-                    <div class="flex space-x-3">
-                        <button type="submit" 
-                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
-                            저장하기
-                        </button>
-                        <button type="button" 
-                                onclick="hideMbtiForm()" 
-                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
-                            취소
-                        </button>
-                    </div>
-                </form>
+            <div class="space-y-3">
+                <p class="inline-flex items-center justify-center rounded-full bg-white/15 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white/90">Friend Insight</p>
+                <h1 class="text-3xl font-bold leading-tight md:text-4xl">{{ owner_name }} 님에 대한 인식 결과</h1>
+                <p class="text-sm text-white/90 md:text-base">
+                    익명 응답이 누적되면 Self ↔ Others 차이를 더 깊게 살펴볼 수 있어요. 초대 링크는 계속 열려 있으니 추가로 공유해 보세요.
+                </p>
             </div>
         </div>
+    </section>
 
-        {% if statistics.total_evaluations == 0 %}
-        <!-- 평가가 없는 경우 -->
-        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div class="text-gray-400 mb-4">
-                <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">아직 평가가 없습니다</h3>
-            <p class="text-gray-600 mb-6">친구들이 {{ friend_info.name }}님을 평가하면 결과가 여기에 표시됩니다.</p>
-            <a href="/mbti/friend" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                새로운 평가 시작하기
-            </a>
-        </div>
-        {% else %}
-        <!-- 평가 통계 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- 전체 통계 -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 전체 통계</h3>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">총 평가 수</span>
-                        <span class="font-semibold text-blue-600">{{ statistics.total_evaluations }}명</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">가장 많은 MBTI</span>
-                        <span class="font-semibold text-green-600">
-                            {% set max_mbti = statistics.mbti_distribution.items() | max(attribute=1) %}
-                            {{ max_mbti[0] }} ({{ max_mbti[1] }}명)
-                        </span>
-                    </div>
-                    {% if friend_info.actual_mbti %}
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">실제 MBTI</span>
-                        <span class="font-semibold text-purple-600">{{ friend_info.actual_mbti }}</span>
-                    </div>
+    <section class="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <div class="space-y-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-slate-600">친구들이 본 {{ owner_name }}의 MBTI</p>
+                    <p class="text-3xl font-bold text-slate-900">{{ perceived_mbti }}</p>
+                    {% if owner_mbti %}
+                    <p class="text-sm text-slate-500">Self 보고: <span class="font-semibold text-indigo-600">{{ owner_mbti }}</span></p>
+                    {% else %}
+                    <p class="text-sm text-slate-500">Self MBTI가 입력되면 비교 카드가 활성화됩니다.</p>
                     {% endif %}
                 </div>
-            </div>
-
-            <!-- 평균 점수 -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">📈 평균 점수</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600">E/I</div>
-                        <div class="font-semibold text-blue-600">{{ statistics.average_scores.E }}/{{ statistics.average_scores.I }}</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600">S/N</div>
-                        <div class="font-semibold text-green-600">{{ statistics.average_scores.S }}/{{ statistics.average_scores.N }}</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600">T/F</div>
-                        <div class="font-semibold text-purple-600">{{ statistics.average_scores.T }}/{{ statistics.average_scores.F }}</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600">J/P</div>
-                        <div class="font-semibold text-orange-600">{{ statistics.average_scores.J }}/{{ statistics.average_scores.P }}</div>
-                    </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                    <p><strong>응답</strong> {{ statistics.total_evaluations }}건</p>
+                    <p><strong>평균 점수</strong> {{ '%.1f'|format(statistics.average_score) }} / 100</p>
                 </div>
             </div>
-        </div>
 
-        <!-- MBTI 분포 -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">🎯 MBTI 유형 분포</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                {% for mbti_type, count in statistics.mbti_distribution.items() %}
-                <div class="text-center p-3 bg-gray-50 rounded-lg {% if friend_info.actual_mbti and mbti_type == friend_info.actual_mbti %}ring-2 ring-green-500 bg-green-50{% endif %}">
-                    <div class="text-lg font-bold text-blue-600">{{ mbti_type }}</div>
-                    <div class="text-sm text-gray-600">{{ count }}명</div>
-                    <div class="text-xs text-gray-500">
-                        {{ "%.1f"|format(count / statistics.total_evaluations * 100) }}%
-                    </div>
-                    {% if friend_info.actual_mbti and mbti_type == friend_info.actual_mbti %}
-                    <div class="text-xs text-green-600 font-semibold">실제 MBTI</div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 최근 평가 -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">🕒 최근 평가 (최대 5개)</h3>
             <div class="space-y-4">
-                {% for evaluation in statistics.recent_evaluations %}
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="font-semibold text-gray-900">
-                                {{ evaluation.mbti_type }}
-                                {% if evaluation.evaluator_name %}
-                                <span class="text-sm text-gray-500">({{ evaluation.evaluator_name }}님)</span>
-                                {% endif %}
+                <h2 class="text-lg font-semibold text-slate-900">주요 축별 비율</h2>
+                <div class="grid gap-4 md:grid-cols-2">
+                    {% set axes = [('E','I'), ('S','N'), ('T','F'), ('J','P')] %}
+                    {% for first, second in axes %}
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="text-sm font-semibold text-slate-600">{{ first }}/{{ second }}</p>
+                        <div class="mt-3 flex items-center gap-3">
+                            <span class="text-lg font-bold text-indigo-600">{{ scores[first] }}</span>
+                            <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
+                                <div class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500" style="width: {{ scores[first] }}%"></div>
                             </div>
-                            <div class="text-sm text-gray-600 mt-1">
-                                {{ evaluation.created_at.split('T')[0] if evaluation.created_at else '날짜 없음' }}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm text-gray-600">
-                                E{{ evaluation.scores.E }}/I{{ evaluation.scores.I }}
-                            </div>
-                            <div class="text-sm text-gray-600">
-                                S{{ evaluation.scores.S }}/N{{ evaluation.scores.N }}
-                            </div>
-                            <div class="text-sm text-gray-600">
-                                T{{ evaluation.scores.T }}/F{{ evaluation.scores.F }}
-                            </div>
-                            <div class="text-sm text-gray-600">
-                                J{{ evaluation.scores.J }}/P{{ evaluation.scores.P }}
-                            </div>
+                            <span class="text-sm font-semibold text-slate-500">{{ second }} {{ scores[second] }}</span>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
-        {% endif %}
 
-        <!-- URL 공유 섹션 -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 친구들과 공유하기</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        평가 요청 링크
-                    </label>
-                    <div class="flex">
-                        <input type="text" 
-                               id="share-url" 
-                               value="{{ request.base_url }}mbti/test?friend_email={{ friend_info.email }}" 
-                               readonly
-                               class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-600">
-                        <button onclick="copyText('share-url')" 
-                                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
-                            복사
-                        </button>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">
-                        이 링크를 친구들에게 공유하면 {{ friend_info.name }}님을 평가할 수 있습니다.
-                    </p>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        결과 확인 링크
-                    </label>
-                    <div class="flex">
-                        <input type="text" 
-                               id="result-url" 
-                               value="{{ request.base_url }}mbti/friend/{{ friend_info.email }}" 
-                               readonly
-                               class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-600">
-                        <button onclick="copyText('result-url')" 
-                                class="bg-green-600 text-white px-4 py-2 rounded-r-md hover:bg-green-700 transition-colors">
-                            복사
-                        </button>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">
-                        이 링크로 {{ friend_info.name }}님의 평가 결과를 확인할 수 있습니다.
-                    </p>
+            <div class="space-y-3">
+                <h2 class="text-lg font-semibold text-slate-900">유형 요약</h2>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                    <p class="text-sm font-semibold text-indigo-600">{{ result.title }}</p>
+                    <p class="mt-2 text-sm text-slate-600">{{ result.description }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- 액션 버튼 -->
-        <div class="mt-8 text-center space-x-4">
-            <a href="/mbti/friend" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                새로운 평가 시작하기
-            </a>
-            <a href="/mbti/" class="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-colors">
-                MBTI 홈으로
-            </a>
-        </div>
-
-        <script>
-async function copyText(id){
-  const el = document.getElementById(id);
-  try {
-    // Modern Clipboard API 사용
-    await navigator.clipboard.writeText(el.value);
-    showCopySuccess();
-  } catch(err) {
-    // Fallback: execCommand 사용
-    try {
-      el.select(); 
-      document.execCommand('copy');
-      showCopySuccess();
-    } catch(fallbackErr) {
-      // 최종 fallback: 수동 복사 안내
-      showManualCopy(el.value);
-    }
-  }
-}
-
-function showCopySuccess() {
-  const button = event.target;
-  const originalText = button.textContent;
-  button.textContent = '복사됨!';
-  button.classList.add('bg-green-600');
-  setTimeout(() => {
-    button.textContent = originalText;
-    button.classList.remove('bg-green-600');
-  }, 2000);
-}
-
-function showManualCopy(text) {
-  const message = `링크를 수동으로 복사해주세요:\n${text}`;
-  if (confirm(message + '\n\n확인을 누르면 링크가 선택됩니다.')) {
-    const el = document.getElementById('shareUrl');
-    el.select();
-    el.focus();
-  }
-}
-
-        function showMbtiForm() {
-            document.getElementById('mbti-form').classList.remove('hidden');
-        }
-
-        function hideMbtiForm() {
-            document.getElementById('mbti-form').classList.add('hidden');
-        }
-        </script>
-    </div>
+        <aside class="space-y-6">
+            <div class="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 text-sm text-emerald-800">
+                <h2 class="text-base font-semibold text-emerald-900">응답이 더 모이면?</h2>
+                <p class="mt-2">관계 그룹별 인사이트, 공감 지수, Self ↔ Others 비교가 자동으로 열립니다. 초대 링크를 계속 공유해 주세요.</p>
+            </div>
+            <div class="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-lg">
+                <h2 class="text-base font-semibold text-slate-900">초대 관리</h2>
+                <ul class="mt-3 space-y-2">
+                    <li>• 초대 링크는 여전히 유효하며, 검색엔진에 노출되지 않습니다.</li>
+                    <li>• 표시명을 바꾸고 싶다면 <a href="/mbti/share" class="font-semibold text-indigo-600 hover:text-indigo-700">새 초대</a>를 생성하세요.</li>
+                    <li>• Self 테스트 결과를 입력하면 비교 카드가 함께 노출됩니다.</li>
+                </ul>
+            </div>
+            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+                <h2 class="text-base font-semibold text-slate-900">공유 다시하기</h2>
+                <p class="mt-2">아래 버튼으로 초대 링크를 다시 복사할 수 있어요.</p>
+                <div class="mt-3 flex flex-col gap-3">
+                    <input id="shareUrlSecondary" type="text" readonly value="{{ invite_url }}" class="rounded-xl border border-slate-300 px-4 py-3 text-xs text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                    <button type="button" class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-xs font-semibold text-white shadow hover:bg-indigo-700" data-copy-target="shareUrlSecondary">링크 복사</button>
+                </div>
+            </div>
+        </aside>
+    </section>
 </div>
-{% endblock %} 
+
+<script>
+function copyToClipboard(inputId, trigger) {
+    const input = document.getElementById(inputId);
+    if (!input || !input.value) {
+        return;
+    }
+    const text = input.value;
+    const button = trigger;
+    const success = () => {
+        if (!button) {
+            return;
+        }
+        const original = button.textContent;
+        button.textContent = '복사 완료!';
+        button.classList.add('bg-emerald-600');
+        setTimeout(() => {
+            button.textContent = original;
+            button.classList.remove('bg-emerald-600');
+        }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(success).catch(() => {
+            fallbackCopy(input, success);
+        });
+    } else {
+        fallbackCopy(input, success);
+    }
+}
+
+function fallbackCopy(input, onSuccess) {
+    input.focus();
+    input.select();
+    try {
+        const ok = document.execCommand('copy');
+        if (ok && typeof onSuccess === 'function') {
+            onSuccess();
+        }
+    } catch (err) {
+        console.warn('copy failed', err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-copy-target]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const target = button.getAttribute('data-copy-target');
+            copyToClipboard(target, button);
+        });
+    });
+});
+</script>
+{% endblock %}

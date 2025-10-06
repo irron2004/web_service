@@ -37,10 +37,29 @@ class MBTIService:
         )
         return mbti, scores, raw
 
-    def create_pair(self, mode: str, email: str | None, 
-                   my_name: str | None = None, my_email: str | None = None, my_mbti: str | None = None) -> str:
-        pair = Pair(mode=mode, friend_email=email,
-                    my_name=my_name, my_email=my_email, my_mbti=my_mbti)
+    def create_pair(
+        self,
+        mode: str,
+        email: str | None,
+        my_name: str | None = None,
+        my_email: str | None = None,
+        my_mbti: str | None = None,
+        my_avatar: str | None = None,
+        my_mbti_source: str = "input",
+        show_public: bool = True,
+    ) -> str:
+        source = my_mbti_source if my_mbti_source in {"input", "self_test"} else "input"
+        mbti_value = my_mbti if source == "input" else None
+        pair = Pair(
+            mode=mode,
+            friend_email=email,
+            my_name=my_name,
+            my_email=my_email,
+            my_mbti=mbti_value,
+            my_avatar=my_avatar,
+            my_mbti_source=source,
+            show_public=show_public,
+        )
         self.session.add(pair)
         self.session.commit()
         return pair.id

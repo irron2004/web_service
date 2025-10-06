@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}공유 링크 생성 완료 - MBTI & Arcade Web Service{% endblock %}
+{% block title %}초대 링크 준비 완료 - MBTI Insight Hub{% endblock %}
 
 {% block head %}
     {{ super() }}
@@ -10,133 +10,129 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">
-            🎉 공유 링크 생성 완료!
-        </h1>
-        <p class="text-xl text-gray-600 mb-6">
-            친구에게 링크를 보내서 MBTI 테스트를 받아보세요.
-        </p>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-lg p-8">
-        <!-- 생성된 링크 -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">🔗 생성된 공유 링크</h2>
-            <div class="flex">
-                <input type="text" 
-                       id="shareUrl" 
-                       value="{{ request.query_params.get('url', '') }}" 
-                       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md text-sm"
-                       readonly>
-                <button onclick="copyText('shareUrl')" 
-                        class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
-                    복사
-                </button>
-            </div>
+{% set share_url = url or request.query_params.get('url', '') %}
+{% set owner_name = name or request.query_params.get('name', '') %}
+{% set owner_mbti = mbti or request.query_params.get('mbti', '') %}
+<div class="mx-auto max-w-4xl space-y-10 py-10">
+    <section class="rounded-3xl bg-gradient-to-br from-emerald-500 via-sky-500 to-indigo-600 px-6 py-10 text-white shadow-xl">
+        <div class="space-y-4 text-center">
+            <span class="inline-flex items-center justify-center rounded-full bg-white/15 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white/90">Invite Ready</span>
+            <h1 class="text-3xl font-bold leading-tight md:text-4xl">🎉 초대 링크가 준비됐어요!</h1>
+            <p class="text-base text-white/90 md:text-lg">
+                링크를 공유하면 친구가 관계와 닉네임만 입력하고 바로 참여할 수 있어요. 응답 3명이 모이면 상세 인사이트를 볼 수 있습니다.
+            </p>
         </div>
+    </section>
 
-        <!-- 공유 방법 -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">📤 공유 방법</h2>
-            <div class="space-y-4">
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-2">💬 메신저 공유</h3>
-                    <p class="text-sm text-gray-600 mb-3">
-                        카카오톡, 텔레그램, 슬랙 등 메신저로 링크를 복사해서 보내세요.
-                    </p>
+    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
+        <div class="space-y-6">
+            <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-6 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-slate-600">초대 대상</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ owner_name or '표시명을 설정해 주세요' }}</p>
+                    {% if owner_mbti %}
+                    <p class="text-sm text-slate-600">MBTI: <span class="font-semibold text-indigo-600">{{ owner_mbti }}</span></p>
+                    {% else %}
+                    <p class="text-sm text-slate-500">Self 테스트 결과가 들어오면 자동으로 업데이트돼요.</p>
+                    {% endif %}
                 </div>
-
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-2">📧 이메일 공유</h3>
-                    <p class="text-sm text-gray-600 mb-3">
-                        이메일로 링크를 보내서 친구가 테스트를 받을 수 있도록 하세요.
-                    </p>
+                <div class="text-sm text-slate-500 md:text-right">
+                    응답자는 닉네임과 관계만 선택하며, 이메일은 수집하지 않습니다.
                 </div>
+            </div>
 
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-2">📱 QR 코드 (선택사항)</h3>
-                    <p class="text-sm text-gray-600 mb-3">
-                        모바일에서 QR 코드를 스캔하여 바로 접속할 수 있습니다.
-                    </p>
-                    <div class="text-center">
-                        <div class="inline-block p-4 bg-white rounded-lg">
-                            <div class="w-32 h-32 bg-gray-200 rounded flex items-center justify-center">
-                                <span class="text-gray-500 text-xs">QR Code</span>
-                            </div>
-                        </div>
-                    </div>
+            <div class="space-y-3">
+                <label for="shareUrl" class="text-sm font-semibold text-slate-700">🔗 공유 링크</label>
+                <div class="flex flex-col gap-3 md:flex-row">
+                    <input id="shareUrl" type="text" readonly value="{{ share_url }}" class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-700 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                    <button type="button" class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-indigo-700" data-copy-target="shareUrl">
+                        복사하기
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500">복사 버튼이 동작하지 않는 경우 링크를 길게 눌러 직접 복사해 주세요.</p>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-3">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                    <h2 class="text-base font-semibold text-slate-900">1단계 · 링크 전달</h2>
+                    <p class="mt-2">카카오톡, 슬랙, 문자 메시지 등 익숙한 채널로 바로 공유하세요.</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                    <h2 class="text-base font-semibold text-slate-900">2단계 · 관계 선택</h2>
+                    <p class="mt-2">친구는 관계(친구/가족/부부/직장/기타)와 닉네임만 선택하고 응답합니다.</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                    <h2 class="text-base font-semibold text-slate-900">3단계 · 인사이트</h2>
+                    <p class="mt-2">응답이 3명 이상 모이면 Self ↔ Others 비교 카드가 열려요.</p>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- 안내사항 -->
-        <div class="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 class="text-lg font-semibold text-blue-800 mb-3">ℹ️ 안내사항</h3>
-            <div class="text-blue-700 space-y-2">
-                <p>• 링크는 1시간 후 만료됩니다.</p>
-                <p>• 친구가 테스트를 완료하면 결과를 비교할 수 있습니다.</p>
-                <p>• 개인정보는 안전하게 보호됩니다.</p>
-            </div>
+    <section class="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+        <h2 class="text-base font-semibold text-slate-900">다음에 할 일</h2>
+        <ul class="mt-3 space-y-2">
+            <li>• 링크를 저장해두고 정기적으로 응답 현황을 확인하세요.</li>
+            <li>• Self 테스트를 아직 하지 않았다면 <a href="/mbti/self-test" class="font-semibold text-indigo-600 hover:text-indigo-700">여기</a>에서 바로 진행할 수 있어요.</li>
+            <li>• 초대 페이지는 검색엔진에 노출되지 않으니 안심하고 공유해도 됩니다.</li>
+        </ul>
+        <div class="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
+            <a href="/mbti/share" class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">다른 초대 만들기</a>
+            <a href="/mbti/friend-system" class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-indigo-700">친구 평가 안내 보기</a>
         </div>
-
-        <!-- 액션 버튼 -->
-        <div class="flex justify-center space-x-4">
-            <a href="/mbti" 
-               class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
-                🧠 다시 테스트하기
-            </a>
-            <a href="/mbti/types" 
-               class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition-colors">
-                📊 모든 유형 보기
-            </a>
-            <a href="/" 
-               class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors">
-                🏠 홈으로
-            </a>
-        </div>
-    </div>
+    </section>
 </div>
 
 <script>
-async function copyText(id) {
-    const el = document.getElementById(id);
-    try {
-        // Modern Clipboard API 사용
-        await navigator.clipboard.writeText(el.value);
-        showCopySuccess();
-    } catch(err) {
-        // Fallback: execCommand 사용
-        try {
-            el.select();
-            document.execCommand('copy');
-            showCopySuccess();
-        } catch(fallbackErr) {
-            // 최종 fallback: 수동 복사 안내
-            showManualCopy(el.value);
+function copyToClipboard(inputId, trigger) {
+    const input = document.getElementById(inputId);
+    if (!input) {
+        return;
+    }
+    const text = input.value;
+    const button = trigger;
+    const success = () => {
+        if (!button) {
+            return;
         }
+        const original = button.textContent;
+        button.textContent = '복사 완료!';
+        button.classList.add('bg-emerald-600');
+        setTimeout(() => {
+            button.textContent = original;
+            button.classList.remove('bg-emerald-600');
+        }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(success).catch(() => {
+            fallbackCopy(input, success);
+        });
+    } else {
+        fallbackCopy(input, success);
     }
 }
 
-function showCopySuccess() {
-    const button = event.target;
-    const originalText = button.textContent;
-    button.textContent = '복사됨!';
-    button.classList.add('bg-green-600');
-    setTimeout(() => {
-        button.textContent = originalText;
-        button.classList.remove('bg-green-600');
-    }, 2000);
-}
-
-function showManualCopy(text) {
-    const message = `링크를 수동으로 복사해주세요:\n${text}`;
-    if (confirm(message + '\n\n확인을 누르면 링크가 선택됩니다.')) {
-        const el = document.getElementById('shareUrl');
-        el.select();
-        el.focus();
+function fallbackCopy(input, onSuccess) {
+    input.focus();
+    input.select();
+    try {
+        const ok = document.execCommand('copy');
+        if (ok && typeof onSuccess === 'function') {
+            onSuccess();
+        }
+    } catch (err) {
+        console.warn('copy failed', err);
     }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-copy-target]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const target = button.getAttribute('data-copy-target');
+            copyToClipboard(target, button);
+        });
+    });
+});
 </script>
-{% endblock %} 
+{% endblock %}
