@@ -287,6 +287,7 @@ class InviteCreateRequest(BaseModel):
 class InviteCreateResponse(BaseModel):
     session_id: str
     invite_token: str
+    invite_url: str
     expires_at: datetime
     max_raters: int
     show_public: bool

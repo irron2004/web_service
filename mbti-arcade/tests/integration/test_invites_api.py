@@ -34,6 +34,9 @@ def test_invite_issue_and_render(client, auth_headers):
 
     body = response.json()
     token = body["invite_token"]
+    assert body["invite_url"] == (
+        f"https://webservice-production-c039.up.railway.app/i/{token}"
+    )
     assert body["owner_display_name"] == PROFILE_PAYLOAD["display_name"]
     assert body["owner_avatar_url"] == PROFILE_PAYLOAD["avatar_url"]
 
@@ -53,6 +56,9 @@ def test_invite_expired_returns_problem_detail(client, auth_headers):
     data = response.json()
     token = data["invite_token"]
     session_id = data["session_id"]
+    assert data["invite_url"] == (
+        f"https://webservice-production-c039.up.railway.app/i/{token}"
+    )
 
     with session_scope() as db:
         session = db.get(SessionModel, session_id)
@@ -74,6 +80,9 @@ def test_invite_capacity_returns_problem_detail(client, auth_headers):
     data = response.json()
     token = data["invite_token"]
     session_id = data["session_id"]
+    assert data["invite_url"] == (
+        f"https://webservice-production-c039.up.railway.app/i/{token}"
+    )
 
     with session_scope() as db:
         participant = Participant(

@@ -9,6 +9,7 @@ from app.core.config import compute_expiry, generate_invite_token, generate_sess
 from app.database import get_db
 from app.models import OwnerProfile, Session as SessionModel
 from app.schemas import InviteCreateRequest, InviteCreateResponse
+from app.urling import build_invite_url
 from app.utils.auth import extract_owner_key
 from app.utils.problem_details import ProblemDetailsException
 
@@ -60,9 +61,12 @@ def create_invite(
     db.add(session)
     db.commit()
 
+    invite_url = build_invite_url(request, token=session.invite_token)
+
     return InviteCreateResponse(
         session_id=session.id,
         invite_token=session.invite_token,
+        invite_url=invite_url,
         expires_at=session.expires_at,
         max_raters=session.max_raters,
         show_public=profile.show_public,
