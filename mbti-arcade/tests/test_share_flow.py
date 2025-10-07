@@ -1,14 +1,15 @@
 from urllib.parse import parse_qs, urlparse
 
+from app import settings
+
 
 def test_share_flow(client):
     """공유 링크 생성 → 퀴즈 → 결과 플로우 테스트"""
     
     # 1. 공유 링크 생성
     share_data = {
-        "name": "테스트 사용자",
-        "email": "test@example.com",
-        "my_mbti": "INTJ"
+        "display_name": "테스트 사용자",
+        "mbti_value": "INTJ",
     }
     
     response = client.post("/share", data=share_data, follow_redirects=False)
@@ -45,6 +46,11 @@ def test_share_flow(client):
     response = client.post(f"/mbti/result/{test_token}", data=quiz_data)
     assert response.status_code == 200
 
+    html = response.text
+    expected_prefix = f"{settings.CANONICAL_BASE_URL}/i/"
+    assert expected_prefix in html
+    assert "testserver" not in html
+
 def test_expired_token(client):
     """만료된 토큰 테스트"""
     
@@ -59,9 +65,8 @@ def test_rate_limit_returns_problem_details(client):
     """Rate limiting 테스트"""
 
     share_data = {
-        "name": "테스트 사용자",
-        "email": "test@example.com",
-        "my_mbti": "INTJ",
+        "display_name": "테스트 사용자",
+        "mbti_value": "INTJ",
     }
 
     first = client.post("/share", data=share_data, follow_redirects=False)
