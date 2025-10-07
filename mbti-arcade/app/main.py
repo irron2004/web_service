@@ -134,6 +134,7 @@ from app.routers import sessions as sessions_router
 from app.routers import share as share_router
 from app.routers import invites as invites_router
 from app.observability import bind_request_id, configure_observability, reset_request_id
+from app.urling import build_invite_url
 from app.utils.problem_details import (
     ProblemDetailsException,
     from_exception,
@@ -709,6 +710,8 @@ async def mbti_friend_result(request: Request, token: str):
         }
     }
 
+    invite_url = build_invite_url(request, token)
+
     response = templates.TemplateResponse(
         "mbti/friend_results.html",
         {
@@ -716,10 +719,10 @@ async def mbti_friend_result(request: Request, token: str):
             "mbti_type": mbti_type,
             "scores": scores,
             "result": result,
-            "pair_token": token,
             "my_mbti": my_mbti,
             "friend_info": friend_info,
             "statistics": statistics,
+            "invite_url": invite_url,
             "robots_meta": NOINDEX_VALUE,
         },
     )
