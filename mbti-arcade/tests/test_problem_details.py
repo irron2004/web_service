@@ -1,4 +1,6 @@
 # 파일: mbti-arcade/tests/test_problem_details.py
+import pytest
+
 from app.core.config import REQUEST_ID_HEADER
 
 
@@ -50,4 +52,43 @@ def test_unhandled_error_returns_problem_details_and_request_id(app, client):
         assert response_with_header.headers.get(REQUEST_ID_HEADER) == provided
     finally:
         # Remove the temporary route to avoid polluting other tests.
+        app.router.routes.pop()
+
+
+def test_rate_limit_exception_preserves_handler_behavior(app, client):
+    pytest.importorskip("slowapi")
+
+    from slowapi.errors import RateLimitExceeded
+    from slowapi.wrappers import Limit
+    from limits.limits import RateLimitItemPerMinute
+
+    limit = Limit(
+        limit=RateLimitItemPerMinute(1),
+        key_func=lambda *args, **kwargs: "test-key",
+        scope="test",
+        per_method=False,
+        methods=None,
+        error_message="custom detail",
+        exempt_when=None,
+        cost=1,
+        override_defaults=False,
+    )
+
+    async def limited() -> None:
+        exc = RateLimitExceeded(limit)
+        exc.headers = {"Retry-After": "42"}
+        raise exc
+
+    app.router.add_api_route("/rate-limited", limited, methods=["GET"])
+
+    try:
+        response = client.get("/rate-limited")
+        assert response.status_code == 429
+        body = response.json()
+        assert body["status"] == 429
+        assert body["title"] == "Rate Limit Exceeded"
+        assert body["detail"] == "custom detail"
+        assert response.headers.get("Retry-After") == "42"
+        assert response.headers.get(REQUEST_ID_HEADER)
+    finally:
         app.router.routes.pop()

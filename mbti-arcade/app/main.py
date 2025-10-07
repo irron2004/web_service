@@ -250,6 +250,8 @@ async def request_id_middleware(request: Request, call_next):
         )
         response = from_validation_error(request, exc)
     except HTTPException as exc:
+        if RateLimitExceeded is not None and isinstance(exc, RateLimitExceeded):
+            raise
         response = from_http_exception(request, exc)
     except Exception:
         log.exception(
@@ -310,6 +312,9 @@ if RateLimitExceeded:  # pragma: no cover - optional dependency
                     pass
         for key, value in headers.items():
             response.headers[key] = value
+        request_id = getattr(request.state, "request_id", None)
+        if request_id:
+            response.headers[REQUEST_ID_HEADER] = request_id
         return response
 
 
