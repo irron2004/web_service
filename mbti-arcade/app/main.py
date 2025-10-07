@@ -799,7 +799,10 @@ def invite_public(
 
     if session_record is not None:
         now = datetime.now(timezone.utc)
-        if session_record.expires_at <= now:
+        expires_at = session_record.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at <= now:
             owner_name = session_record.snapshot_owner_name or "초대한 분"
             return problem_response(
                 request,

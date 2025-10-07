@@ -119,7 +119,7 @@ TKT‑003 초대 링크 발급(/i/{token}) + 만료/정원 + 서버 헤더 렌�
 
 수락 기준
 
-POST /v1/invites → 201 {token, expires_at, max_raters}
+POST /v1/invites → 201 {token, invite_url, expires_at, max_raters}
 
 GET /i/{token} → 200, HTML에 표시명/아바타 보임
 
